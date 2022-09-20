@@ -7,6 +7,7 @@ import android.net.Network;
 import android.net.NetworkCapabilities;
 import android.net.NetworkRequest;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -18,20 +19,27 @@ public class ConnectedActivity extends AppCompatActivity {
             .addTransportType(NetworkCapabilities.TRANSPORT_CELLULAR)
             .build();
     private ConnectivityManager cManager;
-
     private ConnectivityManager.NetworkCallback networkCallback =
             new ConnectivityManager.NetworkCallback(){
             @Override
             public void onAvailable(@NonNull Network network) {
                 super.onAvailable(network);
-                System.out.println("Hay conexion!!!");
+                displayMessage("Se ha establecido la conexion");
             }
 
                 @Override
                 public void onLost(@NonNull Network network) {
                     super.onLost(network);
-                    System.out.println("No hay conexion");
+                    displayMessage("Se ha perdido la conexion.");
 
+                }
+
+                @Override
+                public void onUnavailable()
+                {
+                    super.onUnavailable();
+                    displayMessage("No se halló conexion a tiempo. Volviendo a login");
+                    returnToLoginActivity();
                 }
 
                 @Override
@@ -39,6 +47,7 @@ public class ConnectedActivity extends AppCompatActivity {
                     super.onCapabilitiesChanged(network, networkCapabilities);
                     final boolean unmetered = networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_METERED);
                 }
+
             };
 
     @Override
@@ -47,10 +56,34 @@ public class ConnectedActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         cManager =
                 (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        cManager.registerNetworkCallback(networkRequest, networkCallback);
+
+        cManager.requestNetwork(networkRequest, networkCallback);
+        if(!deviceIsConnected())
+        {
+            displayMessage("No hay conexion a internet");
+        }
     }
 
+    protected void returnToLoginActivity()
+    {
+        //send user back to login screen
+    }
 
+    protected boolean deviceIsConnected () {
+        boolean isConnected = true;
+        if(cManager.getActiveNetwork() == null)
+        {
+            isConnected = false;
+        }
 
-
+        return isConnected;
+    }
+    //to be replaced by actual alert
+    protected void displayMessage(String message)
+    {
+        Context context = getApplicationContext();
+        int duration = Toast.LENGTH_SHORT;
+        Toast toast = Toast.makeText(context, message, duration);
+        toast.show();
+    }
 }
