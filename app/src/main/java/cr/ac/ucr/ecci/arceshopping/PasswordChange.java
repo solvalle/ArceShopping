@@ -7,7 +7,7 @@ import android.widget.Toast;
 
 import com.google.android.material.textfield.TextInputLayout;
 
-public class PasswordChange extends AppCompatActivity {
+public class PasswordChange extends ConnectedActivity {
 
     private TextInputLayout newPassword;
     private TextInputLayout confirmPassword;

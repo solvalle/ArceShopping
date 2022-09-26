@@ -2,6 +2,7 @@ package cr.ac.ucr.ecci.arceshopping;
 
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkCapabilities;
@@ -24,22 +25,26 @@ public class ConnectedActivity extends AppCompatActivity {
             @Override
             public void onAvailable(@NonNull Network network) {
                 super.onAvailable(network);
-                displayMessage("Se ha establecido la conexion");
+                /*
+                *
+                * */
             }
 
                 @Override
                 public void onLost(@NonNull Network network) {
                     super.onLost(network);
                     displayMessage("Se ha perdido la conexion.");
+                    returnToLoginActivity();
 
                 }
 
                 @Override
                 public void onUnavailable()
-                {
+                { //todo: try to find a new network before sending user back to login screen
+                    /*
                     super.onUnavailable();
                     displayMessage("No se halló conexion a tiempo. Volviendo a login");
-                    returnToLoginActivity();
+                    returnToLoginActivity();*/
                 }
 
                 @Override
@@ -57,6 +62,11 @@ public class ConnectedActivity extends AppCompatActivity {
         cManager =
                 (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 
+    }
+
+    protected void onStart()
+    {
+        super.onStart();
         cManager.requestNetwork(networkRequest, networkCallback);
         if(!deviceIsConnected())
         {
@@ -64,9 +74,20 @@ public class ConnectedActivity extends AppCompatActivity {
         }
     }
 
+    protected void onStop(){
+        super.onStop();
+        cManager.unregisterNetworkCallback(networkCallback);
+    }
+
+
+
     protected void returnToLoginActivity()
     {
         //send user back to login screen
+        //todo: close user session too
+        finishAffinity(); // Clear backtstack so user cant return to visited activities
+        Intent loginIntent = new Intent(this, MainActivity.class);
+        startActivity(loginIntent);
     }
 
     protected boolean deviceIsConnected () {

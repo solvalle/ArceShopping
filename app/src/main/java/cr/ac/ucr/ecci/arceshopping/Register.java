@@ -23,7 +23,7 @@ import java.util.Arrays;
 
 import cr.ac.ucr.ecci.arceshopping.ProvinceCalculator;
 
-public class Register extends AppCompatActivity {
+public class Register extends ConnectedActivity {
 
     private TextInputLayout id;
     private TextInputLayout completeName;

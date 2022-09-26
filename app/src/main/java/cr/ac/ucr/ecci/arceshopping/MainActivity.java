@@ -62,7 +62,12 @@ public class MainActivity extends ConnectedActivity {
     }
 
     public void goToRegister(View view) {
-        Intent registerIntent = new Intent(this, Register.class);
-        startActivity(registerIntent);
+        if(deviceIsConnected()) {
+            Intent registerIntent = new Intent(this, Register.class);
+            startActivity(registerIntent);
+        }else
+        {
+            displayMessage("Conectate a una red");
+        }
     }
 }
