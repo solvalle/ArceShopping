@@ -5,9 +5,12 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ListView;
 
 import cr.ac.ucr.ecci.arceshopping.Product;
@@ -31,6 +34,7 @@ import com.android.volley.toolbox.Volley;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 //import com.example.communication.ListaQuotes;
 //import com.example.communication.Quote;
@@ -49,6 +53,8 @@ public class ApiFragment extends Fragment {
     private FragmentApiBinding binding;
     private final String URLEXAMPLE = "https://dummyjson.com/products";
 
+    public Products productos;
+
     private ListView listQuotes;
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -56,6 +62,9 @@ public class ApiFragment extends Fragment {
 
         binding = FragmentApiBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
+        EditText theFilter = (EditText) root.findViewById(R.id.searchFilter);
+        //log
+
         StringRequest myRequest = new StringRequest(Request.Method.GET,
                 URLEXAMPLE,
                 response -> {
@@ -70,6 +79,24 @@ public class ApiFragment extends Fragment {
                         ArrayAdapter<Product> adapter = new ArrayAdapter<Product>(root.getContext(), android.R.layout.simple_list_item_1,
                                 products.getProducts());
                         listQuotes.setAdapter(adapter);
+
+                        productos = products;
+                        theFilter.addTextChangedListener(new TextWatcher() {
+                            @Override
+                            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+                            }
+
+                            @Override
+                            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                                adapter.getFilter().filter(charSequence);
+                            }
+
+                            @Override
+                            public void afterTextChanged(Editable editable) {
+
+                            }
+                        });
 
                     }catch (JSONException e) {
                         e.printStackTrace();

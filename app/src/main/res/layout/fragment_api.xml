@@ -15,12 +15,18 @@
         android:text="@string/title_API"
         android:id="@+id/API_TEXT"
         />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:id="@+id/searchFilter"
+        android:layout_marginTop="24dp"></EditText>
+
     <ListView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/list"
-        android:layout_marginTop="16dp"
-
+        android:layout_marginTop="64dp"
         />
 
 
