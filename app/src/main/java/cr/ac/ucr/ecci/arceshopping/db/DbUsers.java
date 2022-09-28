@@ -33,6 +33,8 @@ public class DbUsers extends DbHelper {
             values.put("password", password);
 
             insertId = db.insert(TABLE_USERS, null, values);
+
+            db.close();
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -44,7 +46,7 @@ public class DbUsers extends DbHelper {
         DbHelper dbHelper = new DbHelper(context);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
-        User user= null;
+        User user = null;
         Cursor userCursor = db.rawQuery("SELECT * FROM " + TABLE_USERS + " WHERE email = \"" + email + "\" LIMIT 1", null);
 
         if(userCursor.moveToFirst()) {
@@ -54,5 +56,22 @@ public class DbUsers extends DbHelper {
         userCursor.close();
 
         return user;
+    }
+
+    public boolean updateUserPassword(String email, String newPassword) {
+        boolean updateSuccess = false;
+
+        DbHelper dbHelper = new DbHelper(context);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        try {
+            db.execSQL("UPDATE " + TABLE_USERS + " SET password = \"" + newPassword + "\", passwordIsChanged = 1 WHERE email = \"" + email + "\"");
+            updateSuccess = true;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        } finally {
+            db.close();
+        }
+        return updateSuccess;
     }
 }

@@ -6,6 +6,7 @@ import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
@@ -35,16 +36,14 @@ import javax.mail.internet.MimeMessage;
 import at.favre.lib.crypto.bcrypt.BCrypt;
 import cr.ac.ucr.ecci.arceshopping.db.DbUsers;
 import cr.ac.ucr.ecci.arceshopping.ProvinceCalculator;
+import cr.ac.ucr.ecci.arceshopping.model.User;
 
-public class Register extends AppCompatActivity {
-
+public class RegisterActivity extends AppCompatActivity {
     private TextInputLayout id;
     private TextInputLayout completeName;
     private TextInputLayout email;
     private TextInputLayout age;
     private Spinner province;
-    private ProvinceCalculator provinceCalculator;
-    private ArrayList<String> provinces;
     private double latitude;
     private double longitude;
 
@@ -57,9 +56,9 @@ public class Register extends AppCompatActivity {
         this.email = (TextInputLayout) findViewById(R.id.register_email);
         this.age = (TextInputLayout) findViewById(R.id.register_age);
         this.province = (Spinner) findViewById(R.id.register_province_spinner);
-        this.provinceCalculator = new ProvinceCalculator();
+        ProvinceCalculator provinceCalculator = new ProvinceCalculator();
 
-        this.provinces = new ArrayList<String>(Arrays.asList("San José", "Alajuela", "Cartago", "Heredia",
+        ArrayList<String> provinces = new ArrayList<String>(Arrays.asList("San José", "Alajuela", "Cartago", "Heredia",
                 "Guanacaste", "Puntarenas", "Limón"));
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
                 com.google.android.material.R.layout.support_simple_spinner_dropdown_item, provinces);
@@ -79,19 +78,24 @@ public class Register extends AppCompatActivity {
         String theAge = age.getEditText().getText().toString();
         String theProvince = province.getSelectedItem().toString();
         if (checkStrings(theId, theCompleteName, theEmail, theAge)) {
-            String firstPassword = UUID.randomUUID().toString().substring(0,16);
-            String hashedPassword = BCrypt.withDefaults().hashToString(12,firstPassword.toCharArray());
-
-            sendPasswordEmail(theEmail, firstPassword);
+            String firstPassword = UUID.randomUUID().toString().substring(0, 16);
+            String hashedPassword = BCrypt.withDefaults().hashToString(12, firstPassword.toCharArray());
 
             DbUsers dbUsers = new DbUsers(this);
-            long insert_id = dbUsers.insertUser(theEmail, theId, theCompleteName, Integer.parseInt(theAge), theProvince, hashedPassword);
+            User user = dbUsers.selectUser(theEmail);
+            if (user == null) {
+                long insert_id = dbUsers.insertUser(theEmail, theId, theCompleteName, Integer.parseInt(theAge), theProvince, hashedPassword);
+                if (insert_id > 0) {
+                    sendPasswordEmail(theEmail, firstPassword);
 
-            if(insert_id > 0) {
-                Toast.makeText(this, "Registro exitoso", Toast.LENGTH_LONG).show();
-                // Enviar a Login
+                    Toast.makeText(this, "Registro exitoso", Toast.LENGTH_LONG).show();
+                    Intent intent = new Intent(this, LoginActivity.class);
+                    startActivity(intent);
+                } else {
+                    Toast.makeText(this, "Error al registrar", Toast.LENGTH_LONG).show();
+                }
             } else {
-                Toast.makeText(this, "Error al registrar", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "Correo electronico ya registrado", Toast.LENGTH_LONG).show();
             }
         }
     }
@@ -135,11 +139,9 @@ public class Register extends AppCompatActivity {
         } catch (MessagingException e) {
             e.printStackTrace();
         }
-
     }
 
-    public boolean checkStrings(String theId, String theCompleteName, String theEmail,
-                                String theAge) {
+    public boolean checkStrings(String theId, String theCompleteName, String theEmail, String theAge) {
         boolean validID = checkID(theId);
         boolean validName = checkName(theCompleteName);
         boolean validEmail = checkEmail(theEmail);

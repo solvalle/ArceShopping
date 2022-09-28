@@ -24,7 +24,8 @@ public class DbHelper extends SQLiteOpenHelper {
                 "name VARCHAR(50) NOT NULL, " +
                 "age INTEGER NOT NULL, " +
                 "province VARCHAR(15) NOT NULL, " +
-                "password VARCHAR(50) NOT NULL)");
+                "password VARCHAR(50) NOT NULL, " +
+                "passwordIsChanged BOOL DEFAULT 0)");
     }
 
     @Override
