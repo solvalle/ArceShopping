@@ -5,8 +5,9 @@ public class User {
     private String password;
     private String id;
     private String email;
-    private String province;
     private int age;
+    private String province;
+    private boolean pass;
 
     public User(String email, String id, String name, int age, String province, String password) {
         this.name = name;
@@ -15,6 +16,7 @@ public class User {
         this.email = email;
         this.province = province;
         this.age = age;
+        this.pass = false;
     }
 
     public String getName() {
@@ -55,5 +57,19 @@ public class User {
 
     public void setAge(int age) {
         this.age = age;
+    }
+
+    public String getProvince() { return province; }
+
+    public void setProvince(String province) {
+        this.province = province;
+    }
+
+    public boolean getPass() {
+        return pass;
+    }
+
+    public void setPass(boolean pass) {
+        this.pass = pass;
     }
 }

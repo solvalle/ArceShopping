@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Patterns;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.material.textfield.TextInputLayout;
@@ -43,9 +44,15 @@ public class MainActivity extends AppCompatActivity {
             if(validCredentials) {
                 Toast.makeText(this, "Se ingresó correctamente", Toast.LENGTH_LONG).show();
                 this.user = user;
-                // Enviar a la tienda
-                // Intent intent = new Intent(this, StoreActivity.class);
-                // startActivity(intent);
+
+                if (user.getPass()) {
+                    Toast.makeText(this, "Implementar tienda", Toast.LENGTH_LONG).show();
+                    // Intent intent = new Intent(this, StoreActivity.class);
+                    // startActivity(intent);
+                } else {
+                    Intent intent = new Intent(this, PasswordChange.class);
+                    startActivity(intent);
+                }
             } else {
                 Toast.makeText(this, "Credenciales inválidas", Toast.LENGTH_LONG).show();
             }
@@ -58,22 +65,24 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private boolean isValidEmail(String email) {
-        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            this.tilEmail.setError("Correo electrónico inválido");
+        if (email.length() == 0) {
+            tilEmail.setError("Escriba su correo electrónico");
             return false;
-        } else {
-            this.tilEmail.setError(null);
         }
+        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            tilEmail.setError("Correo electrónico inválido");
+            return false;
+        }
+        tilEmail.setError(null);
         return true;
     }
 
     private boolean isValidPassword(String password) {
-        if (password.length() < 1) {
-            tilPassword.setError("Contraseña inválida");
+        if (password.length() == 0) {
+            tilPassword.setError("Escriba su contraseña");
             return false;
-        } else {
-            tilPassword.setError(null);
         }
+        tilPassword.setError(null);
         return true;
     }
 
