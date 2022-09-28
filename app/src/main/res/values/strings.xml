@@ -1,3 +1,26 @@
 <resources>
-    <string name="app_name">ArceShopping</string>
+    //login
+    <string name="app_name">Arce</string>
+    <string name="title_login">Iniciar sesión</string>
+    <string name="email_login_hint">Correo</string>
+    <string name="password_login_hint">Contraseña</string>
+    <string name="iniciar_sesion_login_hint">Iniciar sesión</string>
+    <string name="register_text_login">¿No tienes una cuenta?</string>
+    <string name="register_link_login">Registrate</string>
+
+    //register
+    <string name="title_register">Registro</string>
+    <string name="Id_register">ID</string>
+    <string name="complete_name_register">Nombre completo</string>
+    <string name="email_register">Correo</string>
+    <string name="age_register">Edad</string>
+    <string name="province_register">Provincia</string>
+    <string name="button_register">Registrase</string>
+
+    //password
+    <string name="title_password">Cambio de contraseña</string>
+    <string name="new_password">Nueva contraseña</string>
+    <string name="confirm_password">Confirmar contraseña</string>
+    <string name="button_password">Cambiar contraseña</string>
+    <string name="image_description">Logo</string>
 </resources>
