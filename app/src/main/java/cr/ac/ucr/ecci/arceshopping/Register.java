@@ -11,6 +11,7 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.view.View;
+import android.util.Patterns;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
@@ -20,6 +21,7 @@ import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.regex.Pattern;
 
 import cr.ac.ucr.ecci.arceshopping.ProvinceCalculator;
 
@@ -65,33 +67,77 @@ public class Register extends AppCompatActivity {
         String theEmail = email.getEditText().getText().toString();
         String theAge = age.getEditText().getText().toString();
         String theProvince = province.getSelectedItem().toString();
-        if (checkStrings(theId, theCompleteName, theEmail, theAge, theProvince)) {
-            int ageInt = Integer.parseInt(theAge);
-            if (checkAge(ageInt))
-            {
+        if (checkStrings(theId, theCompleteName, theEmail, theAge)) {
                 Toast.makeText(this, "Exito", Toast.LENGTH_LONG).show();
-            }
+                //Crear usuario y ponerlo en la lista
+                //Volver al login
         }
     }
 
-    public boolean checkStrings(String theId, String theCompleteName, String theEmail, String theAge,
-                                  String theProvince) {
-        if (theId.length() == 0 || theCompleteName.length() == 0 || theEmail.length() == 0 ||
-                theAge.length() == 0 || theProvince.length() == 0) {
-            Toast.makeText(this, "Debe completar todos los campos",
-                    Toast.LENGTH_LONG).show();
+    public boolean checkStrings(String theId, String theCompleteName, String theEmail,
+                                String theAge) {
+        boolean validID = checkID(theId);
+        boolean validName = checkName(theCompleteName);
+        boolean validEmail = checkEmail(theEmail);
+        boolean validAge = checkAge(theAge);
+        if (validID && validName && validEmail && validAge) {
+            return true;
+        }
+        Toast.makeText(this, "Tiene campos sin completar", Toast.LENGTH_LONG).show();
+        return false;
+    }
+
+    public boolean checkID(String TheID) {
+        if (TheID.length() == 0) {
+            id.setError("Debe ingresar su número de identidad");
             return false;
         }
+        id.setError(null);
         return true;
     }
 
-    public boolean checkAge(int theAge) {
-        if (theAge <= 0)
-        {
-            Toast.makeText(this, "La edad debe ser mayor a 0",
-                    Toast.LENGTH_LONG).show();
+    public boolean checkName(String TheName) {
+        if (TheName.length() == 0) {
+            completeName.setError("Debe ingresar su nombre completo");
             return false;
         }
+        Pattern patron = Pattern.compile("^[a-zA-Z ]+$");
+        if (!patron.matcher(TheName).matches()) {
+            completeName.setError("nombre invalido");
+            return false;
+        }
+        if (TheName.length() > 30) {
+            completeName.setError("Su nombre no puede ser mayor a 30 caracteres");
+            return false;
+        }
+        completeName.setError(null);
+        return true;
+    }
+
+    public Boolean checkEmail(String theEmail) {
+        if (theEmail.length() == 0) {
+            email.setError("Debe ingresar su número de correo electrónico");
+            return false;
+        }
+        if (!Patterns.EMAIL_ADDRESS.matcher(theEmail).matches()) {
+            email.setError("Correo electrónico inválido");
+            return false;
+        }
+        email.setError(null);
+        return true;
+    }
+
+    public boolean checkAge(String theAge) {
+        if (theAge.length() == 0) {
+            age.setError("Debe ingresar su edad");
+            return false;
+        }
+        if (Integer.parseInt(theAge) <= 0)
+        {
+            age.setError("La edad debe ser mayor a 0");
+            return false;
+        }
+        age.setError(null);
         return true;
     }
 

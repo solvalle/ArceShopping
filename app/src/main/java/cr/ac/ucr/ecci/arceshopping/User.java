@@ -1,26 +1,20 @@
 package cr.ac.ucr.ecci.arceshopping;
 
 public class User {
-    private String username;
-    private String password;
     private String id;
     private String email;
+    private String password;
     private int age;
+    private String province;
+    private boolean pass;
 
-    public User(String username, String password, String id, String email, int age) {
-        this.username = username;
+    public User(String id, String email, String password, int age, String province) {
         this.password = password;
         this.id = id;
         this.email = email;
         this.age = age;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
+        this.province = province;
+        this.pass = false;
     }
 
     public String getPassword() {
@@ -39,9 +33,7 @@ public class User {
         this.id = id;
     }
 
-    public String getEmail() {
-        return email;
-    }
+    public String getEmail() { return email; }
 
     public void setEmail(String email) {
         this.email = email;
@@ -53,5 +45,19 @@ public class User {
 
     public void setAge(int age) {
         this.age = age;
+    }
+
+    public String getProvince() { return province; }
+
+    public void setProvince(String province) {
+        this.province = province;
+    }
+
+    public boolean getPass() {
+        return pass;
+    }
+
+    public void setPass(boolean pass) {
+        this.pass = pass;
     }
 }

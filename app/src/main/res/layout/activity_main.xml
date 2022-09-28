@@ -6,9 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:visibility="visible"
@@ -42,19 +40,21 @@
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/login_username"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
-            android:layout_width="315dp"
-            android:layout_height="47dp"
-            android:layout_marginTop="40dp"
+            android:layout_width="313dp"
+            android:layout_height="67dp"
+            android:layout_marginTop="36dp"
             android:ems="10"
             android:inputType="textPersonName"
+            app:hintEnabled="false"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.489"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView">
-
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/login_username_text"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="0dp"
                 android:ems="10"
                 android:hint="@string/username_login_hint"
                 android:inputType="text"
@@ -108,8 +108,8 @@
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/login_password"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
-            android:layout_width="313dp"
-            android:layout_height="47dp"
+            android:layout_width="312dp"
+            android:layout_height="67dp"
             android:layout_marginTop="28dp"
             android:ems="10"
             app:hintAnimationEnabled="true"
@@ -122,11 +122,12 @@
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/login_password_text"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:ems="10"
                 android:hint="@string/password_login_hint"
                 android:inputType="textPassword"
                 android:singleLine="true" />
+
         </com.google.android.material.textfield.TextInputLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>

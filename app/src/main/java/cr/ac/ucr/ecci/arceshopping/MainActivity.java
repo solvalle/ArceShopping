@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Patterns;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -25,40 +26,65 @@ public class MainActivity extends AppCompatActivity {
         username = (TextInputLayout)findViewById(R.id.login_username);
         password = (TextInputLayout)findViewById(R.id.login_password);
         userList = new ArrayList<>();
-        User user = new User("Asdrubal", "123", "3",
-                "asdrubal.villegasm@gmail.com", 23);
+        // esta es olo de prueba, borrar cuando se implemente almacenamiento
+        User user = new User("3", "asdrubal.villegasm@gmail.com", "123", 23,
+                "Heredia");
         userList.add(user);
     }
 
     public void login(View view) {
         String theUsername = username.getEditText().getText().toString();
         String thePassword = password.getEditText().getText().toString();
-        if (checkTextfield(theUsername, thePassword) && loginSuceed(theUsername, thePassword)) {
-            Toast.makeText(this, "Exito", Toast.LENGTH_LONG).show();
-        }
-    }
-
-    public boolean checkTextfield(String username, String password) {
-        boolean complete = true;
-        if (username.length() == 0 || password.length() == 0) {
-            complete = false;
-            Toast.makeText(this, "Debe poner su nombre de usuario y contraseña",
-                    Toast.LENGTH_LONG).show();
-        }
-        return complete;
-    }
-
-    public boolean loginSuceed(String theUsername, String thePassword) {
-        for (int index = 0; index < userList.size(); index++) {
-            if (this.userList.get(index).getUsername().equals(theUsername)) {
-                if (this.userList.get(index).getPassword().equals(thePassword)) {
-                    return true;
-                }
+        boolean validUsername = checkEmail(theUsername);
+        boolean validPassword = checkPassword(thePassword);
+        if (validUsername && validPassword) {
+            User theUser = lookForUser(theUsername, thePassword);
+            if (theUser != null) {
+                if (theUser.getPass()) {
+                    Toast.makeText(this, "Implementar tienda", Toast.LENGTH_LONG).show();
+                 } else {
+                    Intent intent = new Intent(this, PasswordChange.class);
+                    startActivity(intent);
+                } //Borrar el toast una vez que el codigo comentado se implemente
             }
         }
-        Toast.makeText(this, "Usuario o contraseña incorrectos",
-                Toast.LENGTH_LONG).show();
-        return false;
+    }
+
+    public User lookForUser(String username, String password)
+    {
+        for (int index = 0; index < userList.size(); index++) {
+            User dummyUser = this.userList.get(index);
+            if (dummyUser.getEmail().equals(username)) {
+                if (dummyUser.getPassword().equals(password)) {
+                    return dummyUser;
+                }
+                break;
+            }
+        }
+        Toast.makeText(this, "Usuario o contraseña incorrectos", Toast.LENGTH_LONG).show();
+        return null;
+    }
+
+    public boolean checkEmail(String theEmail) {
+        if (theEmail.length() == 0) {
+            username.setError("Escriba su correo electrónico");
+            return false;
+        }
+        if (!Patterns.EMAIL_ADDRESS.matcher(theEmail).matches()) {
+            username.setError("Correo electrónico inválido");
+            return false;
+        }
+        username.setError(null);
+        return true;
+    }
+
+    public boolean checkPassword(String thePassword) {
+        if (thePassword.length() == 0) {
+            password.setError("Escriba su contraseña");
+            return false;
+        }
+        password.setError(null);
+        return true;
     }
 
     public void goToRegister(View view) {

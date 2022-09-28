@@ -25,6 +25,8 @@ public class PasswordChange extends AppCompatActivity {
         String theConfirmPassword = confirmPassword.getEditText().getText().toString();
         if (theNewPassword.equals(theConfirmPassword)) {
             Toast.makeText(this, "Exito", Toast.LENGTH_LONG).show();
+            //aqui hay que obtener el user y cambiar la contraseña
+            //luego intent a la pantalla tienda
         } else {
             Toast.makeText(this, "Las contraseñas no coinciden", Toast.LENGTH_LONG).show();
         }
