@@ -4,65 +4,83 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Patterns;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.material.textfield.TextInputLayout;
 
-import java.util.ArrayList;
+import at.favre.lib.crypto.bcrypt.BCrypt;
+import cr.ac.ucr.ecci.arceshopping.db.DbUsers;
+import cr.ac.ucr.ecci.arceshopping.model.User;
 
 public class MainActivity extends AppCompatActivity {
 
-    private TextInputLayout username;
-    private TextInputLayout password;
-    private ArrayList<User> userList;
+    private TextInputLayout tilEmail;
+    private TextInputLayout tilPassword;
+    private User user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        username = (TextInputLayout)findViewById(R.id.login_username);
-        password = (TextInputLayout)findViewById(R.id.login_password);
-        userList = new ArrayList<>();
-        User user = new User("Asdrubal", "123", "3",
-                "asdrubal.villegasm@gmail.com", 23);
-        userList.add(user);
+        tilEmail = (TextInputLayout)findViewById(R.id.login_email);
+        tilPassword = (TextInputLayout)findViewById(R.id.login_password);
     }
 
     public void login(View view) {
-        String theUsername = username.getEditText().getText().toString();
-        String thePassword = password.getEditText().getText().toString();
-        if (checkTextfield(theUsername, thePassword) && loginSuceed(theUsername, thePassword)) {
-            Toast.makeText(this, "Exito", Toast.LENGTH_LONG).show();
-        }
-    }
+        String email = tilEmail.getEditText().getText().toString();
+        String password = tilPassword.getEditText().getText().toString();
 
-    public boolean checkTextfield(String username, String password) {
-        boolean complete = true;
-        if (username.length() == 0 || password.length() == 0) {
-            complete = false;
-            Toast.makeText(this, "Debe poner su nombre de usuario y contraseña",
-                    Toast.LENGTH_LONG).show();
-        }
-        return complete;
-    }
+        DbUsers dbUsers = new DbUsers(this);
+        User user = dbUsers.selectUser(email);
 
-    public boolean loginSuceed(String theUsername, String thePassword) {
-        for (int index = 0; index < userList.size(); index++) {
-            if (this.userList.get(index).getUsername().equals(theUsername)) {
-                if (this.userList.get(index).getPassword().equals(thePassword)) {
-                    return true;
-                }
+        boolean validEmail = isValidEmail(email);
+        boolean validPassword = isValidPassword(password);
+        boolean validCredentials = validateCredentials(user, email, password);
+
+        if (validEmail && validPassword) {
+            if(validCredentials) {
+                Toast.makeText(this, "Se ingresó correctamente", Toast.LENGTH_LONG).show();
+                this.user = user;
+                // Enviar a la tienda
+                // Intent intent = new Intent(this, StoreActivity.class);
+                // startActivity(intent);
+            } else {
+                Toast.makeText(this, "Credenciales inválidas", Toast.LENGTH_LONG).show();
             }
         }
-        Toast.makeText(this, "Usuario o contraseña incorrectos",
-                Toast.LENGTH_LONG).show();
-        return false;
     }
 
     public void goToRegister(View view) {
         Intent registerIntent = new Intent(this, Register.class);
         startActivity(registerIntent);
     }
+
+    private boolean isValidEmail(String email) {
+        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            this.tilEmail.setError("Correo electrónico inválido");
+            return false;
+        } else {
+            this.tilEmail.setError(null);
+        }
+        return true;
+    }
+
+    private boolean isValidPassword(String password) {
+        if (password.length() < 1) {
+            tilPassword.setError("Contraseña inválida");
+            return false;
+        } else {
+            tilPassword.setError(null);
+        }
+        return true;
+    }
+
+    private boolean validateCredentials(User user, String email, String password){
+        BCrypt.Result result = BCrypt.verifyer().verify(password.toCharArray(),user.getPassword());
+
+        return email.compareTo(user.getEmail()) == 0 && result.verified;
+    }
+
 }

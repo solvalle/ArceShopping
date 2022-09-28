@@ -12,7 +12,6 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
-import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -20,8 +19,21 @@ import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Properties;
+import java.util.UUID;
 
-import cr.ac.ucr.ecci.arceshopping.ProvinceCalculator;
+
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+
+import at.favre.lib.crypto.bcrypt.BCrypt;
+import cr.ac.ucr.ecci.arceshopping.db.DbUsers;
 
 public class Register extends AppCompatActivity {
 
@@ -31,7 +43,7 @@ public class Register extends AppCompatActivity {
     private TextInputLayout age;
     private Spinner province;
     private ProvinceCalculator provinceCalculator;
-    private ArrayList<String> provincias;
+    private ArrayList<String> provinces;
     private double latitude;
     private double longitude;
 
@@ -46,10 +58,10 @@ public class Register extends AppCompatActivity {
         this.province = (Spinner) findViewById(R.id.register_province_spinner);
         this.provinceCalculator = new ProvinceCalculator();
 
-        this.provincias = new ArrayList<String>(Arrays.asList("San José", "Alajuela", "Cartago", "Heredia",
+        this.provinces = new ArrayList<String>(Arrays.asList("San José", "Alajuela", "Cartago", "Heredia",
                 "Guanacaste", "Puntarenas", "Limón"));
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-                com.google.android.material.R.layout.support_simple_spinner_dropdown_item, provincias);
+                com.google.android.material.R.layout.support_simple_spinner_dropdown_item, provinces);
         this.province.setAdapter(adapter);
 
         if (!getLocation()) {
@@ -67,11 +79,66 @@ public class Register extends AppCompatActivity {
         String theProvince = province.getSelectedItem().toString();
         if (checkStrings(theId, theCompleteName, theEmail, theAge, theProvince)) {
             int ageInt = Integer.parseInt(theAge);
-            if (checkAge(ageInt))
-            {
-                Toast.makeText(this, "Exito", Toast.LENGTH_LONG).show();
+            if (checkAge(ageInt)) {
+
+                String firstPassword = UUID.randomUUID().toString().substring(0,16);
+                String hashedPassword = BCrypt.withDefaults().hashToString(12,firstPassword.toCharArray());
+
+                sendPasswordEmail(theEmail, firstPassword);
+
+                DbUsers dbUsers = new DbUsers(this);
+                long insert_id = dbUsers.insertUser(theEmail, theId, theCompleteName, ageInt, theProvince, hashedPassword);
+
+                if(insert_id > 0) {
+                    Toast.makeText(this, "Registro exitoso", Toast.LENGTH_LONG).show();
+                    // Enviar a Login
+                } else {
+                    Toast.makeText(this, "Error al registrar", Toast.LENGTH_LONG).show();
+                }
             }
         }
+    }
+
+    public void sendPasswordEmail(String receiverEmail, String password) {
+        String senderEmail = "swapitecci@gmail.com";
+        String passwordSenderEmail = "azakfdtukfskysdy";
+        String host = "smtp.gmail.com";
+
+        Properties properties = System.getProperties();
+
+        properties.put("mail.smtp.host", host);
+        properties.put("mail.smtp.port", "465");
+        properties.put("mail.smtp.ssl.enable", "true");
+        properties.put("mail.smtp.auth", "true");
+        try {
+            Session session = Session.getDefaultInstance(properties,
+                    new javax.mail.Authenticator() {
+                        protected PasswordAuthentication getPasswordAuthentication() {
+                            return new PasswordAuthentication(senderEmail, passwordSenderEmail);
+                        }
+                    });
+
+            MimeMessage mimeMessage = new MimeMessage(session);
+            mimeMessage.addRecipient(Message.RecipientType.TO, new InternetAddress(receiverEmail));
+
+            mimeMessage.setSubject("ArceShopping: clave temporal");
+            mimeMessage.setText("¡Gracias por registrarse en ArceShopping!\n\nSu nueva clave temporal es: " + password);
+
+            Thread thread = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        Transport.send(mimeMessage);
+                    } catch (MessagingException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+            thread.start();
+        } catch (MessagingException e) {
+            e.printStackTrace();
+        }
+
     }
 
     public boolean checkStrings(String theId, String theCompleteName, String theEmail, String theAge,

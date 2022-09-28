@@ -1,26 +1,28 @@
-package cr.ac.ucr.ecci.arceshopping;
+package cr.ac.ucr.ecci.arceshopping.model;
 
 public class User {
-    private String username;
+    private String name;
     private String password;
     private String id;
     private String email;
+    private String province;
     private int age;
 
-    public User(String username, String password, String id, String email, int age) {
-        this.username = username;
+    public User(String email, String id, String name, int age, String province, String password) {
+        this.name = name;
         this.password = password;
         this.id = id;
         this.email = email;
+        this.province = province;
         this.age = age;
     }
 
-    public String getUsername() {
-        return username;
+    public String getName() {
+        return name;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getPassword() {

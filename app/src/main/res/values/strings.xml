@@ -2,8 +2,8 @@
     //login
     <string name="app_name">Arce</string>
     <string name="title_login">Iniciar sesión</string>
-    <string name="username_login_hint">Username</string>
-    <string name="password_login_hint">Password</string>
+    <string name="email_login_hint">Correo</string>
+    <string name="password_login_hint">Contraseña</string>
     <string name="iniciar_sesion_login_hint">Iniciar sesión</string>
     <string name="register_text_login">¿No tienes una cuenta?</string>
     <string name="register_link_login">Registrate</string>
@@ -22,4 +22,5 @@
     <string name="new_password">Nueva contraseña</string>
     <string name="confirm_password">Confirmar contraseña</string>
     <string name="button_password">Cambiar contraseña</string>
+    <string name="image_description">Logo</string>
 </resources>
