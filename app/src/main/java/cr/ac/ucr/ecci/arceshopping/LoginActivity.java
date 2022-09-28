@@ -15,7 +15,7 @@ import at.favre.lib.crypto.bcrypt.BCrypt;
 import cr.ac.ucr.ecci.arceshopping.db.DbUsers;
 import cr.ac.ucr.ecci.arceshopping.model.User;
 
-public class LoginActivity extends AppCompatActivity {
+public class LoginActivity extends ConnectedActivity {
     private TextInputLayout tilEmail;
     private TextInputLayout tilPassword;
     private User user;

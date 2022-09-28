@@ -14,7 +14,7 @@ import at.favre.lib.crypto.bcrypt.BCrypt;
 import cr.ac.ucr.ecci.arceshopping.db.DbUsers;
 import cr.ac.ucr.ecci.arceshopping.model.User;
 
-public class PasswordChangeActivity extends AppCompatActivity {
+public class PasswordChangeActivity extends ConnectedActivity {
 
     private TextInputLayout newPassword;
     private TextInputLayout confirmPassword;
