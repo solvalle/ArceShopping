@@ -35,7 +35,6 @@ import javax.mail.internet.MimeMessage;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
 import cr.ac.ucr.ecci.arceshopping.db.DbUsers;
-import cr.ac.ucr.ecci.arceshopping.ProvinceCalculator;
 import cr.ac.ucr.ecci.arceshopping.model.User;
 
 public class RegisterActivity extends AppCompatActivity {
@@ -50,7 +49,7 @@ public class RegisterActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_register2);
+        setContentView(R.layout.activity_register);
         this.id = (TextInputLayout) findViewById(R.id.register_Id);
         this.completeName = (TextInputLayout) findViewById(R.id.register_complete_name);
         this.email = (TextInputLayout) findViewById(R.id.register_email);
