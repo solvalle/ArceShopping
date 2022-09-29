@@ -19,6 +19,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 
+import cr.ac.ucr.ecci.arceshopping.GridSpacingItemDecoration;
 import cr.ac.ucr.ecci.arceshopping.Product;
 import cr.ac.ucr.ecci.arceshopping.Products;
 import cr.ac.ucr.ecci.arceshopping.ProductsAdapter;
@@ -65,6 +66,8 @@ public class ApiFragment extends Fragment {
     private final String URLEXAMPLE = "https://dummyjson.com/products";
 
     public Products productos;
+    RecyclerView rvProducts;
+    ProductsAdapter adapter;
 
     private RecyclerView listQuotes;
     @Override
@@ -73,7 +76,7 @@ public class ApiFragment extends Fragment {
 
         binding = FragmentApiBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
-        RecyclerView rvProducts = (RecyclerView) root.findViewById(R.id.rvProducts);
+        rvProducts = (RecyclerView) root.findViewById(R.id.rvProducts);
         EditText theFilter = (EditText) root.findViewById(R.id.searchFilter);
         //log
 
@@ -88,9 +91,10 @@ public class ApiFragment extends Fragment {
                         Products products = gson.fromJson(items, Products.class);
                         listQuotes = root.findViewById(R.id.rvProducts);
 
-                        ProductsAdapter adapter = new ProductsAdapter(products.getProducts(), root.getContext());
+                        adapter = new ProductsAdapter(products.getProducts(), root.getContext());
 
                         rvProducts.setAdapter(adapter);
+                        rvProducts.addItemDecoration(new GridSpacingItemDecoration(2,50, true));
                         // second arg is the column ammount
                         rvProducts.setLayoutManager(new GridLayoutManager(root.getContext(), 2));
                         /*

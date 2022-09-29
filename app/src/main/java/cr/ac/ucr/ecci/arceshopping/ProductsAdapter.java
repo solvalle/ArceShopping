@@ -47,6 +47,8 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.ViewHo
 
         TextView textView = holder.nameTextView;
         textView.setText(product.getTitle());
+        TextView textViewPrice = holder.priceTextView;
+        textViewPrice.setText("$"+product.getPrice());
         //ImageView
         ImageView imageView = holder.pictureImageView;
         //using only the first image
@@ -76,7 +78,7 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.ViewHo
                     filterResults.values = mProducts;
 
                 }else{
-                    List<Product> resultsModel = new ArrayList<>();
+                    List<Product> resultsModel = new ArrayList<Product>();
                     String searchStr = constraint.toString().toLowerCase();
 
                     for(Product itemsModel:mProducts){
@@ -109,6 +111,7 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.ViewHo
 
         public TextView nameTextView;
        public ImageView pictureImageView;
+       public TextView priceTextView;
 
 
         public ViewHolder(View itemView) {
@@ -117,6 +120,7 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.ViewHo
 
             nameTextView = (TextView) itemView.findViewById(R.id.product_name);
             pictureImageView = (ImageView) itemView.findViewById(R.id.product_image);
+            priceTextView = (TextView) itemView.findViewById(R.id.product_price);
         }
 
     }

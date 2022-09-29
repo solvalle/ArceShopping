@@ -14,7 +14,6 @@
         android:layout_width="300dp"
         android:layout_height="75dp"
         android:layout_gravity="center"
-        android:layout_weight="1"
         />
 
     <ImageView
@@ -23,8 +22,15 @@
         android:layout_height="286dp"
         android:layout_below="@+id/product_name"
         android:layout_gravity="center">
-
     </ImageView>
+
+    <TextView
+        android:id="@+id/product_price"
+        android:layout_width="300dp"
+        android:layout_height="75dp"
+        android:layout_gravity="center"
+        android:layout_below="@id/product_image"
+        />
 
 
 </RelativeLayout>
