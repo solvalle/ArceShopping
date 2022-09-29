@@ -71,7 +71,8 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.ViewHo
     public void filterList(ArrayList<Product> filterlist) {
 
         //losing the reference to filtered products here
-        this.mFilteredProducts = filterlist;
+        //this.mFilteredProducts = filterlist;
+        this.mProducts = filterlist;
 
         for (int i = 0; i < mFilteredProducts.size(); i++) {
             System.out.println(mFilteredProducts.get(i).getTitle());
