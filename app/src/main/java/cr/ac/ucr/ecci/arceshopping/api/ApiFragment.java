@@ -24,6 +24,7 @@ import cr.ac.ucr.ecci.arceshopping.GridSpacingItemDecoration;
 import cr.ac.ucr.ecci.arceshopping.MainActivity;
 import cr.ac.ucr.ecci.arceshopping.Product;
 import cr.ac.ucr.ecci.arceshopping.Products;
+import cr.ac.ucr.ecci.arceshopping.ProductsActivity;
 import cr.ac.ucr.ecci.arceshopping.ProductsAdapter;
 import cr.ac.ucr.ecci.arceshopping.R;
 import cr.ac.ucr.ecci.arceshopping.databinding.FragmentApiBinding;
@@ -105,8 +106,8 @@ public class ApiFragment extends Fragment {
                         listQuotes.setAdapter(adapter);
                          */
                         productos = products;
-                        ((MainActivity)getActivity()).setAdapter(adapter);
-                        ((MainActivity)getActivity()).setmProducts(products.getProducts());
+                        ((ProductsActivity)getActivity()).setAdapter(adapter);
+                        ((ProductsActivity)getActivity()).setmProducts(products.getProducts());
 
                         // show The Image in a ImageView
                         // https://dummyjson.com/image/i/products/1/2.jpg
