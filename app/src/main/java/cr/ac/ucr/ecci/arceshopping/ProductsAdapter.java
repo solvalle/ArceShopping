@@ -12,12 +12,15 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import cr.ac.ucr.ecci.arceshopping.api.ApiFragment;
 
 
 public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.ViewHolder> implements Filterable {
@@ -63,6 +66,19 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.ViewHo
         mProducts = products;
         mFilteredProducts = products;
         mContext = context;
+    }
+
+    public void filterList(ArrayList<Product> filterlist) {
+
+        //losing the reference to filtered products here
+        this.mFilteredProducts = filterlist;
+
+        for (int i = 0; i < mFilteredProducts.size(); i++) {
+            System.out.println(mFilteredProducts.get(i).getTitle());
+        }
+
+
+        notifyDataSetChanged();
     }
 
 

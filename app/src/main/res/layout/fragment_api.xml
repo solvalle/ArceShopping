@@ -9,25 +9,27 @@
     tools:context=".api.ApiFragment">
 
     <!-- TODO: Update blank fragment layout -->
+    <!--
     <TextView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:text="@string/title_API"
         android:id="@+id/API_TEXT"
         />
+        -->
 
-
+    <!--
     <EditText
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:id="@+id/searchFilter"
-        android:layout_marginTop="24dp"></EditText>
+        android:layout_marginTop="24dp"></EditText>-->
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvProducts"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="100dp"
+        android:layout_marginTop="20dp"
          />
 
     <!-->
