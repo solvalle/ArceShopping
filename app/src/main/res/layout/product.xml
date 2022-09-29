@@ -14,6 +14,7 @@
         android:layout_width="300dp"
         android:layout_height="20dp"
         android:layout_gravity="center"
+        android:layout_centerHorizontal="true"
         />
 
     <ImageView
@@ -21,7 +22,8 @@
         android:layout_width="300dp"
         android:layout_height="150dp"
         android:layout_below="@+id/product_name"
-        android:layout_gravity="center">
+        android:layout_gravity="center"
+        android:layout_centerHorizontal="true">
     </ImageView>
 
     <TextView
@@ -30,6 +32,7 @@
         android:layout_height="20dp"
         android:layout_gravity="center"
         android:layout_below="@id/product_image"
+        android:layout_centerHorizontal="true"
         />
 
 
