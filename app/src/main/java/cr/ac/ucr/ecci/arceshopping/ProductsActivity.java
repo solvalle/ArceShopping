@@ -1,33 +1,21 @@
 package cr.ac.ucr.ecci.arceshopping;
 
 import androidx.appcompat.app.AppCompatActivity;
-
-import android.os.Bundle;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
-import androidx.navigation.ui.AppBarConfiguration;
-import androidx.navigation.ui.NavigationUI;
-import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-
-import androidx.appcompat.widget.SearchView;
 import android.widget.Toast;
-
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
 
 import cr.ac.ucr.ecci.arceshopping.api.ApiFragment;
 import cr.ac.ucr.ecci.arceshopping.databinding.ActivityMainBinding;
 
-
-public class MainActivity extends AppCompatActivity {
+public class ProductsActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
 
     ArrayList<Product> mProducts;
