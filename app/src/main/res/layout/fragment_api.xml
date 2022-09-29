@@ -16,18 +16,32 @@
         android:id="@+id/API_TEXT"
         />
 
+
     <EditText
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:id="@+id/searchFilter"
         android:layout_marginTop="24dp"></EditText>
 
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvProducts"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="100dp"
+         />
+
+    <!-->
     <ListView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/list"
-        android:layout_marginTop="64dp"
+        android:layout_marginTop="66dp"
+
+
         />
+    <-->
+
+
 
 
 

@@ -9,8 +9,12 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
+import androidx.recyclerview.widget.RecyclerView;
+
 import android.os.Bundle;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+
+import java.util.ArrayList;
 
 import cr.ac.ucr.ecci.arceshopping.api.ApiFragment;
 import cr.ac.ucr.ecci.arceshopping.databinding.ActivityMainBinding;
@@ -18,12 +22,16 @@ import cr.ac.ucr.ecci.arceshopping.databinding.ActivityMainBinding;
 
 public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
+
+    ArrayList<Product> mProducts;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         if (savedInstanceState == null) {
+            //RecyclerView rvProducts = (RecyclerView) findViewById(R.id.rvProducts);
+
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             // Replace the contents of the container with the new fragment
             ft.replace(R.id.your_placeholder, new ApiFragment());
