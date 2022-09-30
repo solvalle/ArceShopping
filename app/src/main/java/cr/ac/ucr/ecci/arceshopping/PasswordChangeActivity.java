@@ -10,6 +10,8 @@ import android.widget.Toast;
 
 import com.google.android.material.textfield.TextInputLayout;
 
+import javax.mail.Store;
+
 import at.favre.lib.crypto.bcrypt.BCrypt;
 import cr.ac.ucr.ecci.arceshopping.db.DbUsers;
 import cr.ac.ucr.ecci.arceshopping.model.User;
@@ -40,7 +42,7 @@ public class PasswordChangeActivity extends ConnectedActivity {
             boolean passwordUpdated = dbUsers.updateUserPassword(email, hashedPassword);
             if(passwordUpdated) {
                 Toast.makeText(this, "Cambio de contraseña exitoso", Toast.LENGTH_LONG).show();
-                Intent intent = new Intent( this ,MainActivity.class);
+                Intent intent = new Intent( this , StoreActivity.class);
                 startActivity(intent);
             } else {
                 Toast.makeText(this, "Ocurrió un error al cambiar la contraseña. Intentelo de nuevo", Toast.LENGTH_LONG).show();

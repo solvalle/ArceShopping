@@ -4,7 +4,7 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_API">Productos</string>
     //login
-    <string name="app_name">Arce</string>
+
     <string name="title_login">Iniciar sesión</string>
     <string name="email_login_hint">Correo</string>
     <string name="password_login_hint">Contraseña</string>
