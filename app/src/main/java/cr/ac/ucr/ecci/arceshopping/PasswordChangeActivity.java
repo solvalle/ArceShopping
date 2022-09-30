@@ -32,7 +32,9 @@ public class PasswordChangeActivity extends ConnectedActivity {
     public void changePassword(View view) {
         String theNewPassword = newPassword.getEditText().getText().toString();
         String theConfirmPassword = confirmPassword.getEditText().getText().toString();
-        if (theNewPassword.equals(theConfirmPassword)) {
+        boolean validNewPassword = isValidNewPassword(theNewPassword);
+        boolean validConfirmPassword = isValidConfirmPassword(theConfirmPassword);
+        if (theNewPassword.equals(theConfirmPassword) && validNewPassword && validConfirmPassword) {
             SharedPreferences sp = getSharedPreferences("login",MODE_PRIVATE);
             String email = sp.getString("userEmail","");
 
@@ -50,5 +52,23 @@ public class PasswordChangeActivity extends ConnectedActivity {
         } else {
             Toast.makeText(this, "Las contraseñas no coinciden", Toast.LENGTH_LONG).show();
         }
+    }
+
+    private boolean isValidNewPassword(String password) {
+        if (password.length() == 0) {
+            newPassword.setError("Escriba su contraseña");
+            return false;
+        }
+        newPassword.setError(null);
+        return true;
+    }
+
+    private boolean isValidConfirmPassword(String password) {
+        if (password.length() == 0) {
+            confirmPassword.setError("Escriba su contraseña");
+            return false;
+        }
+        confirmPassword.setError(null);
+        return true;
     }
 }

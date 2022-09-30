@@ -50,7 +50,8 @@ public class DbUsers extends DbHelper {
         Cursor userCursor = db.rawQuery("SELECT * FROM " + TABLE_USERS + " WHERE email = \"" + email + "\" LIMIT 1", null);
 
         if(userCursor.moveToFirst()) {
-            user = new User(userCursor.getString(0), userCursor.getString(1), userCursor.getString(2), userCursor.getInt(3), userCursor.getString(4), userCursor.getString(5));
+            user = new User(userCursor.getString(0), userCursor.getString(1), userCursor.getString(2),
+                    userCursor.getInt(3), userCursor.getString(4), userCursor.getString(5), userCursor.getInt(6) != 0);
         }
 
         userCursor.close();
