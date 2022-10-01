@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/navigation_api">
+    <fragment
+        android:id="@+id/navigation_home"
+        android:name="cr.ac.ucr.ecci.arceshopping.account.AccountFragment"
+        android:label="@string/home_title_products"
+        tools:layout="@layout/fragment_account" />
+    <fragment
+        android:id="@+id/navigation_api"
+        android:name="cr.ac.ucr.ecci.arceshopping.api.ApiFragment"
+        android:label="@string/store_title_products"
+        tools:layout="@layout/fragment_api" />
+    <fragment
+        android:id="@+id/navigation_cart"
+        android:name="cr.ac.ucr.ecci.arceshopping.cart.CartFragment"
+        android:label="@string/cart_title_products"
+        tools:layout="@layout/fragment_cart" />
+</navigation>

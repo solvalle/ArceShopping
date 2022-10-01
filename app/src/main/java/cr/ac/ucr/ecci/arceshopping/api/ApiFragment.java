@@ -61,8 +61,6 @@ import android.widget.ListView;
 import java.io.InputStream;
 import java.util.List;
 
-
-
 public class ApiFragment extends Fragment {
 
     private FragmentApiBinding binding;
