@@ -10,7 +10,7 @@
         android:icon="@drawable/baseline_store_black_24dp"
         android:title="Tienda" />
     <item
-        android:id="@+id/navigation_gps"
+        android:id="@+id/navigation_cart"
         android:icon="@drawable/baseline_shopping_cart_black_24dp"
         android:title="Carrito" />
 </menu>

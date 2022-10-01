@@ -1,6 +1,10 @@
 <resources>
+    <string name="app_name">ArceShopping</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_API">Productos</string>
     //login
-    <string name="app_name">Arce</string>
+
     <string name="title_login">Iniciar sesión</string>
     <string name="email_login_hint">Correo</string>
     <string name="password_login_hint">Contraseña</string>
@@ -23,6 +27,10 @@
     <string name="confirm_password">Confirmar contraseña</string>
     <string name="button_password">Cambiar contraseña</string>
     <string name="image_description">Logo</string>
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="title_API">Productos</string>
+
+    //products
+    <string name="home_title_products">Home</string>
+    <string name="store_title_products">Tienda</string>
+    <string name="cart_title_products">Carrito</string>
+    <string name="no_implemented_products">Falta por implementar</string>
 </resources>

@@ -11,11 +11,13 @@ import android.widget.Toast;
 
 import com.google.android.material.textfield.TextInputLayout;
 
+import javax.mail.Store;
+
 import at.favre.lib.crypto.bcrypt.BCrypt;
 import cr.ac.ucr.ecci.arceshopping.db.DbUsers;
 import cr.ac.ucr.ecci.arceshopping.model.User;
 
-public class LoginActivity extends AppCompatActivity {
+public class LoginActivity extends ConnectedActivity {
     private TextInputLayout tilEmail;
     private TextInputLayout tilPassword;
     private User user;
@@ -47,7 +49,7 @@ public class LoginActivity extends AppCompatActivity {
                 sp.edit().putString("userEmail" , email).apply();
                 if (user.getPasswordIsChanged()) {
                     Toast.makeText(this, "Ir a tienda", Toast.LENGTH_LONG).show();
-                    Intent intent = new Intent( this ,MainActivity.class );
+                    Intent intent = new Intent( this , StoreActivity.class );
                     startActivity(intent);
                 } else {
                     Intent intent = new Intent(this, PasswordChangeActivity.class);

@@ -9,14 +9,14 @@ public class User {
     private String province;
     private boolean passwordIsChanged;
 
-    public User(String email, String id, String name, int age, String province, String password) {
+    public User(String email, String id, String name, int age, String province, String password, boolean passwordIsChanged) {
         this.name = name;
         this.password = password;
         this.id = id;
         this.email = email;
         this.province = province;
         this.age = age;
-        this.passwordIsChanged = false;
+        this.passwordIsChanged = passwordIsChanged;
     }
 
     public String getName() {

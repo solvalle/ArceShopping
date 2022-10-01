@@ -1,41 +1,44 @@
 package cr.ac.ucr.ecci.arceshopping;
-
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.SearchView;
-import androidx.fragment.app.FragmentTransaction;
-
 import android.os.Bundle;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
+import androidx.navigation.ui.AppBarConfiguration;
+import androidx.navigation.ui.NavigationUI;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import androidx.appcompat.widget.SearchView;
 import android.widget.Toast;
-
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import java.util.ArrayList;
 
 import cr.ac.ucr.ecci.arceshopping.api.ApiFragment;
-import cr.ac.ucr.ecci.arceshopping.databinding.ActivityMainBinding;
+import cr.ac.ucr.ecci.arceshopping.databinding.ActivityProductsBinding;
 
-public class ProductsActivity extends AppCompatActivity {
-    private ActivityMainBinding binding;
+
+public class StoreActivity extends ConnectedActivity {
+    private ActivityProductsBinding binding;
 
     ArrayList<Product> mProducts;
     ProductsAdapter adapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        binding = ActivityProductsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        if (savedInstanceState == null) {
-            //RecyclerView rvProducts = (RecyclerView) findViewById(R.id.rvProducts);
-
-            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            // Replace the contents of the container with the new fragment
-            ft.replace(R.id.your_placeholder, new ApiFragment());
-            // or ft.add(R.id.your_placeholder, new FooFragment());
-            // Complete the changes added above
-            ft.commit();
-        }
-
+        BottomNavigationView navView = findViewById(R.id.nav_view);
+        AppBarConfiguration appBarConfiguration = new
+                AppBarConfiguration.Builder(
+                R.id.navigation_home, R.id.navigation_api,
+                R.id.navigation_cart)
+                .build();
+        NavController navController = Navigation.findNavController(this,
+                R.id.nav_host_fragment_activity_main);
+        NavigationUI.setupActionBarWithNavController(this, navController,
+                appBarConfiguration);
+        NavigationUI.setupWithNavController(binding.navView, navController);
     }
 
     public void setmProducts(ArrayList<Product> mProducts) {
@@ -107,3 +110,4 @@ public class ProductsActivity extends AppCompatActivity {
         }
     }
 }
+
