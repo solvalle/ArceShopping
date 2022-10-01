@@ -78,9 +78,6 @@ public class ApiFragment extends Fragment {
         binding = FragmentApiBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
         rvProducts = (RecyclerView) root.findViewById(R.id.rvProducts);
-        //EditText theFilter = (EditText) root.findViewById(R.id.searchFilter);
-
-
         StringRequest myRequest = new StringRequest(Request.Method.GET,
                 URLEXAMPLE,
                 response -> {
@@ -98,37 +95,10 @@ public class ApiFragment extends Fragment {
                         rvProducts.addItemDecoration(new GridSpacingItemDecoration(2,50, true));
                         // second arg is the column ammount
                         rvProducts.setLayoutManager(new GridLayoutManager(root.getContext(), 2));
-                        /*
-                        ArrayAdapter<Product> adapter = new ArrayAdapter<Product>(root.getContext(), android.R.layout.simple_list_item_1,
-                                products.getProducts());
-                        listQuotes.setAdapter(adapter);
-                         */
+
                         productos = products;
                         ((StoreActivity)getActivity()).setAdapter(adapter);
                         ((StoreActivity)getActivity()).setmProducts(products.getProducts());
-
-                        // show The Image in a ImageView
-                        // https://dummyjson.com/image/i/products/1/2.jpg
-
-                        /*
-                        theFilter.addTextChangedListener(new TextWatcher() {
-                            @Override
-                            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-                            }
-
-                            @Override
-                            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                                adapter.getFilter().filter(charSequence);
-                            }
-
-                            @Override
-                            public void afterTextChanged(Editable editable) {
-
-                            }
-
-
-                        }); */
 
                     }catch (JSONException e) {
                         e.printStackTrace();

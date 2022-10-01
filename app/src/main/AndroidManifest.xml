@@ -30,9 +30,7 @@
         <activity
             android:name=".RegisterActivity"
             android:exported="false" />
-        <activity
-            android:name=".ProductsActivity"
-            android:exported="false" />
+
         <activity
             android:name=".StoreActivity"
             android:exported="false" />
