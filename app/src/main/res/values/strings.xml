@@ -29,8 +29,8 @@
     <string name="image_description">Logo</string>
 
     //products
-    <string name="home_title_products">Home</string>
+    <string name="user_title_products">Cuenta</string>
     <string name="store_title_products">Tienda</string>
     <string name="cart_title_products">Carrito</string>
-    <string name="no_implemented_products">Falta por implementar</string>
+    <string name="no_implemented_products">Disponible próximamente</string>
 </resources>

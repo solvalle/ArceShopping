@@ -1,45 +1,24 @@
 package cr.ac.ucr.ecci.arceshopping.api;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.media.Image;
-import android.os.AsyncTask;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.ListView;
 
 import cr.ac.ucr.ecci.arceshopping.GridSpacingItemDecoration;
-import cr.ac.ucr.ecci.arceshopping.MainActivity;
-import cr.ac.ucr.ecci.arceshopping.Product;
-import cr.ac.ucr.ecci.arceshopping.Products;
+import cr.ac.ucr.ecci.arceshopping.model.Products;
 import cr.ac.ucr.ecci.arceshopping.ProductsAdapter;
 import cr.ac.ucr.ecci.arceshopping.R;
 import cr.ac.ucr.ecci.arceshopping.StoreActivity;
 import cr.ac.ucr.ecci.arceshopping.databinding.FragmentApiBinding;
 
-import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Toast;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -48,18 +27,12 @@ import com.android.volley.toolbox.Volley;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 //import com.example.communication.ListaQuotes;
 //import com.example.communication.Quote;
 //import com.example.communication.R;
 
 import com.google.gson.*;
-
-import android.widget.ListView;
-
-import java.io.InputStream;
-import java.util.List;
 
 public class ApiFragment extends Fragment {
 

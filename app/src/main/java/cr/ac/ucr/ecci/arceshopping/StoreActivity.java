@@ -1,11 +1,11 @@
 package cr.ac.ucr.ecci.arceshopping;
 import android.os.Bundle;
-import androidx.fragment.app.FragmentTransaction;
+
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
-import androidx.recyclerview.widget.RecyclerView;
+
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -14,8 +14,8 @@ import android.widget.Toast;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import java.util.ArrayList;
 
-import cr.ac.ucr.ecci.arceshopping.api.ApiFragment;
 import cr.ac.ucr.ecci.arceshopping.databinding.ActivityProductsBinding;
+import cr.ac.ucr.ecci.arceshopping.model.Product;
 
 
 public class StoreActivity extends ConnectedActivity {
@@ -31,7 +31,7 @@ public class StoreActivity extends ConnectedActivity {
         BottomNavigationView navView = findViewById(R.id.nav_view);
         AppBarConfiguration appBarConfiguration = new
                 AppBarConfiguration.Builder(
-                R.id.navigation_home, R.id.navigation_api,
+                R.id.navigation_account, R.id.navigation_api,
                 R.id.navigation_cart)
                 .build();
         NavController navController = Navigation.findNavController(this,
@@ -92,9 +92,6 @@ public class StoreActivity extends ConnectedActivity {
             if (item.getTitle().toLowerCase().contains(text.toLowerCase())) {
                 // if the item is matched we are
                 // adding it to our filtered list.
-                System.out.println("Im searching in:"+" "+item.getTitle());
-                System.out.println(" for the product: "+ text);
-
                 filteredList.add(item);
             }
         }

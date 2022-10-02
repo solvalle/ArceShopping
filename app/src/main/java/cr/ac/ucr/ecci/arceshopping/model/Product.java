@@ -1,4 +1,4 @@
-package cr.ac.ucr.ecci.arceshopping;
+package cr.ac.ucr.ecci.arceshopping.model;
 
 import java.util.ArrayList;
 

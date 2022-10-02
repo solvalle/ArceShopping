@@ -5,9 +5,9 @@
     android:id="@+id/mobile_navigation"
     app:startDestination="@+id/navigation_api">
     <fragment
-        android:id="@+id/navigation_home"
+        android:id="@+id/navigation_account"
         android:name="cr.ac.ucr.ecci.arceshopping.account.AccountFragment"
-        android:label="@string/home_title_products"
+        android:label="@string/user_title_products"
         tools:layout="@layout/fragment_account" />
     <fragment
         android:id="@+id/navigation_api"

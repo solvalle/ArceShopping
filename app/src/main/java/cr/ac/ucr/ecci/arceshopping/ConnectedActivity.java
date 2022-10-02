@@ -22,13 +22,10 @@ public class ConnectedActivity extends AppCompatActivity {
     private ConnectivityManager cManager;
     private ConnectivityManager.NetworkCallback networkCallback =
             new ConnectivityManager.NetworkCallback(){
-            @Override
-            public void onAvailable(@NonNull Network network) {
-                super.onAvailable(network);
-                /*
-                *
-                * */
-            }
+                @Override
+                public void onAvailable(@NonNull Network network) {
+                    super.onAvailable(network);
+                }
 
                 @Override
                 public void onLost(@NonNull Network network) {
@@ -99,7 +96,7 @@ public class ConnectedActivity extends AppCompatActivity {
 
         return isConnected;
     }
-    //to be replaced by actual alert
+
     protected void displayMessage(String message)
     {
         Context context = getApplicationContext();
