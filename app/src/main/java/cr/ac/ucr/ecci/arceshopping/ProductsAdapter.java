@@ -71,11 +71,6 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.ViewHo
         //this.mFilteredProducts = filterlist;
         this.mProducts = filterlist;
 
-        for (int i = 0; i < mFilteredProducts.size(); i++) {
-            System.out.println(mFilteredProducts.get(i).getTitle());
-        }
-
-
         notifyDataSetChanged();
     }
 
