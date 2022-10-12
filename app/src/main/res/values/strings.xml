@@ -13,6 +13,10 @@
     <string name="register_link_login">Registrate</string>
 
     //register
+    <array name="provinces">
+        ["San José", "Alajuela", "Cartago", "Heredia",
+        "Guanacaste", "Puntarenas", "Limón"]
+    </array>
     <string name="title_register">Registro</string>
     <string name="Id_register">ID</string>
     <string name="complete_name_register">Nombre completo</string>
@@ -28,6 +32,9 @@
     <string name="button_password">Cambiar contraseña</string>
     <string name="image_description">Logo</string>
 
+    //account settings
+    <string name="title_account">Ajustes de cuenta</string>
+    <string name="user_pic">Foto</string>
     //products
     <string name="user_title_products">Cuenta</string>
     <string name="store_title_products">Tienda</string>
