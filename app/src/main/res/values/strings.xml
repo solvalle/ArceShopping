@@ -35,6 +35,8 @@
     //account settings
     <string name="title_account">Ajustes de cuenta</string>
     <string name="user_pic">Foto</string>
+    <string name="update">Actualizar mis datos</string>
+    <string name="change_pic">Cambiar foto de perfil</string>
     //products
     <string name="user_title_products">Cuenta</string>
     <string name="store_title_products">Tienda</string>
