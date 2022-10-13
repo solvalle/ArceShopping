@@ -75,4 +75,22 @@ public class DbUsers extends DbHelper {
         }
         return updateSuccess;
     }
+
+    public boolean updateUserDetails(String userUpdate) {
+        boolean updateSuccess = false;
+
+        DbHelper dbHelper = new DbHelper(context);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        System.out.println(userUpdate);
+        try {
+            //When an activity or fragment calls this method, it must provide a compatible string, containing all data updated by user.
+            db.execSQL("UPDATE " + TABLE_USERS + userUpdate);
+            updateSuccess = true;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        } finally {
+            db.close();
+        }
+        return updateSuccess;
+    }
 }
