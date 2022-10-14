@@ -79,7 +79,7 @@ public class RegisterActivity extends ConnectedActivity {
         if (checkStrings(theId, theCompleteName, theEmail, theAge)) {
             String firstPassword = UUID.randomUUID().toString().substring(0, 16);
             String hashedPassword = BCrypt.withDefaults().hashToString(12, firstPassword.toCharArray());
-
+            System.out.println(firstPassword);
             DbUsers dbUsers = new DbUsers(this);
             User user = dbUsers.selectUser(theEmail);
             if (user == null) {

@@ -1,8 +1,11 @@
 package cr.ac.ucr.ecci.arceshopping.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.util.ArrayList;
 
-public class Product{
+public class Product implements Parcelable {
     public int id;
     public String title;
     public String description;
@@ -14,7 +17,6 @@ public class Product{
     public String category;
     public String thumbnail;
     public ArrayList<String> images;
-
 
     public Product(int id, String title, String description, int price, double discountPercentage, double rating, int stock, String brand, String category, String thumbnail) {
         this.id = id;
@@ -129,4 +131,50 @@ public class Product{
                 ", category: " + category;
     }
 
+    protected Product(Parcel in) {
+        this.id = in.readInt();
+        this.title = in.readString();
+        this.description = in.readString();
+        this.price = in.readInt();
+        this.discountPercentage = in.readDouble();
+        this.rating = in.readDouble();
+        this.stock = in.readInt();
+        this.brand = in.readString();
+        this.category = in.readString();
+        this.thumbnail = in.readString();
+        this.images = in.readArrayList(null);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeInt(id);
+        parcel.writeString(title);
+        parcel.writeString(description);
+        parcel.writeInt(price);
+        parcel.writeDouble(discountPercentage);
+        parcel.writeDouble(rating);
+        parcel.writeInt(stock);
+        parcel.writeString(brand);
+        parcel.writeString(category);
+        parcel.writeString(thumbnail);
+        parcel.writeList(images);
+    }
+
+    public static Creator<Product> CREATOR = new Creator<Product>() {
+
+        @Override
+        public Product createFromParcel(Parcel in) {
+            return new Product(in);
+        }
+
+        @Override
+        public Product[] newArray(int size) {
+            return new Product[size];
+        }
+    };
 }
