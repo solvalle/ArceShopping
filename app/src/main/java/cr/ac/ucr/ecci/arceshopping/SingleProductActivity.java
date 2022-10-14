@@ -63,7 +63,7 @@ public class SingleProductActivity extends AppCompatActivity {
      */
     public void addCounter(View view) {
         int counter = Integer.parseInt(textCounter.getText().toString()) + 1;
-        if (counter <= 10) {
+        if (counter <= 10 && counter <= product.getStock()) {
             textCounter.setText(Integer.toString(counter));
         }
     }
