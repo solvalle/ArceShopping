@@ -1,14 +1,25 @@
 package cr.ac.ucr.ecci.arceshopping.account;
 
+import static android.app.Activity.RESULT_OK;
 import static android.content.Context.MODE_PRIVATE;
 
+import android.app.AlertDialog;
+import android.content.ActivityNotFoundException;
+import android.content.ContentResolver;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import android.preference.PreferenceManager;
+import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,10 +27,13 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.textfield.TextInputLayout;
 
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -35,26 +49,36 @@ public class AccountFragment extends Fragment {
     private ImageView user_pic;
     private Button change_pic_button;
     private TextInputLayout til_name;
-    private TextInputLayout til_id;
-    private TextInputLayout til_email;
+    private TextView tv_id;
+    private TextView tv_email;
     private Spinner province_spinner;
     private TextInputLayout til_age;
     private Button update_password_button;
     private Button save_changes_button;
     private FragmentAccountBinding binding;
-
+    private AlertDialog.Builder picOptions;
+    private Bitmap selectedImage;
+    public static final int GALLERY_RESULT = 0;
+    public static final int CAMERA_RESULT = 1;
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState)
     {
         binding = FragmentAccountBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
+        //Retrieve an instance so we can save changes to db
         dbUsers = new DbUsers(getActivity());
+        //Retrieve user email so we can retrieve their data from db
         SharedPreferences sp = getActivity().getSharedPreferences("login", MODE_PRIVATE);
         loggedInUser = dbUsers.selectUser(sp.getString("userEmail", "DEFAULT"));
+        picOptions = new AlertDialog.Builder(getActivity());
+
+        //Retrieve xml elements so we can populate them with user data
         retrieveXmlElements(root);
         setData();
         setClickEvents();
+        setPicOptions();
+
         return root;
     }
 
@@ -79,14 +103,78 @@ public class AccountFragment extends Fragment {
                 goToPasswordChangeScreen();
             }
         });
+
+    }
+
+    private void setPicOptions()
+    {
+        picOptions.setTitle("Actualizar imagen");
+        picOptions.setMessage("¿Cómo desea actualizar su imagen de perfil?");
+
+        picOptions.setPositiveButton("Galería", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                launchGallery();
+            }
+        });
+        picOptions.setNegativeButton("Cámara", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                launchCamera();
+            }
+        });
     }
 
     private void startPicUpdate() {
-        // 1. Check permissions and request to access storage and camera
-        // 2. Allow user to take a picture or retrieve one from their gallery
-        // 3. Save such image as variable
-        // 4. When user hits Actualizar, save the pic in the database, either its route or as a bytearray
+        picOptions.show();
     }
+
+    private void launchCamera(){
+        Intent takePicture = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        startActivityForResult(takePicture, CAMERA_RESULT);
+    }
+
+    private void launchGallery() {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("image/*");
+        startActivityForResult(intent, GALLERY_RESULT);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(requestCode == GALLERY_RESULT) {
+
+            //Code taken from solution found at stack overflow
+            //Available at: https://stackoverflow.com/questions/38352148/get-image-from-the-gallery-and-show-in-imageview
+            if (resultCode == RESULT_OK) {
+                try {
+                    final Uri imageUri = data.getData();
+                    final InputStream imageStream = getActivity().getContentResolver().openInputStream(imageUri);
+                    selectedImage = BitmapFactory.decodeStream(imageStream);
+                    user_pic.setImageBitmap(selectedImage);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                    displayMessage("Ocurrió un error");
+                }
+
+            }else {
+                displayMessage("No se eligió imagen");
+            }
+        }
+
+        if(requestCode == CAMERA_RESULT) {
+            if(resultCode == RESULT_OK )
+            {
+                selectedImage = (Bitmap) data.getExtras().get("data");
+                user_pic.setImageBitmap(selectedImage);
+            }else {
+                displayMessage("Ocurrio un error");
+            }
+
+
+        }
+    }
+
 
     private void saveChanges() {
         //" SET password = \"" + newPassword + "\", passwordIsChanged = 1 WHERE email = \"" + email + "\""
@@ -94,8 +182,9 @@ public class AccountFragment extends Fragment {
         String til_name_content = til_name.getEditText().getText().toString();
         if(!loggedInUser.getName().equals(til_name_content)) {
             changesToSqlString += "name = \"" +  til_name_content +"\",";
+            this.loggedInUser.setName(til_name_content);
         }
-
+/*
         String til_email_content = til_email.getEditText().getText().toString();
         if(!loggedInUser.getEmail().equals(til_email_content)) {
             changesToSqlString += "email = \"" + til_email_content + "\",";
@@ -105,15 +194,19 @@ public class AccountFragment extends Fragment {
         if(!loggedInUser.getId().equals(til_id_content)) {
             changesToSqlString += "id =\"" + til_id_content + "\",";
         }
+*/
+
 
         int til_age_content = Integer.valueOf(til_age.getEditText().getText().toString());
         if(loggedInUser.getAge() != til_age_content) {
             changesToSqlString += "age = \"" + String.valueOf(til_age_content) + "\",";
+            this.loggedInUser.setAge(til_age_content);
         }
 
         String province_spinner_content = province_spinner.getSelectedItem().toString();
         if(!loggedInUser.getProvince().equals(province_spinner_content)) {
             changesToSqlString += "province = \"" + province_spinner_content + "\"";
+            this.loggedInUser.setProvince(province_spinner_content);
         }
         //Only save into db if any field was actually modified
         if(changesToSqlString.length() > 6) {
@@ -129,11 +222,14 @@ public class AccountFragment extends Fragment {
 
             changesToSqlString += " WHERE email = \"" + loggedInUser.getEmail() + "\"";
             if(dbUsers.updateUserDetails(changesToSqlString)){
+                /*
                 //Update data in memory and update shared preferences
                 SharedPreferences sp = getActivity().getSharedPreferences("login", MODE_PRIVATE);
                 sp.edit().putString("userEmail",til_email_content).apply();
                 loggedInUser = dbUsers.selectUser(sp.getString("userEmail", "DEFAULT"));
+                */
                 displayMessage("Cambios guardados exitosamente");
+
             }else{
                 displayMessage("Ocurrió un error");
             }
@@ -149,8 +245,8 @@ public class AccountFragment extends Fragment {
     private void setData(){
         //TODO: save image in table and retrieve it from user table
         til_name.getEditText().setText(loggedInUser.getName());
-        til_id.getEditText().setText(loggedInUser.getId());
-        til_email.getEditText().setText(loggedInUser.getEmail());
+        tv_id.setText(loggedInUser.getId());
+        tv_email.setText(loggedInUser.getEmail());
 
         //TODO: Learn to save the provinces array in the strings.xml file so it can be used here and
         //on the register screen
@@ -167,8 +263,8 @@ public class AccountFragment extends Fragment {
         user_pic = root.findViewById(R.id.user_pic);
         change_pic_button = root.findViewById(R.id.change_pic_button);
         til_name = root.findViewById(R.id.til_name);
-        til_id = root.findViewById(R.id.til_id);
-        til_email = root.findViewById(R.id.til_email);
+        tv_id = root.findViewById(R.id.tv_id);
+        tv_email = root.findViewById(R.id.tv_email);
         province_spinner = root.findViewById(R.id.account_province_spinner);
         til_age = root.findViewById(R.id.til_age);
         update_password_button = root.findViewById(R.id.change_password_button);
