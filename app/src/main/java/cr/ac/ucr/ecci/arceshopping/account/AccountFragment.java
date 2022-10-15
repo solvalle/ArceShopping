@@ -5,7 +5,6 @@ import static android.content.Context.MODE_PRIVATE;
 import static android.content.Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION;
 
 import android.Manifest;
-import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -22,6 +21,8 @@ import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
@@ -42,6 +43,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import cr.ac.ucr.ecci.arceshopping.ImageGetter;
 import cr.ac.ucr.ecci.arceshopping.R;
 import cr.ac.ucr.ecci.arceshopping.databinding.FragmentAccountBinding;
 import cr.ac.ucr.ecci.arceshopping.db.DbUsers;
@@ -61,11 +63,8 @@ public class AccountFragment extends Fragment {
     private Button update_password_button;
     private Button save_changes_button;
     private FragmentAccountBinding binding;
-    private AlertDialog.Builder picOptions;
-    private Bitmap selectedImage;
     private Uri pathToUserPic;
-    public static final int GALLERY_RESULT = 0;
-    public static final int CAMERA_RESULT = 1;
+    private ImageGetter imageGetter;
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState)
@@ -77,22 +76,21 @@ public class AccountFragment extends Fragment {
         //Retrieve user email so we can retrieve their data from db
         SharedPreferences sp = getActivity().getSharedPreferences("login", MODE_PRIVATE);
         loggedInUser = dbUsers.selectUser(sp.getString("userEmail", "DEFAULT"));
-        picOptions = new AlertDialog.Builder(getActivity());
 
         //Retrieve xml elements so we can populate them with user data
         retrieveXmlElements(root);
         setData();
         setClickEvents();
-        setPicOptions();
 
         return root;
     }
+
 
     private void setClickEvents(){
         change_pic_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startPicUpdate();
+                imageGetter.startPicUpdate();
             }
         });
 
@@ -110,66 +108,6 @@ public class AccountFragment extends Fragment {
             }
         });
 
-    }
-
-    private void setPicOptions()
-    {
-        picOptions.setTitle("Actualizar imagen");
-        picOptions.setMessage("¿Cómo desea actualizar su imagen de perfil?");
-
-        picOptions.setPositiveButton("Galería", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                launchGallery();
-            }
-        });
-        picOptions.setNegativeButton("Cámara", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                launchCamera();
-            }
-        });
-    }
-
-    private void startPicUpdate() {
-        picOptions.show();
-    }
-
-    private void launchCamera(){
-        Intent takePicture = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        startActivityForResult(takePicture, CAMERA_RESULT);
-    }
-
-    private void launchGallery() {
-        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-        intent.setType("image/*");
-        startActivityForResult(intent, GALLERY_RESULT);
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(requestCode == GALLERY_RESULT) {
-
-            if (resultCode == RESULT_OK) {
-                pathToUserPic = data.getData();
-                setProfilePic();
-
-            }else {
-                displayMessage("No se eligió imagen");
-            }
-        }
-
-        if(requestCode == CAMERA_RESULT) {
-            if(resultCode == RESULT_OK )
-            {
-                selectedImage = (Bitmap) data.getExtras().get("data");
-                user_pic.setImageBitmap(selectedImage);
-            }else {
-                displayMessage("Ocurrio un error");
-            }
-
-
-        }
     }
 
 
@@ -192,9 +130,10 @@ public class AccountFragment extends Fragment {
             changesToSqlString += "id =\"" + til_id_content + "\",";
         }
 */
-        if(!loggedInUser.getPath().equals(pathToUserPic.toString())) {
-            changesToSqlString += "path = \"" + pathToUserPic.toString() + "\",";
-            this.loggedInUser.setPath(pathToUserPic.toString());
+        if(!loggedInUser.getPath().equals(imageGetter.getUriPath())) {
+            if(imageGetter.didUserTakePic()){}
+            changesToSqlString += "path = \"" + imageGetter.getUriPath() + "\",";
+            this.loggedInUser.setPath(imageGetter.getUriPath());
             System.out.println(this.loggedInUser.getPath());
         }
 
@@ -228,13 +167,13 @@ public class AccountFragment extends Fragment {
                 sp.edit().putString("userEmail",til_email_content).apply();
                 loggedInUser = dbUsers.selectUser(sp.getString("userEmail", "DEFAULT"));
                 */
-                displayMessage("Cambios guardados exitosamente");
+                imageGetter.displayMessage("Cambios guardados exitosamente");
 
             }else{
-                displayMessage("Ocurrió un error");
+                imageGetter.displayMessage("Ocurrió un error");
             }
         } else {
-            displayMessage("No hay cambios que guardar.");
+            imageGetter.displayMessage("No hay cambios que guardar.");
         }
     }
 
@@ -259,40 +198,17 @@ public class AccountFragment extends Fragment {
         province_spinner.setSelection(adapter.getPosition(loggedInUser.getProvince()));
         til_age.getEditText().setText(String.valueOf(loggedInUser.getAge()));
 
-        retrieveUserPic();
-    }
+        pathToUserPic = Uri.parse(loggedInUser.getPath());
+        System.out.println(pathToUserPic.toString());
+        imageGetter = new ImageGetter(getContext(), user_pic, pathToUserPic);
+        imageGetter.retrieveUserPic();
 
-    private void retrieveUserPic() {
-        //If user had previously saved an image as their profile pic, retrieve it
-        if(!loggedInUser.getPath().equals("")){
-            pathToUserPic = Uri.parse(loggedInUser.getPath());
-            setProfilePic();
-        }
-    }
+        //ImageGetter needs to be attached to account fragment's activity so it can start intents
+        // and avoid runtime errors
+        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.fragmentContainer, imageGetter).commit();
 
-    private Bitmap fromUriToBitmap() {
-        Bitmap resultPicture = null;
-
-        try {
-            //Get content resolver so we have permission to retrieve img, even after the intent shown in launchGallery()
-            ContentResolver cr =getActivity().getContentResolver();
-            cr.takePersistableUriPermission(pathToUserPic, Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            //Open stream from picture's URI
-            final InputStream imageStream = cr.openInputStream(pathToUserPic);
-            //Generate bitmap from img specified in Uri
-            resultPicture = BitmapFactory.decodeStream(imageStream);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-            displayMessage("Ocurrió un error");
-        }
-        return  resultPicture;
-    }
-
-    private void setProfilePic() {
-        selectedImage = fromUriToBitmap();
-        if(selectedImage != null) {
-            user_pic.setImageBitmap(selectedImage);
-        }
     }
 
     private void retrieveXmlElements(View root) {
@@ -313,11 +229,5 @@ public class AccountFragment extends Fragment {
         binding = null;
     }
 
-    protected void displayMessage(String message)
-    {
-        Context context = getActivity();
-        int duration = Toast.LENGTH_SHORT;
-        Toast toast = Toast.makeText(context, message, duration);
-        toast.show();
-    }
+
 }
