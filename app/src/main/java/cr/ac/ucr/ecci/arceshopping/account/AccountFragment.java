@@ -2,7 +2,9 @@ package cr.ac.ucr.ecci.arceshopping.account;
 
 import static android.app.Activity.RESULT_OK;
 import static android.content.Context.MODE_PRIVATE;
+import static android.content.Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
 import android.content.ContentResolver;
@@ -10,12 +12,15 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import android.preference.PreferenceManager;
@@ -58,6 +63,7 @@ public class AccountFragment extends Fragment {
     private FragmentAccountBinding binding;
     private AlertDialog.Builder picOptions;
     private Bitmap selectedImage;
+    private Uri pathToUserPic;
     public static final int GALLERY_RESULT = 0;
     public static final int CAMERA_RESULT = 1;
     @Override
@@ -135,7 +141,7 @@ public class AccountFragment extends Fragment {
     }
 
     private void launchGallery() {
-        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
         intent.setType("image/*");
         startActivityForResult(intent, GALLERY_RESULT);
     }
@@ -144,18 +150,9 @@ public class AccountFragment extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(requestCode == GALLERY_RESULT) {
 
-            //Code taken from solution found at stack overflow
-            //Available at: https://stackoverflow.com/questions/38352148/get-image-from-the-gallery-and-show-in-imageview
             if (resultCode == RESULT_OK) {
-                try {
-                    final Uri imageUri = data.getData();
-                    final InputStream imageStream = getActivity().getContentResolver().openInputStream(imageUri);
-                    selectedImage = BitmapFactory.decodeStream(imageStream);
-                    user_pic.setImageBitmap(selectedImage);
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                    displayMessage("Ocurrió un error");
-                }
+                pathToUserPic = data.getData();
+                setProfilePic();
 
             }else {
                 displayMessage("No se eligió imagen");
@@ -177,7 +174,7 @@ public class AccountFragment extends Fragment {
 
 
     private void saveChanges() {
-        //" SET password = \"" + newPassword + "\", passwordIsChanged = 1 WHERE email = \"" + email + "\""
+        //Build sql string as program verifies which fields have been modified
         String changesToSqlString = " SET ";
         String til_name_content = til_name.getEditText().getText().toString();
         if(!loggedInUser.getName().equals(til_name_content)) {
@@ -195,7 +192,11 @@ public class AccountFragment extends Fragment {
             changesToSqlString += "id =\"" + til_id_content + "\",";
         }
 */
-
+        if(!loggedInUser.getPath().equals(pathToUserPic.toString())) {
+            changesToSqlString += "path = \"" + pathToUserPic.toString() + "\",";
+            this.loggedInUser.setPath(pathToUserPic.toString());
+            System.out.println(this.loggedInUser.getPath());
+        }
 
         int til_age_content = Integer.valueOf(til_age.getEditText().getText().toString());
         if(loggedInUser.getAge() != til_age_content) {
@@ -211,7 +212,6 @@ public class AccountFragment extends Fragment {
         //Only save into db if any field was actually modified
         if(changesToSqlString.length() > 6) {
             //Remove last comma if there is any, to avoid syntax errors
-
             char lastComma = changesToSqlString.charAt(changesToSqlString.length() -1);
 
             if(lastComma == ',')
@@ -219,7 +219,7 @@ public class AccountFragment extends Fragment {
                 changesToSqlString = changesToSqlString.substring(0, changesToSqlString.length()-1);
                 System.out.println(changesToSqlString);
             }
-
+            //Finally, save changes into user's row
             changesToSqlString += " WHERE email = \"" + loggedInUser.getEmail() + "\"";
             if(dbUsers.updateUserDetails(changesToSqlString)){
                 /*
@@ -258,7 +258,43 @@ public class AccountFragment extends Fragment {
         //adapter.getPosition() is how we get the index number for the user's province
         province_spinner.setSelection(adapter.getPosition(loggedInUser.getProvince()));
         til_age.getEditText().setText(String.valueOf(loggedInUser.getAge()));
+
+        retrieveUserPic();
     }
+
+    private void retrieveUserPic() {
+        //If user had previously saved an image as their profile pic, retrieve it
+        if(!loggedInUser.getPath().equals("")){
+            pathToUserPic = Uri.parse(loggedInUser.getPath());
+            setProfilePic();
+        }
+    }
+
+    private Bitmap fromUriToBitmap() {
+        Bitmap resultPicture = null;
+
+        try {
+            //Get content resolver so we have permission to retrieve img, even after the intent shown in launchGallery()
+            ContentResolver cr =getActivity().getContentResolver();
+            cr.takePersistableUriPermission(pathToUserPic, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            //Open stream from picture's URI
+            final InputStream imageStream = cr.openInputStream(pathToUserPic);
+            //Generate bitmap from img specified in Uri
+            resultPicture = BitmapFactory.decodeStream(imageStream);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            displayMessage("Ocurrió un error");
+        }
+        return  resultPicture;
+    }
+
+    private void setProfilePic() {
+        selectedImage = fromUriToBitmap();
+        if(selectedImage != null) {
+            user_pic.setImageBitmap(selectedImage);
+        }
+    }
+
     private void retrieveXmlElements(View root) {
         user_pic = root.findViewById(R.id.user_pic);
         change_pic_button = root.findViewById(R.id.change_pic_button);

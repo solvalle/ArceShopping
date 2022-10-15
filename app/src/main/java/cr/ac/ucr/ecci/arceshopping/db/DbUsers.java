@@ -18,7 +18,7 @@ public class DbUsers extends DbHelper {
         this.context = context;
     }
 
-    public long insertUser(String email, String id, String name,int age, String province, String password){
+    public long insertUser(String email, String id, String name, String path,int age, String province, String password){
         long insertId = 0;
         try {
             DbHelper dbHelper = new DbHelper(context);
@@ -28,6 +28,7 @@ public class DbUsers extends DbHelper {
             values.put("email", email);
             values.put("id", id);
             values.put("name", name);
+            values.put("path",path);
             values.put("age", age);
             values.put("province", province);
             values.put("password", password);
@@ -51,7 +52,8 @@ public class DbUsers extends DbHelper {
 
         if(userCursor.moveToFirst()) {
             user = new User(userCursor.getString(0), userCursor.getString(1), userCursor.getString(2),
-                    userCursor.getInt(3), userCursor.getString(4), userCursor.getString(5), userCursor.getInt(6) != 0);
+                    userCursor.getString(3),userCursor.getInt(4), userCursor.getString(5), userCursor.getString(6),
+                        userCursor.getInt(7) != 0);
         }
 
         userCursor.close();

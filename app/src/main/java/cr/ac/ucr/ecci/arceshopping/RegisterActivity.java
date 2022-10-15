@@ -83,7 +83,8 @@ public class RegisterActivity extends ConnectedActivity {
             DbUsers dbUsers = new DbUsers(this);
             User user = dbUsers.selectUser(theEmail);
             if (user == null) {
-                long insert_id = dbUsers.insertUser(theEmail, theId, theCompleteName, Integer.parseInt(theAge), theProvince, hashedPassword);
+                //empty space is path to user
+                long insert_id = dbUsers.insertUser(theEmail, theId, theCompleteName, "",Integer.parseInt(theAge), theProvince, hashedPassword);
                 if (insert_id > 0) {
                     sendPasswordEmail(theEmail, firstPassword);
 

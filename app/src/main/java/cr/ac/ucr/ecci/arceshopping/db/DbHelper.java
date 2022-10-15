@@ -22,6 +22,7 @@ public class DbHelper extends SQLiteOpenHelper {
                 "email VARCHAR(50) PRIMARY KEY, " +
                 "id VARCHAR(30) NOT NULL, " +
                 "name VARCHAR(50) NOT NULL, " +
+                "path VARCHAR(50) NOT NULL, " +
                 "age INTEGER NOT NULL, " +
                 "province VARCHAR(15) NOT NULL, " +
                 "password VARCHAR(50) NOT NULL, " +
