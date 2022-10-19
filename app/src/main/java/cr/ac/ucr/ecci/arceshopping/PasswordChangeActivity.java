@@ -41,7 +41,7 @@ public class PasswordChangeActivity extends ConnectedActivity {
             String hashedPassword = BCrypt.withDefaults().hashToString(12,theNewPassword.toCharArray());
 
             DbUsers dbUsers = new DbUsers(this);
-            boolean passwordUpdated = dbUsers.updateUserPassword(email, hashedPassword);
+            boolean passwordUpdated = dbUsers.updateUserPassword(email, hashedPassword, 1);
             if(passwordUpdated) {
                 Toast.makeText(this, "Cambio de contraseña exitoso", Toast.LENGTH_LONG).show();
                 Intent intent = new Intent( this , StoreActivity.class);

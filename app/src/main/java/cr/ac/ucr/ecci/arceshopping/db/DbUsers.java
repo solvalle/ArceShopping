@@ -59,14 +59,17 @@ public class DbUsers extends DbHelper {
         return user;
     }
 
-    public boolean updateUserPassword(String email, String newPassword) {
+    public boolean updateUserPassword(String email, String newPassword, int bool) {
+        if (bool > 1 || bool < 0) {
+            return false;
+        }
         boolean updateSuccess = false;
 
         DbHelper dbHelper = new DbHelper(context);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
         try {
-            db.execSQL("UPDATE " + TABLE_USERS + " SET password = \"" + newPassword + "\", passwordIsChanged = 1 WHERE email = \"" + email + "\"");
+            db.execSQL("UPDATE " + TABLE_USERS + " SET password = \"" + newPassword + "\", passwordIsChanged = " + bool + " WHERE email = \"" + email + "\"");
             updateSuccess = true;
         } catch (Exception ex) {
             ex.printStackTrace();
