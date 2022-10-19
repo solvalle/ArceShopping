@@ -91,5 +91,13 @@ public class SingleProductActivity extends AppCompatActivity {
         Intent intent = new Intent(this, StoreActivity.class);
         startActivity(intent);
          */
+        DbShoppingCart db = new DbShoppingCart(this);
+        SharedPreferences sp = this.getSharedPreferences("login", Context.MODE_PRIVATE);
+        db.insertProduct(sp.getString("userEmail",""), this.product.getId(), Integer.parseInt(textCounter.getText().toString()));
+
+        /*
+        Intent intent = new Intent(this, StoreActivity.class);
+        startActivity(intent);
+         */
     }
 }

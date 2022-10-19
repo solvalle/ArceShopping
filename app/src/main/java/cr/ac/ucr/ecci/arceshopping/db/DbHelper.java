@@ -11,6 +11,7 @@ public class DbHelper extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 1;
     private static final String DATABASE_NAME = "arceshopping.db";
     protected static final String TABLE_USERS= "t_users";
+    protected static final String TABLE_SHOPPINGCART= "t_shoppingCart";
 
     public DbHelper(@Nullable Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -26,12 +27,18 @@ public class DbHelper extends SQLiteOpenHelper {
                 "province VARCHAR(15) NOT NULL, " +
                 "password VARCHAR(50) NOT NULL, " +
                 "passwordIsChanged BOOL DEFAULT 0)");
+
+        sqLiteDatabase.execSQL("CREATE TABLE " + TABLE_SHOPPINGCART + "(" +
+                "userEmail VARCHAR(50) PRIMARY KEY, " +
+                "productId INTEGER PRIMARY KEY, " +
+                "quantity INTEGER NOT NULL, " +
+                "FOREIGN KEY(userEmail) REFERENCES " + TABLE_USERS + "(email))");
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
         sqLiteDatabase.execSQL("DROP TABLE " + TABLE_USERS);
+        sqLiteDatabase.execSQL("DROP TABLE " + TABLE_SHOPPINGCART);
         onCreate(sqLiteDatabase);
-
     }
 }
