@@ -16,6 +16,7 @@ import com.denzcoskun.imageslider.models.SlideModel;
 import java.util.ArrayList;
 import java.util.List;
 
+import cr.ac.ucr.ecci.arceshopping.db.DbShoppingCart;
 import cr.ac.ucr.ecci.arceshopping.model.Product;
 
 public class SingleProductActivity extends AppCompatActivity {
