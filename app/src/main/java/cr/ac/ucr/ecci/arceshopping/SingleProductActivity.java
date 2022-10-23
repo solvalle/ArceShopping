@@ -83,23 +83,10 @@ public class SingleProductActivity extends AppCompatActivity {
      * Adds the current product to the cart and then goes the CartActivity
      */
     public void addToCart(View view) {
-        /** Esto es un codigo simula que guarda el producto en la base de datos y luego intent al carrito
-        DbCartProducts db = new DbCartProducts(this);
-        SharedPreferences sp = this.getSharedPreferences("login", Context.MODE_PRIVATE);
-        db.insertCartProduct(Integer.toString(this.product.getId()), this.product.getTitle(),
-                Integer.parseInt(textCounter.getText().toString()), this.product.getPrice(),
-                this.product.getThumbnail(), sp.getString("userEmail",""));
-        Intent intent = new Intent(this, StoreActivity.class);
-        startActivity(intent);
-         */
         DbShoppingCart db = new DbShoppingCart(this);
         SharedPreferences sp = this.getSharedPreferences("login", Context.MODE_PRIVATE);
         db.insertProduct(sp.getString("userEmail",""), this.product.getId(), Integer.parseInt(textCounter.getText().toString()), this.product.getPrice());
         Toast.makeText(this, "Producto añadido éxitosamente", Toast.LENGTH_SHORT).show();
-
-        /*
-        Intent intent = new Intent(this, StoreActivity.class);
-        startActivity(intent);
-         */
+        finish();
     }
 }
