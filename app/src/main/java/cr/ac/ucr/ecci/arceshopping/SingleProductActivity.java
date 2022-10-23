@@ -85,8 +85,18 @@ public class SingleProductActivity extends AppCompatActivity {
     public void addToCart(View view) {
         DbShoppingCart db = new DbShoppingCart(this);
         SharedPreferences sp = this.getSharedPreferences("login", Context.MODE_PRIVATE);
-        db.insertProduct(sp.getString("userEmail",""), this.product.getId(), Integer.parseInt(textCounter.getText().toString()), this.product.getPrice());
-        Toast.makeText(this, "Producto añadido éxitosamente", Toast.LENGTH_SHORT).show();
-        finish();
+        long result = db.insertProduct(sp.getString("userEmail",""), this.product.getId(),
+                Integer.parseInt(textCounter.getText().toString()), this.product.getPrice(),
+                this.product.getStock());
+        if (result == 1) {
+            Toast.makeText(this, "Producto añadido éxitosamente", Toast.LENGTH_SHORT).show();
+            finish();
+        }
+        else if (result == 2) {
+            Toast.makeText(this, "La cantidad excede del stock o de 10", Toast.LENGTH_SHORT).show();
+        }
+        else {
+            Toast.makeText(this, "Hubo un error", Toast.LENGTH_SHORT).show();
+        }
     }
 }

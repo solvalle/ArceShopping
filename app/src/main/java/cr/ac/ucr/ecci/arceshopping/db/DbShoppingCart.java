@@ -12,13 +12,14 @@ import java.util.HashMap;
 
 public class DbShoppingCart extends DbHelper {
     Context context;
+    static final int LIMIT = 10;
 
     public DbShoppingCart(@Nullable Context context) {
         super(context);
         this.context = context;
     }
 
-    public long insertProduct(String userEmail, int productId, int quantity, int price){
+    public long insertProduct(String userEmail, int productId, int quantity, int price, int stock){
         long insertId = 0;
         try {
             DbHelper dbHelper = new DbHelper(context);
@@ -38,7 +39,7 @@ public class DbShoppingCart extends DbHelper {
 
             } else {
                 System.out.println("Actualizando");
-                insertId = increaseItemQuantity(userEmail, productId, quantity) ? 1 : 0 ;
+                insertId = increaseItemQuantity(userEmail, productId, quantity, stock);
             }
             db.close();
         } catch (Exception ex) {
@@ -93,15 +94,39 @@ public class DbShoppingCart extends DbHelper {
         return totalPrice;
     }
 
-    public boolean increaseItemQuantity(String userEmail, int productId, int quantity) {
-        boolean updateSuccess = false;
+    public int getItemQuantity(String email, int productId) {
+        DbHelper dbHelper = new DbHelper(context);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        int quantity = 0;
+        Cursor itemCursor = db.rawQuery("SELECT quantity FROM " + TABLE_SHOPPINGCART +
+                        " WHERE userEmail = \"" + email + "\" and productId = " + productId + " LIMIT 1",
+                null);
+
+        if(itemCursor.moveToFirst()) {
+            quantity = itemCursor.getInt(0);
+        }
+        itemCursor.close();
+        return quantity;
+    }
+
+    public long increaseItemQuantity(String userEmail, int productId, int quantity, int stock) {
+        long updateSuccess = 0;
+
+        if (quantity > 0) {
+            int total = getItemQuantity(userEmail, productId) + quantity;
+            if (total > stock || total > LIMIT) {
+                return 2;
+            }
+        }
 
         DbHelper dbHelper = new DbHelper(context);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
         try {
-            db.execSQL("UPDATE " + TABLE_SHOPPINGCART + " SET quantity = (quantity+" + quantity + ") WHERE userEmail = \"" + userEmail + "\" AND productId = " + productId);
-            updateSuccess = true;
+            db.execSQL("UPDATE " + TABLE_SHOPPINGCART + " SET quantity = (quantity+" + quantity + ") " +
+                    "WHERE userEmail = \"" + userEmail + "\" AND productId = " + productId);
+            updateSuccess = 1;
         } catch (Exception ex) {
             ex.printStackTrace();
         } finally {
