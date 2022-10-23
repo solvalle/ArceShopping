@@ -87,6 +87,7 @@
             android:layout_marginRight="16dp"
             android:scrollbars="vertical"
             app:layout_constraintHeight_max="230dp"
+            app:layout_constraintHeight_min="100dp"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
