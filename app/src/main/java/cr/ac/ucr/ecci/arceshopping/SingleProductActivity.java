@@ -3,11 +3,11 @@ package cr.ac.ucr.ecci.arceshopping;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.denzcoskun.imageslider.ImageSlider;
 import com.denzcoskun.imageslider.constants.ScaleTypes;
@@ -94,7 +94,8 @@ public class SingleProductActivity extends AppCompatActivity {
          */
         DbShoppingCart db = new DbShoppingCart(this);
         SharedPreferences sp = this.getSharedPreferences("login", Context.MODE_PRIVATE);
-        db.insertProduct(sp.getString("userEmail",""), this.product.getId(), Integer.parseInt(textCounter.getText().toString()));
+        db.insertProduct(sp.getString("userEmail",""), this.product.getId(), Integer.parseInt(textCounter.getText().toString()), this.product.getPrice());
+        Toast.makeText(this, "Producto añadido éxitosamente", Toast.LENGTH_SHORT).show();
 
         /*
         Intent intent = new Intent(this, StoreActivity.class);

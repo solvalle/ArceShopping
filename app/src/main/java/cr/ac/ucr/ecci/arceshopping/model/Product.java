@@ -17,6 +17,8 @@ public class Product implements Parcelable {
     public String category;
     public String thumbnail;
     public ArrayList<String> images;
+    public int itemsInCart;
+
 
     public Product(int id, String title, String description, int price, double discountPercentage, double rating, int stock, String brand, String category, String thumbnail) {
         this.id = id;
@@ -119,6 +121,15 @@ public class Product implements Parcelable {
         this.images = images;
     }
 
+    public int getItemsInCart() {
+        return itemsInCart;
+    }
+
+    public void setItemsInCart(int itemsInCart) {
+        this.itemsInCart = itemsInCart;
+    }
+
+
     @Override
     public String toString() {
         return
@@ -128,7 +139,8 @@ public class Product implements Parcelable {
                 "rating:" + rating +
                 ", stock:" + stock +
                 ", brand: " + brand  +
-                ", category: " + category;
+                ", category: " + category +
+                ", itemsInCart: " + itemsInCart;
     }
 
     protected Product(Parcel in) {

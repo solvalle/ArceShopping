@@ -38,4 +38,13 @@
     <string name="single_product_plus">+</string>
     <string name="single_product_minus">-</string>
     <string name="single_product_to_cart">Añadir al carrito</string>
+
+    //shoppingCart
+    <string name="shopping_cart">Carrito de Compras</string>
+    <string name="shopping_history">Historial de Compras</string>
+    <string name="total">TOTAL:</string>
+    <string name="pay_button">Pagar</string>
+    <string name="cancel_button">Cancelar</string>
+    <string name="empty_cart">¡El carrito de compras se encuentra vacío!</string>
+
 </resources>

@@ -29,9 +29,11 @@ public class DbHelper extends SQLiteOpenHelper {
                 "passwordIsChanged BOOL DEFAULT 0)");
 
         sqLiteDatabase.execSQL("CREATE TABLE " + TABLE_SHOPPINGCART + "(" +
-                "userEmail VARCHAR(50) PRIMARY KEY, " +
-                "productId INTEGER PRIMARY KEY, " +
+                "userEmail VARCHAR(50), " +
+                "productId INTEGER, " +
                 "quantity INTEGER NOT NULL, " +
+                "price INTEGER NOT NULL, " +
+                "PRIMARY KEY(userEmail, productId), " +
                 "FOREIGN KEY(userEmail) REFERENCES " + TABLE_USERS + "(email))");
     }
 

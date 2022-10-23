@@ -73,7 +73,7 @@ public class ApiFragment extends Fragment implements ListProductViewInterface{
                         rvProducts.setLayoutManager(new GridLayoutManager(root.getContext(), 2));
 
                         productos = products;
-                        ((StoreActivity)getActivity()).setAdapter(adapter);
+                        ((StoreActivity)getActivity()).setProductsAdapter(adapter);
                         ((StoreActivity)getActivity()).setmProducts(products.getProducts());
 
                     }catch (JSONException e) {
