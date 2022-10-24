@@ -19,6 +19,11 @@ import at.favre.lib.crypto.bcrypt.BCrypt;
 import cr.ac.ucr.ecci.arceshopping.db.DbUsers;
 import cr.ac.ucr.ecci.arceshopping.model.EmailManager;
 
+/**
+ * This class's purpose is to help the users to change their password. First they have to put their email.
+ * If the email exists, a randomly generated 6-digit code is send. Then they have to put the code and then
+ * a randomly generated password is generated and the user is send to the login screen
+ */
 public class ForgotPasswordActivity extends AppCompatActivity {
 
     private TextInputLayout tilEmail;
@@ -44,6 +49,10 @@ public class ForgotPasswordActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Sends a randomly generated 6-digit code to the user's email and then shows a dialog where the
+     * user can put the code
+     */
     public void changeForgotPassword(View view) {
         String email = tilEmail.getEditText().getText().toString();
         DbUsers dbUsers = new DbUsers(this);
@@ -59,6 +68,9 @@ public class ForgotPasswordActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Checks if the email is valid. It doesn't check if the email exists
+     */
     private boolean isValidEmail(String email) {
         if (email.length() == 0) {
             tilEmail.setError("Escriba su correo electrónico");
@@ -78,11 +90,17 @@ public class ForgotPasswordActivity extends AppCompatActivity {
         return true;
     }
 
+    /**
+     * Checks if the entered code is correct. If it is correct, a new randomly generated password is
+     * sent to the user's email and then the user is send to the login screen. If the code isn't correct
+     * then the user is send to the login screen with a Toast message indicating that entered code was
+     * incorrect
+     */
     public void checkCode() {
+        // if the entered code is incorrect, generate a "incorrect code" message
         if (code.compareTo(tilCode.getEditText().getText().toString()) != 0) {
             Toast.makeText(this, "Código incorrecto", Toast.LENGTH_LONG).show();
-            Intent intent = new Intent(this, LoginActivity.class);
-            startActivity(intent);
+        // if the entered code is correct, send a new randomly generated password
         } else {
             String firstPassword = UUID.randomUUID().toString().substring(0, 16);
             String hashedPassword = BCrypt.withDefaults().hashToString(12, firstPassword.toCharArray());
@@ -94,8 +112,9 @@ public class ForgotPasswordActivity extends AppCompatActivity {
             manager.sendPasswordEmail(email, firstPassword);
             Toast.makeText(this, "Se le envió una contraseña temporal al correo",
                     Toast.LENGTH_LONG).show();
-            Intent intent= new Intent(this, LoginActivity.class);
-            startActivity(intent);
         }
+        // go to the login screen
+        Intent intent= new Intent(this, LoginActivity.class);
+        startActivity(intent);
     }
 }

@@ -10,6 +10,9 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
+/**
+ * This class's purpose is to send emails to the users
+ */
 public class EmailManager {
 
     private String senderEmail = "swapitecci@gmail.com";
@@ -17,7 +20,9 @@ public class EmailManager {
     private String host = "smtp.gmail.com";
     private Properties properties;
 
-
+    /**
+     * Class's constructor
+     */
     public EmailManager() {
         properties = System.getProperties();
 
@@ -27,6 +32,11 @@ public class EmailManager {
         properties.put("mail.smtp.auth", "true");
     }
 
+    /**
+     * @Param receiverEmail The user's email. The email that will receive the message
+     * @Param password The randomly generated password that will be send
+     * Class's main method. Sends a randomly generated password to the user's email
+     */
     public void sendPasswordEmail(String receiverEmail, String password) {
         try {
             Session session = Session.getDefaultInstance(properties,
