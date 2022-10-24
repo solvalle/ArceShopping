@@ -44,6 +44,7 @@ public class CartFragment extends Fragment {
     private FragmentCartBinding binding;
     private RecyclerView productsRV;
     private TextView emptyCartTV;
+    private TextView priceTV;
     private CartAdapter adapter;
 
     @Override
@@ -58,7 +59,7 @@ public class CartFragment extends Fragment {
 
         ImageView userPhotoIV = (ImageView) root.findViewById(R.id.userPhoto);
         TextView userFullNameTV = (TextView) root.findViewById(R.id.userFullName);
-        TextView priceTV = (TextView) root.findViewById(R.id.priceTV);
+        this.priceTV = (TextView) root.findViewById(R.id.priceTV);
         Button cancelButton = (Button) root.findViewById(R.id.cancel_button);
         Button payButton = (Button) root.findViewById(R.id.pay_button);
         productsRV = (RecyclerView) root.findViewById(R.id.productsRV);
@@ -144,6 +145,7 @@ public class CartFragment extends Fragment {
             productList.clear();
             productsRV.setAdapter(null);
             emptyCartTV.setVisibility(View.VISIBLE);
+            priceTV.setText("$0");
         } else {
             Toast.makeText(root.getContext(), "Ocurrió un problema limpiando el carrito. Intentelo de nuevo", Toast.LENGTH_SHORT).show();
         }
