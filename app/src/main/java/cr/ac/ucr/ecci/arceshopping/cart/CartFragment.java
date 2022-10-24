@@ -105,6 +105,9 @@ public class CartFragment extends Fragment {
         binding = null;
     }
 
+    /**
+     * Consults the api to load the products in the cart with the necessary information
+     */
     public void loadProducts(View root, HashMap<Integer, Integer> shoppingCart) {
         RequestQueue requestQueue = Volley.newRequestQueue(root.getContext());
 
@@ -137,17 +140,23 @@ public class CartFragment extends Fragment {
         }
     }
 
+    /**
+     * This method is attached to the "cancel button". Thjis mehtod clers the cart, including the
+     * data stored in the data base
+     */
     private void cleanCart(View root, String userEmail) {
         DbShoppingCart dbShoppingCart = new DbShoppingCart(root.getContext());
-
+        // Delete the data base
         boolean deleted = dbShoppingCart.deleteUserCart(userEmail);
+        // Reflect the data on the screen
         if(deleted) {
             productList.clear();
             productsRV.setAdapter(null);
             emptyCartTV.setVisibility(View.VISIBLE);
             priceTV.setText("$0");
         } else {
-            Toast.makeText(root.getContext(), "Ocurrió un problema limpiando el carrito. Intentelo de nuevo", Toast.LENGTH_SHORT).show();
+            Toast.makeText(root.getContext(), "Ocurrió un problema limpiando el carrito. Intentelo de nuevo",
+                    Toast.LENGTH_SHORT).show();
         }
     }
 

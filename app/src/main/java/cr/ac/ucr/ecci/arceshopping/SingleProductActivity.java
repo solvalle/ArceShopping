@@ -45,12 +45,15 @@ public class SingleProductActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+        // Receive the product that was selected
         this.product = getIntent().getExtras().getParcelable("product");
+        // Load the product's values
         productTitle.setText(this.product.getTitle());
         productDescription.setText(this.product.getDescription());
         productCategory.setText("Category: " + this.product.getCategory());
         productPrice.setText("$"+Integer.toString(this.product.getPrice()));
         ArrayList<String> productList = new ArrayList<>(this.product.getImages());
+        // Create a SlideModel list for the carousel
         List<SlideModel> slideList = new ArrayList<>();
         for (int index = 0; index < productList.size(); index++) {
             String var = productList.get(index);
