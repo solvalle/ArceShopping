@@ -78,6 +78,16 @@ public class DbShoppingCart extends DbHelper {
         return deleted;
     }
 
+    public boolean deleteItem(String userEmail, int id) {
+        DbHelper dbHelper = new DbHelper(context);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        boolean deleted = db.delete(TABLE_SHOPPINGCART, "userEmail = \"" + userEmail + "\" " +
+                "and productId = " + id , null) > 0;
+        db.close();
+        return deleted;
+    }
+
     public int getTotalPriceOfUserShoppingCart(String userEmail) {
         DbHelper dbHelper = new DbHelper(context);
         SQLiteDatabase db = dbHelper.getWritableDatabase();

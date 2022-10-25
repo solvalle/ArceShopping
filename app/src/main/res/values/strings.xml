@@ -44,7 +44,7 @@
     <string name="shopping_history">Historial de Compras</string>
     <string name="total">TOTAL:</string>
     <string name="pay_button">Pagar</string>
-    <string name="cancel_button">Cancelar</string>
+    <string name="cancel_button">Limpiar</string>
     <string name="empty_cart">¡El carrito de compras se encuentra vacío!</string>
 
 </resources>
