@@ -9,14 +9,20 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class ImageGetter extends Fragment {
     public static final int GALLERY_RESULT = 0;
@@ -67,7 +73,24 @@ public class ImageGetter extends Fragment {
 
     private void launchCamera(){
         Intent takePicture = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        startActivityForResult(takePicture, CAMERA_RESULT);
+        File photoFile = null;
+        try {
+            photoFile = createImageFile();
+        } catch (IOException ex) {
+            // Error occurred while creating the File
+        }
+
+        if (photoFile != null) {
+            //Generate a new file.
+            Uri photoURI = FileProvider.getUriForFile(getActivity(),
+                    "com.arceshopping.android.fileprovider",
+                    photoFile);
+            pathToUserPic = photoURI;
+            //Add new file to intent, so intent returns the full sized image
+            takePicture.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+            startActivityForResult(takePicture, CAMERA_RESULT);
+        }
+
     }
 
     private void launchGallery() {
@@ -94,9 +117,10 @@ public class ImageGetter extends Fragment {
         if(requestCode == CAMERA_RESULT) {
             if(resultCode == RESULT_OK )
             {
-                picFromCamera = (Bitmap) data.getExtras().get("data");
-                iView.setImageBitmap(picFromCamera);
+              //  picFromCamera = (Bitmap) data.getExtras().get("data");
+                setProfilePic();
                 userTookPicture = true;
+                //code to save bitmap into storage and then save its uri here...
             }else {
                 displayMessage("Ocurrio un error");
             }
@@ -118,7 +142,7 @@ public class ImageGetter extends Fragment {
         try {
             //Get content resolver so we have permission to retrieve img, even after the intent shown in launchGallery()
             ContentResolver cr = this.context.getContentResolver();
-            cr.takePersistableUriPermission(pathToUserPic, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            //cr.takePersistableUriPermission(pathToUserPic, Intent.FLAG_GRANT_READ_URI_PERMISSION);
             //Open stream from picture's URI
             final InputStream imageStream = cr.openInputStream(pathToUserPic);
             //Generate bitmap from img specified in Uri
@@ -142,6 +166,22 @@ public class ImageGetter extends Fragment {
         int duration = Toast.LENGTH_SHORT;
         Toast toast = Toast.makeText(context, message, duration);
         toast.show();
+    }
+    //Code taken from android official documentation. Available at:
+    //https://developer.android.com/training/camera-deprecated/photobasics
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = getActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
+
+
+        return image;
     }
 }
 

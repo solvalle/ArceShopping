@@ -131,7 +131,6 @@ public class AccountFragment extends Fragment {
         }
 */
         if(!loggedInUser.getPath().equals(imageGetter.getUriPath())) {
-            if(imageGetter.didUserTakePic()){}
             changesToSqlString += "path = \"" + imageGetter.getUriPath() + "\",";
             this.loggedInUser.setPath(imageGetter.getUriPath());
             System.out.println(this.loggedInUser.getPath());
