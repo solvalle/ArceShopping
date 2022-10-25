@@ -11,12 +11,9 @@
     <string name="iniciar_sesion_login_hint">Iniciar sesión</string>
     <string name="register_text_login">¿No tienes una cuenta?</string>
     <string name="register_link_login">Registrate</string>
+    <string name="forgot_password_link_login">¿Olvidaste tu contraseña?</string>
 
     //register
-    <array name="provinces">
-        ["San José", "Alajuela", "Cartago", "Heredia",
-        "Guanacaste", "Puntarenas", "Limón"]
-    </array>
     <string name="title_register">Registro</string>
     <string name="Id_register">ID</string>
     <string name="complete_name_register">Nombre completo</string>
@@ -42,6 +39,15 @@
     <string name="store_title_products">Tienda</string>
     <string name="cart_title_products">Carrito</string>
     <string name="no_implemented_products">Disponible próximamente</string>
+
+    //forgotPassword
+    <string name="title_forgot_password">Contraseña olvidada</string>
+    <string name="hint_email_forgot_password">Introduzca su correo electrónico</string>
+    <string name="button_forgot_password">Cambiar contraseña</string>
+
+    //dialog
+    <string name="button_dialog">Enviar código</string>
+    <string name="code_hint_dialog">Ingrese el código aquí</string>
 
     //singleProduct
     <string name="single_product_plus">+</string>
