@@ -26,19 +26,17 @@ public class DbShoppingCart extends DbHelper {
             SQLiteDatabase db = dbHelper.getWritableDatabase();
 
             HashMap<Integer, Integer> shoppingCart = selectUserShoppingCart(userEmail);
-            System.out.println("size: " + shoppingCart.get(productId) );
             if(shoppingCart.get(productId) == null ) {
-                System.out.println("Insertando");
                 ContentValues values = new ContentValues();
                 values.put("userEmail", userEmail);
                 values.put("productId", productId);
                 values.put("quantity", quantity);
                 values.put("price", price);
 
-                insertId = db.insert(TABLE_SHOPPINGCART, null, values);
+                db.insert(TABLE_SHOPPINGCART, null, values);
+                insertId = 1;
 
             } else {
-                System.out.println("Actualizando");
                 insertId = increaseItemQuantity(userEmail, productId, quantity, stock);
             }
             db.close();
