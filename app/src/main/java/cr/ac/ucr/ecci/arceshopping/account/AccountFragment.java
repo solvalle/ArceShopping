@@ -181,7 +181,6 @@ public class AccountFragment extends Fragment {
     }
 
     private void setData(){
-        //TODO: save image in table and retrieve it from user table
         til_name.getEditText().setText(loggedInUser.getName());
         tv_id.setText(loggedInUser.getId());
         tv_email.setText(loggedInUser.getEmail());
@@ -197,8 +196,11 @@ public class AccountFragment extends Fragment {
         province_spinner.setSelection(adapter.getPosition(loggedInUser.getProvince()));
         til_age.getEditText().setText(String.valueOf(loggedInUser.getAge()));
 
+        //Get profile pic path from user and turn it into an URI object
         pathToUserPic = Uri.parse(loggedInUser.getPath());
         System.out.println(pathToUserPic.toString());
+
+        //Give a context, an image view and a URI object to imageGetter
         imageGetter = new ImageGetter(getContext(), user_pic, pathToUserPic);
         imageGetter.retrieveUserPic();
 

@@ -48,6 +48,7 @@ public class ImageGetter extends Fragment {
 
     private void setPicOptions()
     {
+        //Set click listeners, title and default message to dialog.
         picOptions.setTitle("Actualizar imagen");
         picOptions.setMessage("¿Cómo desea actualizar su imagen de perfil?");
 
@@ -65,13 +66,13 @@ public class ImageGetter extends Fragment {
         });
     }
 
-    public Boolean didUserTakePic() {return userTookPicture;}
 
     public void startPicUpdate() {
         picOptions.show();
     }
 
     private void launchCamera(){
+        //Intent that launches camera
         Intent takePicture = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         File photoFile = null;
         try {
@@ -82,12 +83,14 @@ public class ImageGetter extends Fragment {
         }
 
         if (photoFile != null) {
-
+            //Create path for incoming image file
             Uri photoURI = FileProvider.getUriForFile(getActivity(),
                     "com.arceshopping.android.fileprovider",
                     photoFile);
+            //Save path
             pathToUserPic = photoURI;
             //Add new file to intent, so intent returns the full sized image
+            //and saves it into provided path.
             takePicture.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
             startActivityForResult(takePicture, CAMERA_RESULT);
         }else {displayMessage("Ocurrió un error");}
@@ -139,7 +142,7 @@ public class ImageGetter extends Fragment {
         Bitmap resultPicture = null;
 
         try {
-            //Get content resolver so we have permission to retrieve img, even after the intent shown in launchGallery()
+            //Get content resolver so we can open image as stream.
             ContentResolver cr = this.context.getContentResolver();
             //cr.takePersistableUriPermission(pathToUserPic, Intent.FLAG_GRANT_READ_URI_PERMISSION);
             //Open stream from picture's URI
