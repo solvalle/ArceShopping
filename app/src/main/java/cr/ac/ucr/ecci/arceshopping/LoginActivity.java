@@ -66,6 +66,11 @@ public class LoginActivity extends ConnectedActivity {
         startActivity(registerIntent);
     }
 
+    public void goToForgotPassword(View view) {
+        Intent forgotPasswordIntent = new Intent(this, ForgotPasswordActivity.class);
+        startActivity(forgotPasswordIntent);
+    }
+
     private boolean isValidEmail(String email) {
         if (email.length() == 0) {
             tilEmail.setError("Escriba su correo electrónico");
