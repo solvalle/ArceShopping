@@ -22,7 +22,7 @@ public class StoreActivity extends ConnectedActivity {
     private ActivityProductsBinding binding;
 
     ArrayList<Product> mProducts;
-    ProductsAdapter adapter;
+    ProductsAdapter productsAdapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,8 +45,8 @@ public class StoreActivity extends ConnectedActivity {
         this.mProducts = mProducts;
     }
 
-    public void setAdapter(ProductsAdapter adapter){
-        this.adapter = adapter;
+    public void setProductsAdapter(ProductsAdapter productsAdapter){
+        this.productsAdapter = productsAdapter;
     }
 
     //https://www.geeksforgeeks.org/searchview-in-android-with-recyclerview/
@@ -103,7 +103,7 @@ public class StoreActivity extends ConnectedActivity {
             // at last we are passing that filtered
             // list to our adapter class.
 
-            adapter.filterList(filteredList);
+            productsAdapter.filterList(filteredList);
         }
     }
 }
