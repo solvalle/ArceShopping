@@ -75,13 +75,14 @@ public class ImageGetter extends Fragment {
         Intent takePicture = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         File photoFile = null;
         try {
+            //Generate a new file.
             photoFile = createImageFile();
         } catch (IOException ex) {
             // Error occurred while creating the File
         }
 
         if (photoFile != null) {
-            //Generate a new file.
+
             Uri photoURI = FileProvider.getUriForFile(getActivity(),
                     "com.arceshopping.android.fileprovider",
                     photoFile);
@@ -89,7 +90,7 @@ public class ImageGetter extends Fragment {
             //Add new file to intent, so intent returns the full sized image
             takePicture.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
             startActivityForResult(takePicture, CAMERA_RESULT);
-        }
+        }else {displayMessage("Ocurrió un error");}
 
     }
 
@@ -119,10 +120,8 @@ public class ImageGetter extends Fragment {
             {
               //  picFromCamera = (Bitmap) data.getExtras().get("data");
                 setProfilePic();
-                userTookPicture = true;
-                //code to save bitmap into storage and then save its uri here...
             }else {
-                displayMessage("Ocurrio un error");
+                displayMessage("No se tomó foto");
             }
 
 
@@ -167,6 +166,7 @@ public class ImageGetter extends Fragment {
         Toast toast = Toast.makeText(context, message, duration);
         toast.show();
     }
+
     //Code taken from android official documentation. Available at:
     //https://developer.android.com/training/camera-deprecated/photobasics
     private File createImageFile() throws IOException {
