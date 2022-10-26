@@ -3,6 +3,7 @@ package cr.ac.ucr.ecci.arceshopping;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkCapabilities;
@@ -12,6 +13,8 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+
+import cr.ac.ucr.ecci.arceshopping.db.DbUsers;
 
 public class ConnectedActivity extends AppCompatActivity {
     private NetworkRequest networkRequest = new NetworkRequest.Builder()
@@ -83,6 +86,11 @@ public class ConnectedActivity extends AppCompatActivity {
         //send user back to login screen
         //todo: close user session too
         finishAffinity(); // Clear backtstack so user cant return to visited activities
+
+        SharedPreferences sp = getSharedPreferences("login",MODE_PRIVATE);
+        DbUsers dbUsers = new DbUsers(this);
+        dbUsers.logoutUser(sp.getString("userEmail",""));
+
         Intent loginIntent = new Intent(this, MainActivity.class);
         startActivity(loginIntent);
     }

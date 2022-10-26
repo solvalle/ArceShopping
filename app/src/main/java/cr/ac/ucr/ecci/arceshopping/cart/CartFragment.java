@@ -32,7 +32,6 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import cr.ac.ucr.ecci.arceshopping.CartAdapter;
 import cr.ac.ucr.ecci.arceshopping.R;
 import cr.ac.ucr.ecci.arceshopping.databinding.FragmentCartBinding;
 import cr.ac.ucr.ecci.arceshopping.db.DbShoppingCart;
@@ -40,6 +39,10 @@ import cr.ac.ucr.ecci.arceshopping.db.DbUsers;
 import cr.ac.ucr.ecci.arceshopping.model.Product;
 import cr.ac.ucr.ecci.arceshopping.model.User;
 
+/**
+ * Fragment that represents and controls the cart. Here the user can administrate his/her cart and buy
+ * the products that he/she wants
+ */
 public class CartFragment extends Fragment {
     private ArrayList<Product> productList = new ArrayList<Product>();
     private FragmentCartBinding binding;
@@ -72,7 +75,7 @@ public class CartFragment extends Fragment {
         userFullNameTV.setText(user.getName());
 
         // TODO: load user photo
-        //Picasso.get().load(user.getPhoto()).into(userPhotoIV);
+        Picasso.get().load(user.getPath()).into(userPhotoIV);
 
         this.dbShoppingCart = new DbShoppingCart(root.getContext());
         priceTV.setText("$" + dbShoppingCart.getTotalPriceOfUserShoppingCart(user.getEmail()));
@@ -93,13 +96,13 @@ public class CartFragment extends Fragment {
                 pay();
             }
         });
-
         cancelButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 cleanCart(v, user.getEmail());
             }
         });
 
+        // sets the delete swipe on cart products
         new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0,
                 ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
             @Override
@@ -169,7 +172,7 @@ public class CartFragment extends Fragment {
     }
 
     /**
-     * This method is attached to the "cancel button". Thjis mehtod clers the cart, including the
+     * This method is attached to the "cancel button". This mehtod clears the cart, including the
      * data stored in the data base
      */
     private void cleanCart(View root, String userEmail) {
@@ -235,10 +238,6 @@ public class CartFragment extends Fragment {
             return productsList.size();
         }
 
-        public ArrayList<Product> getProductsList() {
-            return productsList;
-        }
-
         public void setProductsList(ArrayList<Product> productsList) {
             this.productsList = productsList;
         }
@@ -276,10 +275,6 @@ public class CartFragment extends Fragment {
                 return deductButton;
             }
 
-            public int getStock() {
-                return stock;
-            }
-
             public void setStock(int stock) {
                 this.stock = stock;
             }
@@ -296,6 +291,9 @@ public class CartFragment extends Fragment {
                 stock = 10;
             }
 
+            /**
+             * Increases the product counter
+             */
             public void addCounter() {
                 int counter = Integer.parseInt(quantity.getText().toString()) + 1;
                 if (counter <= 10 && counter <= this.stock) {
@@ -303,6 +301,9 @@ public class CartFragment extends Fragment {
                 }
             }
 
+            /**
+             * Decreases the product counter
+             */
             public void deductCounter() {
                 int counter = Integer.parseInt(quantity.getText().toString()) - 1;
                 if (counter >= 1) {
@@ -310,6 +311,9 @@ public class CartFragment extends Fragment {
                 }
             }
 
+            /**
+             * Saves the cart changes on the data base
+             */
             public void modifyPrices(int counter, int number) {
                 Product product = productsList.get(this.getAdapterPosition());
                 dbShoppingCart.increaseItemQuantity(user.getEmail(), product.getId(), number, product.getStock());

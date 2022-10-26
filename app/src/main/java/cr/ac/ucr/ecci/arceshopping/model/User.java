@@ -34,10 +34,6 @@ public class User {
         return password;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
     public String getId() {
         return id;
     }
@@ -78,10 +74,6 @@ public class User {
 
     public boolean getPasswordIsChanged() {
         return passwordIsChanged;
-    }
-
-    public void setPasswordIsChanged(boolean passwordIsChanged) {
-        this.passwordIsChanged = passwordIsChanged;
     }
 
     @Override

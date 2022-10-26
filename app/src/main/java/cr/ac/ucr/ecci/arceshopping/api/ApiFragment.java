@@ -16,7 +16,7 @@ import cr.ac.ucr.ecci.arceshopping.model.Product;
 import cr.ac.ucr.ecci.arceshopping.model.Products;
 import cr.ac.ucr.ecci.arceshopping.ProductsAdapter;
 import cr.ac.ucr.ecci.arceshopping.R;
-import cr.ac.ucr.ecci.arceshopping.StoreActivity;
+import cr.ac.ucr.ecci.arceshopping.MainActivity;
 import cr.ac.ucr.ecci.arceshopping.databinding.FragmentApiBinding;
 
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -31,10 +31,6 @@ import com.android.volley.toolbox.Volley;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-//import com.example.communication.ListaQuotes;
-//import com.example.communication.Quote;
-//import com.example.communication.R;
-
 import com.google.gson.*;
 
 public class ApiFragment extends Fragment implements ListProductViewInterface{
@@ -46,7 +42,6 @@ public class ApiFragment extends Fragment implements ListProductViewInterface{
     RecyclerView rvProducts;
     ProductsAdapter adapter;
 
-    private RecyclerView listProducts;
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -63,7 +58,6 @@ public class ApiFragment extends Fragment implements ListProductViewInterface{
                         Gson gson = new Gson();
 
                         Products products = gson.fromJson(items, Products.class);
-                        listProducts = root.findViewById(R.id.rvProducts);
 
                         adapter = new ProductsAdapter(products.getProducts(), root.getContext(), this);
 
@@ -73,8 +67,8 @@ public class ApiFragment extends Fragment implements ListProductViewInterface{
                         rvProducts.setLayoutManager(new GridLayoutManager(root.getContext(), 2));
 
                         productos = products;
-                        ((StoreActivity)getActivity()).setProductsAdapter(adapter);
-                        ((StoreActivity)getActivity()).setmProducts(products.getProducts());
+                        ((MainActivity)getActivity()).setProductsAdapter(adapter);
+                        ((MainActivity)getActivity()).setmProducts(products.getProducts());
 
                     }catch (JSONException e) {
                         e.printStackTrace();

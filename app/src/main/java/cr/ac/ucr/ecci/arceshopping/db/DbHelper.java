@@ -27,7 +27,8 @@ public class DbHelper extends SQLiteOpenHelper {
                 "age INTEGER NOT NULL, " +
                 "province VARCHAR(15) NOT NULL, " +
                 "password VARCHAR(50) NOT NULL, " +
-                "passwordIsChanged BOOL DEFAULT 0)");
+                "passwordIsChanged BOOL DEFAULT 0, " +
+                "isLoggedIn BOOL DEFAULT 0)");
 
         sqLiteDatabase.execSQL("CREATE TABLE " + TABLE_SHOPPINGCART + "(" +
                 "userEmail VARCHAR(50), " +

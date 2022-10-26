@@ -1,7 +1,5 @@
 package cr.ac.ucr.ecci.arceshopping;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -11,8 +9,6 @@ import android.widget.Toast;
 
 import com.google.android.material.textfield.TextInputLayout;
 
-import javax.mail.Store;
-
 import at.favre.lib.crypto.bcrypt.BCrypt;
 import cr.ac.ucr.ecci.arceshopping.db.DbUsers;
 import cr.ac.ucr.ecci.arceshopping.model.User;
@@ -20,7 +16,6 @@ import cr.ac.ucr.ecci.arceshopping.model.User;
 public class LoginActivity extends ConnectedActivity {
     private TextInputLayout tilEmail;
     private TextInputLayout tilPassword;
-    private User user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,9 +42,10 @@ public class LoginActivity extends ConnectedActivity {
                 SharedPreferences sp = getSharedPreferences("login",MODE_PRIVATE);
                 sp.edit().putBoolean("logged" , true).apply();
                 sp.edit().putString("userEmail" , email).apply();
+                dbUsers.loginUser(email);
                 if (user.getPasswordIsChanged()) {
                     Toast.makeText(this, "Ir a tienda", Toast.LENGTH_LONG).show();
-                    Intent intent = new Intent( this , StoreActivity.class );
+                    Intent intent = new Intent( this , MainActivity.class );
                     startActivity(intent);
                 } else {
                     Intent intent = new Intent(this, PasswordChangeActivity.class);
