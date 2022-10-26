@@ -1,5 +1,6 @@
 package cr.ac.ucr.ecci.arceshopping.model;
 
+import java.util.ArrayList;
 import java.util.Properties;
 
 import javax.mail.Message;
@@ -50,7 +51,44 @@ public class EmailManager {
             mimeMessage.addRecipient(Message.RecipientType.TO, new InternetAddress(receiverEmail));
 
             mimeMessage.setSubject("ArceShopping: clave temporal");
+
+            String body = "";
+
             mimeMessage.setText("¡Gracias por registrarse en ArceShopping!\n\nSu nueva clave temporal es: " + password);
+
+            Thread thread = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        Transport.send(mimeMessage);
+                    } catch (MessagingException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+            thread.start();
+        } catch (MessagingException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sendPurchaseEmail(User user, ArrayList<Product> products) {
+        try {
+            Session session = Session.getDefaultInstance(properties,
+                    new javax.mail.Authenticator() {
+                        protected PasswordAuthentication getPasswordAuthentication() {
+                            return new PasswordAuthentication(senderEmail, passwordSenderEmail);
+                        }
+                    });
+
+            MimeMessage mimeMessage = new MimeMessage(session);
+            mimeMessage.addRecipient(Message.RecipientType.TO, new InternetAddress(user.getEmail()));
+
+            mimeMessage.setSubject("ArceShopping: compra exitosa");
+
+            String body = "";
+
+            mimeMessage.setText(body);
 
             Thread thread = new Thread(new Runnable() {
                 @Override
