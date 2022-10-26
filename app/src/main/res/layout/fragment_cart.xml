@@ -27,7 +27,7 @@
                 android:layout_width="85dp"
                 android:layout_height="85dp"
                 android:layout_gravity="center_vertical"
-                tools:src="@tools:sample/avatars" />
+                android:src="@drawable/generic_user_icon" />
 
             <TextView
                 android:id="@+id/userFullName"
@@ -86,7 +86,7 @@
             android:layout_marginTop="8dp"
             android:layout_marginRight="16dp"
             android:scrollbars="vertical"
-            app:layout_constraintHeight_max="300dp"
+            app:layout_constraintHeight_max="320dp"
             app:layout_constraintHeight_min="100dp"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintLeft_toLeftOf="parent"

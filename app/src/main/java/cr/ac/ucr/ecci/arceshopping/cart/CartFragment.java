@@ -74,8 +74,8 @@ public class CartFragment extends Fragment {
 
         userFullNameTV.setText(user.getName());
 
-        // TODO: load user photo
-        Picasso.get().load(user.getPath()).into(userPhotoIV);
+        if(user.getPath().compareTo("") > 0)
+            Picasso.get().load(user.getPath()).into(userPhotoIV);
 
         this.dbShoppingCart = new DbShoppingCart(root.getContext());
         priceTV.setText("$" + dbShoppingCart.getTotalPriceOfUserShoppingCart(user.getEmail()));
