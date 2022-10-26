@@ -41,6 +41,7 @@ public class EmailManager {
     public void sendPasswordEmail(String name, String email, String password) {
         //"¡Gracias por registrarse en ArceShopping!\n\nSu nueva clave temporal es: " + password
         String subject = "ArceShopping: clave temporal";
+        // Html adapted from: https://codepen.io/rKalways/pen/VwwQKpV
         String body = "<!doctype html>\n" +
                 "<html lang=\"en-US\">\n" +
                 "<head>\n" +
@@ -101,6 +102,7 @@ public class EmailManager {
 
     public void sendPurchaseEmail(String name, String email, ArrayList<Product> products, String precioTotal) {
         String subject = "ArceShopping: tu compra ha sido completada";
+        // Html adapted from: https://codepen.io/rKalways/pen/MWWQjvm
         String body = "<!doctype html>\n" +
                 "<html lang=\"en-US\">\n" +
                 "<head>\n" +
