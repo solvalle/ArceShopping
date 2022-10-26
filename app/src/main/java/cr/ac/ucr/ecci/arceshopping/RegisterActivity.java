@@ -86,7 +86,7 @@ public class RegisterActivity extends ConnectedActivity {
                 long insert_id = dbUsers.insertUser(theEmail, theId, theCompleteName, "",Integer.parseInt(theAge), theProvince, hashedPassword);
                 if (insert_id > 0) {
                     EmailManager emailManager = new EmailManager();
-                    //System.out.println(firstPassword);
+                    System.out.println(firstPassword);
                     emailManager.sendPasswordEmail(theEmail, firstPassword);
                     Toast.makeText(this, "Registro exitoso", Toast.LENGTH_LONG).show();
                     Intent intent = new Intent(this, LoginActivity.class);

@@ -2,6 +2,7 @@ package cr.ac.ucr.ecci.arceshopping.account;
 
 import static android.content.Context.MODE_PRIVATE;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
@@ -19,16 +20,21 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.UUID;
 
+import at.favre.lib.crypto.bcrypt.BCrypt;
 import cr.ac.ucr.ecci.arceshopping.ImageGetter;
+import cr.ac.ucr.ecci.arceshopping.LoginActivity;
 import cr.ac.ucr.ecci.arceshopping.R;
 import cr.ac.ucr.ecci.arceshopping.databinding.FragmentAccountBinding;
 import cr.ac.ucr.ecci.arceshopping.db.DbUsers;
+import cr.ac.ucr.ecci.arceshopping.model.EmailManager;
 import cr.ac.ucr.ecci.arceshopping.model.User;
 
 
@@ -86,7 +92,7 @@ public class AccountFragment extends Fragment {
         update_password_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                goToPasswordChangeScreen();
+                changePassword();
             }
         });
 
@@ -158,8 +164,18 @@ public class AccountFragment extends Fragment {
         }
     }
 
-    private void goToPasswordChangeScreen(){
-        //code to redirect here
+    private void changePassword(){
+        String firstPassword = UUID.randomUUID().toString().substring(0, 16);
+        String hashedPassword = BCrypt.withDefaults().hashToString(12, firstPassword.toCharArray());
+        String email = loggedInUser.getEmail();
+        this.dbUsers.updateUserPassword(email, hashedPassword, 0);
+        EmailManager manager = new EmailManager();
+        manager.sendPasswordEmail(email, firstPassword);
+        System.out.println(firstPassword);
+        Toast.makeText(getContext(), "Se le envió una contraseña temporal al correo",
+                Toast.LENGTH_LONG).show();
+        Intent intent = new Intent(getContext(), LoginActivity.class);
+        startActivity(intent);
     }
 
     private void setData(){
@@ -180,7 +196,6 @@ public class AccountFragment extends Fragment {
 
         //Get profile pic path from user and turn it into an URI object
         pathToUserPic = Uri.parse(loggedInUser.getPath());
-        System.out.println(pathToUserPic.toString());
 
         //Give a context, an image view and a URI object to imageGetter
         imageGetter = new ImageGetter(getContext(), user_pic, pathToUserPic);
@@ -191,7 +206,6 @@ public class AccountFragment extends Fragment {
         FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.fragmentContainer, imageGetter).commit();
-
     }
 
     private void retrieveXmlElements(View root) {

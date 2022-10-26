@@ -104,12 +104,12 @@ public class ForgotPasswordActivity extends AppCompatActivity {
         } else {
             String firstPassword = UUID.randomUUID().toString().substring(0, 16);
             String hashedPassword = BCrypt.withDefaults().hashToString(12, firstPassword.toCharArray());
-            System.out.println(firstPassword); //prueba
             DbUsers dbUsers = new DbUsers(this);
             String email = tilEmail.getEditText().getText().toString();
             dbUsers.updateUserPassword(email, hashedPassword, 0);
             EmailManager manager = new EmailManager();
             manager.sendPasswordEmail(email, firstPassword);
+            System.out.println(firstPassword);
             Toast.makeText(this, "Se le envió una contraseña temporal al correo",
                     Toast.LENGTH_LONG).show();
         }
