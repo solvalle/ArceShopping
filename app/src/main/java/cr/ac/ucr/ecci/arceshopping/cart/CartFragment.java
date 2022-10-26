@@ -36,6 +36,7 @@ import cr.ac.ucr.ecci.arceshopping.R;
 import cr.ac.ucr.ecci.arceshopping.databinding.FragmentCartBinding;
 import cr.ac.ucr.ecci.arceshopping.db.DbShoppingCart;
 import cr.ac.ucr.ecci.arceshopping.db.DbUsers;
+import cr.ac.ucr.ecci.arceshopping.model.EmailManager;
 import cr.ac.ucr.ecci.arceshopping.model.Product;
 import cr.ac.ucr.ecci.arceshopping.model.User;
 
@@ -93,12 +94,12 @@ public class CartFragment extends Fragment {
         // Listeners to buttons
         payButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                pay();
+                pay(v);
             }
         });
         cancelButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                cleanCart(v, user.getEmail());
+                cleanCart(v);
             }
         });
 
@@ -175,10 +176,10 @@ public class CartFragment extends Fragment {
      * This method is attached to the "cancel button". This mehtod clears the cart, including the
      * data stored in the data base
      */
-    private void cleanCart(View root, String userEmail) {
+    private void cleanCart(View root) {
         DbShoppingCart dbShoppingCart = new DbShoppingCart(root.getContext());
         // Delete the data base
-        boolean deleted = dbShoppingCart.deleteUserCart(userEmail);
+        boolean deleted = dbShoppingCart.deleteUserCart(user.getEmail());
         // Reflect the data on the screen
         if(deleted) {
             productList.clear();
@@ -191,7 +192,23 @@ public class CartFragment extends Fragment {
         }
     }
 
-    private void pay() {
+    private void pay(View root) {
+        DbShoppingCart dbShoppingCart = new DbShoppingCart(root.getContext());
+        boolean deleted = dbShoppingCart.deleteUserCart(user.getEmail());
+
+        if(deleted) {
+            Toast.makeText(root.getContext(), "Compra exitosa. Revisa tu correo",
+                    Toast.LENGTH_SHORT).show();
+            EmailManager emailManager = new EmailManager();
+            emailManager.sendPurchaseEmail(user.getName(), user.getEmail(),productList, priceTV.getText().toString());
+            productList.clear();
+            productsRV.setAdapter(null);
+            emptyCartTV.setVisibility(View.VISIBLE);
+            priceTV.setText("$0");
+        } else {
+            Toast.makeText(root.getContext(), "Ocurrió un problema con el carrito. Intentelo de nuevo",
+                    Toast.LENGTH_SHORT).show();
+        }
     }
 
     public class CartRvAdapter extends RecyclerView.Adapter<CartRvAdapter.ViewHolder> {
