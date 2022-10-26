@@ -2,12 +2,15 @@ package cr.ac.ucr.ecci.arceshopping.account;
 
 import static android.content.Context.MODE_PRIVATE;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -22,10 +25,17 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.material.datepicker.MaterialDatePicker;
+import com.google.android.material.datepicker.MaterialPickerOnPositiveButtonClickListener;
 import com.google.android.material.textfield.TextInputLayout;
 
+import java.time.LocalDate;
+import java.time.Period;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Locale;
 import java.util.UUID;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
@@ -47,12 +57,14 @@ public class AccountFragment extends Fragment {
     private TextView tv_id;
     private TextView tv_email;
     private Spinner province_spinner;
-    private TextInputLayout til_age;
+    private TextView tv_age;
+    private Button age_button;
     private Button update_password_button;
     private Button save_changes_button;
     private FragmentAccountBinding binding;
     private Uri pathToUserPic;
     private ImageGetter imageGetter;
+    private MaterialDatePicker materialDatePicker;
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState)
@@ -64,6 +76,9 @@ public class AccountFragment extends Fragment {
         //Retrieve user email so we can retrieve their data from db
         SharedPreferences sp = getActivity().getSharedPreferences("login", MODE_PRIVATE);
         loggedInUser = dbUsers.selectUser(sp.getString("userEmail", "DEFAULT"));
+        MaterialDatePicker.Builder materialDateBuilder = MaterialDatePicker.Builder.datePicker();
+        materialDateBuilder.setTitleText("Seleccione una fecha");
+        materialDatePicker = materialDateBuilder.build();
 
         //Retrieve xml elements so we can populate them with user data
         retrieveXmlElements(root);
@@ -96,6 +111,22 @@ public class AccountFragment extends Fragment {
             }
         });
 
+        this.age_button.setOnClickListener( new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                materialDatePicker.show(getActivity().getSupportFragmentManager(),
+                        "MATERIAL_DATE_PICKER");
+            }
+        });
+
+        materialDatePicker.addOnPositiveButtonClickListener(
+                new MaterialPickerOnPositiveButtonClickListener() {
+                    @SuppressLint("SetTextI18n")
+                    @Override
+                    public void onPositiveButtonClick(Object selection) {
+                        calculateAge(materialDatePicker.getHeaderText());
+                    }
+                });
     }
 
 
@@ -124,10 +155,10 @@ public class AccountFragment extends Fragment {
             System.out.println(this.loggedInUser.getPath());
         }
 
-        int til_age_content = Integer.valueOf(til_age.getEditText().getText().toString());
-        if(loggedInUser.getAge() != til_age_content) {
-            changesToSqlString += "age = \"" + String.valueOf(til_age_content) + "\",";
-            this.loggedInUser.setAge(til_age_content);
+        int tv_age_content = Integer.valueOf(tv_age.getText().toString());
+        if(loggedInUser.getAge() != tv_age_content) {
+            changesToSqlString += "age = \"" + String.valueOf(tv_age_content) + "\",";
+            this.loggedInUser.setAge(tv_age_content);
         }
 
         String province_spinner_content = province_spinner.getSelectedItem().toString();
@@ -178,6 +209,13 @@ public class AccountFragment extends Fragment {
         startActivity(intent);
     }
 
+    private void calculateAge(String stringDate) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM d, yyyy", Locale.ENGLISH);
+        LocalDate date = LocalDate.parse(stringDate, formatter);
+        int theAge = Period.between(date, LocalDate.now( ZoneId.of( "Pacific/Auckland" ))).getYears();
+        this.tv_age.setText(String.valueOf(theAge));
+    }
+
     private void setData(){
         til_name.getEditText().setText(loggedInUser.getName());
         tv_id.setText(loggedInUser.getId());
@@ -192,7 +230,7 @@ public class AccountFragment extends Fragment {
         province_spinner.setAdapter(adapter);
         //adapter.getPosition() is how we get the index number for the user's province
         province_spinner.setSelection(adapter.getPosition(loggedInUser.getProvince()));
-        til_age.getEditText().setText(String.valueOf(loggedInUser.getAge()));
+        tv_age.setText(String.valueOf(loggedInUser.getAge()));
 
         //Get profile pic path from user and turn it into an URI object
         pathToUserPic = Uri.parse(loggedInUser.getPath());
@@ -215,7 +253,8 @@ public class AccountFragment extends Fragment {
         tv_id = root.findViewById(R.id.tv_id);
         tv_email = root.findViewById(R.id.tv_email);
         province_spinner = root.findViewById(R.id.account_province_spinner);
-        til_age = root.findViewById(R.id.til_age);
+        tv_age = root.findViewById(R.id.user_age);
+        age_button = root.findViewById(R.id.date_button);
         update_password_button = root.findViewById(R.id.change_password_button);
         save_changes_button = root.findViewById(R.id.save_changes_button);
     }
