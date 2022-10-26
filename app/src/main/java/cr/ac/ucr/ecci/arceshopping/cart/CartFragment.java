@@ -39,6 +39,10 @@ import cr.ac.ucr.ecci.arceshopping.db.DbUsers;
 import cr.ac.ucr.ecci.arceshopping.model.Product;
 import cr.ac.ucr.ecci.arceshopping.model.User;
 
+/**
+ * Fragment that represents and controls the cart. Here the user can administrate his/her cart and buy
+ * the products that he/she wants
+ */
 public class CartFragment extends Fragment {
     private ArrayList<Product> productList = new ArrayList<Product>();
     private FragmentCartBinding binding;
@@ -92,13 +96,13 @@ public class CartFragment extends Fragment {
                 pay();
             }
         });
-
         cancelButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 cleanCart(v, user.getEmail());
             }
         });
 
+        // sets the delete swipe on cart products
         new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0,
                 ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
             @Override
@@ -287,6 +291,9 @@ public class CartFragment extends Fragment {
                 stock = 10;
             }
 
+            /**
+             * Increases the product counter
+             */
             public void addCounter() {
                 int counter = Integer.parseInt(quantity.getText().toString()) + 1;
                 if (counter <= 10 && counter <= this.stock) {
@@ -294,6 +301,9 @@ public class CartFragment extends Fragment {
                 }
             }
 
+            /**
+             * Decreases the product counter
+             */
             public void deductCounter() {
                 int counter = Integer.parseInt(quantity.getText().toString()) - 1;
                 if (counter >= 1) {
@@ -301,6 +311,9 @@ public class CartFragment extends Fragment {
                 }
             }
 
+            /**
+             * Saves the cart changes on the data base
+             */
             public void modifyPrices(int counter, int number) {
                 Product product = productsList.get(this.getAdapterPosition());
                 dbShoppingCart.increaseItemQuantity(user.getEmail(), product.getId(), number, product.getStock());

@@ -15,8 +15,8 @@ import javax.mail.internet.MimeMessage;
  */
 public class EmailManager {
 
-    private String senderEmail = "swapitecci@gmail.com";
-    private String passwordSenderEmail = "azakfdtukfskysdy";
+    private String senderEmail = "swapitecci@gmail.com"; //our email, the sender
+    private String passwordSenderEmail = "azakfdtukfskysdy"; // email's password
     private String host = "smtp.gmail.com";
     private Properties properties;
 

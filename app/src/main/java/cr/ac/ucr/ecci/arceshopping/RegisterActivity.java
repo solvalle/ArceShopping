@@ -34,6 +34,7 @@ import javax.mail.internet.MimeMessage;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
 import cr.ac.ucr.ecci.arceshopping.db.DbUsers;
+import cr.ac.ucr.ecci.arceshopping.model.EmailManager;
 import cr.ac.ucr.ecci.arceshopping.model.User;
 
 public class RegisterActivity extends ConnectedActivity {
@@ -84,8 +85,9 @@ public class RegisterActivity extends ConnectedActivity {
                 //empty space is path to user
                 long insert_id = dbUsers.insertUser(theEmail, theId, theCompleteName, "",Integer.parseInt(theAge), theProvince, hashedPassword);
                 if (insert_id > 0) {
-                    sendPasswordEmail(theEmail, firstPassword);
-
+                    EmailManager emailManager = new EmailManager();
+                    //System.out.println(firstPassword);
+                    emailManager.sendPasswordEmail(theEmail, firstPassword);
                     Toast.makeText(this, "Registro exitoso", Toast.LENGTH_LONG).show();
                     Intent intent = new Intent(this, LoginActivity.class);
                     startActivity(intent);
@@ -95,47 +97,6 @@ public class RegisterActivity extends ConnectedActivity {
             } else {
                 Toast.makeText(this, "Correo electronico ya registrado", Toast.LENGTH_LONG).show();
             }
-        }
-    }
-
-    public void sendPasswordEmail(String receiverEmail, String password) {
-        String senderEmail = "swapitecci@gmail.com";
-        String passwordSenderEmail = "azakfdtukfskysdy";
-        String host = "smtp.gmail.com";
-
-        Properties properties = System.getProperties();
-
-        properties.put("mail.smtp.host", host);
-        properties.put("mail.smtp.port", "465");
-        properties.put("mail.smtp.ssl.enable", "true");
-        properties.put("mail.smtp.auth", "true");
-        try {
-            Session session = Session.getDefaultInstance(properties,
-                    new javax.mail.Authenticator() {
-                        protected PasswordAuthentication getPasswordAuthentication() {
-                            return new PasswordAuthentication(senderEmail, passwordSenderEmail);
-                        }
-                    });
-
-            MimeMessage mimeMessage = new MimeMessage(session);
-            mimeMessage.addRecipient(Message.RecipientType.TO, new InternetAddress(receiverEmail));
-
-            mimeMessage.setSubject("ArceShopping: clave temporal");
-            mimeMessage.setText("¡Gracias por registrarse en ArceShopping!\n\nSu nueva clave temporal es: " + password);
-
-            Thread thread = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        Transport.send(mimeMessage);
-                    } catch (MessagingException e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
-            thread.start();
-        } catch (MessagingException e) {
-            e.printStackTrace();
         }
     }
 
