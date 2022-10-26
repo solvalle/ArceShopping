@@ -170,7 +170,7 @@ public class AccountFragment extends Fragment {
         String email = loggedInUser.getEmail();
         this.dbUsers.updateUserPassword(email, hashedPassword, 0);
         EmailManager manager = new EmailManager();
-        manager.sendPasswordEmail(email, firstPassword);
+        manager.sendPasswordEmail(loggedInUser.getName(), email, firstPassword);
         System.out.println(firstPassword);
         Toast.makeText(getContext(), "Se le envió una contraseña temporal al correo",
                 Toast.LENGTH_LONG).show();

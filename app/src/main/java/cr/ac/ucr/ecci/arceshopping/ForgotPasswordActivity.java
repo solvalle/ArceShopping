@@ -61,7 +61,7 @@ public class ForgotPasswordActivity extends AppCompatActivity {
             int randomNumber = random.nextInt(999999);
             String cypher = String.format("%06d", randomNumber);
             EmailManager manager = new EmailManager();
-            manager.sendPasswordEmail(email, cypher);
+            manager.sendPasswordEmail(dbUsers.selectUser(email).getName(), email, cypher);
             code = Integer.toString(randomNumber);
             System.out.println(code);
             dialog.show();
@@ -108,7 +108,7 @@ public class ForgotPasswordActivity extends AppCompatActivity {
             String email = tilEmail.getEditText().getText().toString();
             dbUsers.updateUserPassword(email, hashedPassword, 0);
             EmailManager manager = new EmailManager();
-            manager.sendPasswordEmail(email, firstPassword);
+            manager.sendPasswordEmail(dbUsers.selectUser(email).getName(), email, firstPassword);
             System.out.println(firstPassword);
             Toast.makeText(this, "Se le envió una contraseña temporal al correo",
                     Toast.LENGTH_LONG).show();
