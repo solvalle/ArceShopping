@@ -35,7 +35,7 @@ public class LoginActivity extends ConnectedActivity {
         if (validEmail && validPassword) {
             DbUsers dbUsers = new DbUsers(this);
             User user = dbUsers.selectUser(email);
-            boolean validCredentials = validateCredentials(user, email, password);
+            boolean validCredentials = user != null && validateCredentials(user, email, password);
 
             if(validCredentials) {
                 Toast.makeText(this, "Se ingresó correctamente", Toast.LENGTH_LONG).show();
