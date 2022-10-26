@@ -61,6 +61,59 @@ public class DbUsers extends DbHelper {
         return user;
     }
 
+    public String getLoginUser(){
+        DbHelper dbHelper = new DbHelper(context);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        String email = "";
+        Cursor userCursor = db.rawQuery("SELECT email FROM " + TABLE_USERS + " WHERE isLoggedIn = 1 LIMIT 1", null);
+
+        if(userCursor.moveToFirst()) {
+            email = userCursor.getString(0);
+        }
+
+        userCursor.close();
+
+        return email;
+
+    }
+
+    public boolean loginUser(String email) {
+        boolean logged = false;
+
+        DbHelper dbHelper = new DbHelper(context);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        try {
+            db.execSQL("UPDATE " + TABLE_USERS + " SET isLoggedIn = 1 WHERE email = \"" + email + "\"");
+            logged = true;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        } finally {
+            db.close();
+        }
+
+        return logged;
+    }
+
+    public boolean logoutUser(String email) {
+        boolean logout = false;
+
+        DbHelper dbHelper = new DbHelper(context);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        try {
+            db.execSQL("UPDATE " + TABLE_USERS + " SET isLoggedIn = 0 WHERE email = \"" + email + "\"");
+            logout = true;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        } finally {
+            db.close();
+        }
+
+        return logout;
+    }
+
     public boolean updateUserPassword(String email, String newPassword, int bool) {
         if (bool > 1 || bool < 0) {
             return false;

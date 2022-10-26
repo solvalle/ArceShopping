@@ -1,7 +1,6 @@
 package cr.ac.ucr.ecci.arceshopping;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import android.Manifest;

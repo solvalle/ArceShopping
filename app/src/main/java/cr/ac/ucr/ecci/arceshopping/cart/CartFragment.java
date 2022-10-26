@@ -32,7 +32,6 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import cr.ac.ucr.ecci.arceshopping.CartAdapter;
 import cr.ac.ucr.ecci.arceshopping.R;
 import cr.ac.ucr.ecci.arceshopping.databinding.FragmentCartBinding;
 import cr.ac.ucr.ecci.arceshopping.db.DbShoppingCart;
@@ -72,7 +71,7 @@ public class CartFragment extends Fragment {
         userFullNameTV.setText(user.getName());
 
         // TODO: load user photo
-        //Picasso.get().load(user.getPhoto()).into(userPhotoIV);
+        Picasso.get().load(user.getPath()).into(userPhotoIV);
 
         this.dbShoppingCart = new DbShoppingCart(root.getContext());
         priceTV.setText("$" + dbShoppingCart.getTotalPriceOfUserShoppingCart(user.getEmail()));
@@ -169,7 +168,7 @@ public class CartFragment extends Fragment {
     }
 
     /**
-     * This method is attached to the "cancel button". Thjis mehtod clers the cart, including the
+     * This method is attached to the "cancel button". This mehtod clears the cart, including the
      * data stored in the data base
      */
     private void cleanCart(View root, String userEmail) {
@@ -235,10 +234,6 @@ public class CartFragment extends Fragment {
             return productsList.size();
         }
 
-        public ArrayList<Product> getProductsList() {
-            return productsList;
-        }
-
         public void setProductsList(ArrayList<Product> productsList) {
             this.productsList = productsList;
         }
@@ -274,10 +269,6 @@ public class CartFragment extends Fragment {
 
             public Button getDeductButton() {
                 return deductButton;
-            }
-
-            public int getStock() {
-                return stock;
             }
 
             public void setStock(int stock) {
