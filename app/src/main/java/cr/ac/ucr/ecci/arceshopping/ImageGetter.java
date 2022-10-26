@@ -144,7 +144,9 @@ public class ImageGetter extends Fragment {
         try {
             //Get content resolver so we can open image as stream.
             ContentResolver cr = this.context.getContentResolver();
-            if(pathToUserPic.toString().split("com.arceshopping.android",1).length <= 0) {
+            System.out.println("\n Array"+pathToUserPic.toString().split("com.arceshopping.android",3).length);
+            if(pathToUserPic.toString().split("com.arceshopping.android",3).length <= 1) {
+                System.out.println("voy a pedir");
                 //If pathToUser pic is split by the above operation, that means that the user's picture was taken from camera.
                 //In that case, the below line of code must not be executed, or else app crashes.
                 cr.takePersistableUriPermission(pathToUserPic, Intent.FLAG_GRANT_READ_URI_PERMISSION);
