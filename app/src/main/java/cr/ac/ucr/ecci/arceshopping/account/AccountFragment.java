@@ -130,12 +130,7 @@ public class AccountFragment extends Fragment {
                     @SuppressLint("SetTextI18n")
                     @Override
                     public void onPositiveButtonClick(Long selection) {
-                        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-                        calendar.setTimeInMillis(selection);
-                        SimpleDateFormat format = new SimpleDateFormat("MMM d, yyyy");
-                        String formattedDate  = format.format(calendar.getTime());
-                        //System.out.println(formattedDate);
-                        calculateAge(formattedDate);
+                        calculateAge(selection);
                     }
                 });
     }
@@ -230,9 +225,13 @@ public class AccountFragment extends Fragment {
     /**
      * Method to calculate the user's current age with his/her birthday
      */
-    private void calculateAge(String stringDate) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM d, yyyy", Locale.ENGLISH);
-        LocalDate date = LocalDate.parse(stringDate, formatter);
+    private void calculateAge(long milliseconds) {
+        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+        calendar.setTimeInMillis(milliseconds);
+        System.out.println(calendar.get(Calendar.DAY_OF_MONTH));
+        LocalDate date = LocalDate.of(calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.DAY_OF_MONTH));
         int theAge = Period.between(date, LocalDate.now( ZoneId.of( "Pacific/Auckland" ))).getYears();
         if (theAge > 0) {
             this.tv_age.setText(String.valueOf(theAge));
