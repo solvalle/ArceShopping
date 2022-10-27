@@ -34,12 +34,12 @@ public class EmailManager {
     }
 
     /**
-     * @Param receiverEmail The user's email. The email that will receive the message
-     * @Param password The randomly generated password that will be send
-     * Class's main method. Sends a randomly generated password to the user's email
+     * Create a html message with the temporary password and call sendEmail() method with that message as the body
+     * @Param name The user's name
+     * @Param email The user's email. The email that will receive the message
+     * @Param password The new temporary password, which  will be send
      */
     public void sendPasswordEmail(String name, String email, String password) {
-        //"¡Gracias por registrarse en ArceShopping!\n\nSu nueva clave temporal es: " + password
         String subject = "ArceShopping: clave temporal";
         // Html adapted from: https://codepen.io/rKalways/pen/VwwQKpV
         String body = "<!doctype html>\n" +
@@ -67,7 +67,9 @@ public class EmailManager {
                 "                                </tr>\n" +
                 "                                <tr>\n" +
                 "                                    <td style=\"padding:0 35px;\">\n" +
-                "                                        <h1 style=\"color:#1e1e2d; font-weight:500; margin:0;font-size:32px;font-family:'Rubik',sans-serif;\">Hola "+ name +",</h1>\n" +
+                "                                        <h1 style=\"color:#1e1e2d; font-weight:500; margin:0;font-size:32px;font-family:'Rubik',sans-serif;\"> \n" +
+                "                                           Hola "+ name +",\n" +
+                "                                        </h1>\n" +
                 "                                        <span\n" +
                 "                                            style=\"display:inline-block; vertical-align:middle; margin:29px 0 26px; border-bottom:1px solid #cecece; width:100px;\"></span>\n" +
                 "                                        <p style=\"color:#455056; font-size:15px;line-height:24px; margin:0; text-align: left;\">\n" +
@@ -77,8 +79,7 @@ public class EmailManager {
                 "                                            Por tu seguridad, no compartas esta clave con nadie. Si no pediste esta clave, por favor ignora este correo. \n" +
                 "                                        </p>\n" +
                 "                                        <br/>\n" +
-                "                                        <p style=\"color:#455056; font-size:15px;line-height:24px; margin:0; font-weight: bold;\">Gracias por registrate en ArceShopping! </p>\n" +
-                "                                        \n" +
+                "                                        <p style=\"color:#455056; font-size:15px;line-height:24px; margin:0; font-weight: bold;\">¡Gracias por registrate en ArceShopping! </p>\n" +
                 "                                    </td>\n" +
                 "                                </tr>\n" +
                 "                                <tr>\n" +
@@ -100,7 +101,14 @@ public class EmailManager {
         sendEmail(email, subject, body);
     }
 
-    public void sendPurchaseEmail(String name, String email, ArrayList<Product> products, String precioTotal) {
+    /**
+     * Create a html message for the user's purchase and call sendEmail() method with that message as the body
+     * @Param name The user's name
+     * @Param email The user's email. The email that will receive the message
+     * @Param products The products in the shopping cart
+     * @Param totalPrice The total price of the shopping cart
+     */
+    public void sendPurchaseEmail(String name, String email, ArrayList<Product> products, String totalPrice) {
         String subject = "ArceShopping: tu compra ha sido completada";
         // Html adapted from: https://codepen.io/rKalways/pen/MWWQjvm
         String body = "<!doctype html>\n" +
@@ -114,23 +122,23 @@ public class EmailManager {
                 "        style=\"@import url(https://fonts.googleapis.com/css?family=Rubik:300,400,500,700|Open+Sans:300,400,600,700); font-family: 'Open Sans', sans-serif;\">\n" +
                 "        <tr>\n" +
                 "            <td>\n" +
-                "                <table style=\"background-color: #f2f3f8; max-width:670px; margin:0 auto;\" width=\"100%\" border=\"0\"\n" +
-                "                    align=\"center\" cellpadding=\"0\" cellspacing=\"0\">\n" +
+                "                <table style=\"background-color: #f2f3f8; max-width:670px; margin:0 auto;\" width=\"100%\" border=\"0\" align=\"center\" cellpadding=\"0\" cellspacing=\"0\">\n" +
                 "                    <tr>\n" +
                 "                        <td height=\"20px;\">&nbsp;</td>\n" +
                 "                    </tr>\n" +
                 "                    <!-- Email Content -->\n" +
                 "                    <tr>\n" +
                 "                        <td>\n" +
-                "                            <table width=\"95%\" border=\"0\" align=\"center\" cellpadding=\"0\" cellspacing=\"0\" \n" +
-                "                                style=\"padding: 5%;max-width:600px; background:#fff; border-radius:3px; text-align:left;-webkit-box-shadow:0 6px 18px 0 rgba(0,0,0,.06);-moz-box-shadow:0 6px 18px 0 rgba(0,0,0,.06);box-shadow:0 6px 18px 0 rgba(0,0,0,.06);\">\n" +
+                "                            <table width=\"95%\" border=\"0\" align=\"center\" cellpadding=\"0\" cellspacing=\"0\" style=\"padding: 5%;max-width:600px; background:#fff; border-radius:3px; text-align:left;-webkit-box-shadow:0 6px 18px 0 rgba(0,0,0,.06);-moz-box-shadow:0 6px 18px 0 rgba(0,0,0,.06);box-shadow:0 6px 18px 0 rgba(0,0,0,.06);\">\n" +
                 "                                <tr>\n" +
                 "                                    <td style=\"height:40px;\">&nbsp;</td>\n" +
                 "                                </tr>\n" +
                 "                                <!-- Title -->\n" +
                 "                                <tr>\n" +
                 "                                    <td style=\"padding:0 15px; text-align:center;\">\n" +
-                "                                        <h1 style=\"color:#1e1e2d; font-weight:400; margin:0;font-size:32px;font-family:'Rubik',sans-serif;\">Hola " + name + ", </h1>\n" +
+                "                                        <h1 style=\"color:#1e1e2d; font-weight:400; margin:0;font-size:32px;font-family:'Rubik',sans-serif;\n \">" +
+                "                                           Hola " + name + ",\n" +
+                "                                        </h1>\n" +
                 "                                        <span style=\"display:inline-block; vertical-align:middle; margin:29px 0 26px; border-bottom:1px solid #cecece; \n" +
                 "                                        width:100px;\"></span>\n" +
                 "                                    </td>\n" +
@@ -140,48 +148,38 @@ public class EmailManager {
                 "                                      <p style=\"font-size:15px; color:#455056; margin: 29px 0 26px; line-height:24px; margin:8px 0 30px;\">Gracias por visitar ArceShopping. Hemos terminado de procesar tu pedido.</p>\n" +
                 "                                    </td>\n" +
                 "                                </tr>\n" +
-                "\n" +
-                "\n" +
                 "                                <!-- Details Table -->\n" +
                 "                                <tr>\n" +
                 "                                    <td>\n" +
-                "                                        <table cellpadding=\"0\" cellspacing=\"0\"\n" +
-                "                                            style=\"width: 100%; border: 1px solid #ededed\">\n" +
+                "                                        <table cellpadding=\"0\" cellspacing=\"0\" style=\"width: 100%; border: 1px solid #ededed\">\n" +
                 "                                            <tbody>\n" +
                 "                                                <tr>\n" +
-                "                                                    <td\n" +
-                "                                                        style=\"padding: 10px; border-bottom: 1px solid #ededed; border-right: 1px solid #ededed; width: 35%; font-weight:bold; color:rgba(0,0,0,.64)\">\n" +
-                "                                                        Producto</td>\n" +
-                "                                                    <td\n" +
-                "                                                        style=\"padding: 10px; border-bottom: 1px solid #ededed; border-right: 1px solid #ededed; width: 35%; font-weight:bold; color:rgba(0,0,0,.64)\">\n" +
-                "                                                        Cantidad</td>     \n" +
-                "                                                    <td\n" +
-                "                                                    style=\"padding: 10px; border-bottom: 1px solid #ededed; border-right: 1px solid #ededed; width: 35%; font-weight:bold; color:rgba(0,0,0,.64)\">\n" +
-                "                                                    Precio</td> " +
+                "                                                    <td style=\"padding: 10px; border-bottom: 1px solid #ededed; border-right: 1px solid #ededed; width: 35%; font-weight:bold; color:rgba(0,0,0,.64)\">\n" +
+                "                                                        Producto\n" +
+                "                                                    </td>\n" +
+                "                                                    <td style=\"padding: 10px; border-bottom: 1px solid #ededed; border-right: 1px solid #ededed; width: 35%; font-weight:bold; color:rgba(0,0,0,.64)\">\n" +
+                "                                                        Cantidad\n" +
+                "                                                    </td>\n" +
+                "                                                    <td style=\"padding: 10px; border-bottom: 1px solid #ededed; border-right: 1px solid #ededed; width: 35%; font-weight:bold; color:rgba(0,0,0,.64)\">\n" +
+                "                                                       Precio\n" +
+                "                                                    </td> \n" +
                 "                                           </tr>\n";
 
         for (Product product : products) {
             body += "                                                <tr>\n" +
-                    "                                                    <td\n" +
-                    "                                                        style=\"padding: 10px; border-bottom: 1px solid #ededed; color: #455056; border-right: 1px solid #ededed; \">\n" +
+                    "                                                    <td style=\"padding: 10px; border-bottom: 1px solid #ededed; color: #455056; border-right: 1px solid #ededed;\">\n" +
                     "                                                        "+ product.getTitle() +"</td>\n" +
-                    "\n" +
-                    "                                                    <td\n" +
-                    "                                                        style=\"padding: 10px; border-bottom: 1px solid #ededed; color: #455056; border-right: 1px solid #ededed; \">\n" +
+                    "                                                    <td style=\"padding: 10px; border-bottom: 1px solid #ededed; color: #455056; border-right: 1px solid #ededed;\">\n" +
                     "                                                        "+ product.getItemsInCart() +"</td>\n" +
-                    "\n" +
-                    "                                                    <td\n" +
-                    "                                                        style=\"padding: 10px; border-bottom: 1px solid #ededed; color: #455056; border-right: 1px solid #ededed; \">\n" +
-                    "                                                         "+ product.getPrice() +"</td>\n" +
+                    "                                                    <td style=\"padding: 10px; border-bottom: 1px solid #ededed; color: #455056; border-right: 1px solid #ededed;\">\n" +
+                    "                                                         $"+ product.getPrice() +"</td>\n" +
                     "                                                </tr>\n";
         }
         body += "                                                <tr>\n" +
-                "                                                    <td\n" +
-                "                                                        style=\"padding: 10px; border-bottom: 1px solid #ededed; color: #455056;  font-weight:bold;  border-right: 1px solid #ededed; \">\n" +
+                "                                                    <td style=\"padding: 10px; border-bottom: 1px solid #ededed; color: #455056;  font-weight:bold;  border-right: 1px solid #ededed; \">\n" +
                 "                                                        Total</td>\n" +
-                "                                                    <td\n" +
-                "                                                        style=\"padding: 10px; border-bottom: 1px solid #ededed; color: #455056; font-weight:bold; \">\n" +
-                "                                                        " + precioTotal + "</td>\n" +
+                "                                                    <td style=\"padding: 10px; border-bottom: 1px solid #ededed; color: #455056; font-weight:bold; \">\n" +
+                "                                                        " + totalPrice + "</td>\n" +
                 "                                                </tr>\n" +
                 "                                            </tbody>\n" +
                 "                                        </table>\n" +
@@ -201,12 +199,17 @@ public class EmailManager {
                 "        </tr>\n" +
                 "    </table>\n" +
                 "</body>\n" +
-                "\n" +
                 "</html>";
 
         sendEmail(email, subject, body);
     }
 
+    /**
+     * Class's main method. Sends a email to the user's email
+     * @Param receiverEmail The user's email. The email that will receive the message
+     * @Param subject The email subject that will be send
+     * @Param body The message of the email
+     */
     public void sendEmail(String receiverEmail, String subject, String body) {
         try {
             Session session = Session.getDefaultInstance(properties,

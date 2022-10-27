@@ -35,7 +35,7 @@ public class MainActivity extends ConnectedActivity {
 
         SharedPreferences sp = getSharedPreferences("login", MODE_PRIVATE);
         DbUsers dbUsers = new DbUsers(this);
-        String userEmail = dbUsers.getLoginUser();
+        String userEmail = dbUsers.getLoggedInUser();
 
         if (userEmail.equals("")) {
             sp.edit().putBoolean("logged" , false).apply();

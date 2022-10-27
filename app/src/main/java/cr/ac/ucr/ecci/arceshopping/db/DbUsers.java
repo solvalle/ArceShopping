@@ -18,6 +18,16 @@ public class DbUsers extends DbHelper {
         this.context = context;
     }
 
+    /**
+     * Insert a new user in the database
+     * @Param email The user's email. This will be the primary key
+     * @Param id The user's dni
+     * @Param name The user's name
+     * @Param path The path of the user's profile picture
+     * @Param age The age of the user
+     * @Param province The province where the user lives
+     * @Param password The user's password
+     */
     public long insertUser(String email, String id, String name, String path,int age, String province, String password){
         long insertId = 0;
         try {
@@ -43,6 +53,10 @@ public class DbUsers extends DbHelper {
         return insertId;
     }
 
+    /**
+     * Search and return a user from the database
+     * @Param email The user's email to be searched
+     */
     public User selectUser(String email) {
         DbHelper dbHelper = new DbHelper(context);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
@@ -61,7 +75,10 @@ public class DbUsers extends DbHelper {
         return user;
     }
 
-    public String getLoginUser(){
+    /**
+     * Get the logged in user
+     */
+    public String getLoggedInUser(){
         DbHelper dbHelper = new DbHelper(context);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
@@ -78,6 +95,10 @@ public class DbUsers extends DbHelper {
 
     }
 
+    /**
+     * Log in to a user
+     * @Param email The user's email to be logged
+     */
     public boolean loginUser(String email) {
         boolean logged = false;
 
@@ -96,6 +117,10 @@ public class DbUsers extends DbHelper {
         return logged;
     }
 
+    /**
+     * Log out a user
+     * @Param email The user's email to log out
+     */
     public boolean logoutUser(String email) {
         boolean logout = false;
 
@@ -114,6 +139,12 @@ public class DbUsers extends DbHelper {
         return logout;
     }
 
+    /**
+     * Update the user's password
+     * @Param email The user's email
+     * @Param newPassword The new password
+     * @Param bool New value for the passwordIsChanged flag
+     */
     public boolean updateUserPassword(String email, String newPassword, int bool) {
         if (bool > 1 || bool < 0) {
             return false;
@@ -134,6 +165,10 @@ public class DbUsers extends DbHelper {
         return updateSuccess;
     }
 
+    /**
+     * Update user info
+     * @Param userUpdate The query that contains the values to update
+     */
     public boolean updateUserDetails(String userUpdate) {
         boolean updateSuccess = false;
 

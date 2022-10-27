@@ -19,6 +19,14 @@ public class DbShoppingCart extends DbHelper {
         this.context = context;
     }
 
+    /**
+     * Insert a new product in the user's shopping cart. If that products already exists, call the method increaseItemQuantity()
+     * @Param userEmail The user's email
+     * @Param productId The id of the new product
+     * @Param quantity The quantity of products to add
+     * @Param price The product's price
+     * @Param stock The product's stock
+     */
     public long insertProduct(String userEmail, int productId, int quantity, int price, int stock){
         long insertId = 0;
         try {
@@ -47,6 +55,10 @@ public class DbShoppingCart extends DbHelper {
         return insertId;
     }
 
+    /**
+     * Search and return the user shopping cart from the database
+     * @Param userEmail The user's email
+     */
     public HashMap<Integer, Integer> selectUserShoppingCart(String userEmail) {
         DbHelper dbHelper = new DbHelper(context);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
@@ -66,6 +78,10 @@ public class DbShoppingCart extends DbHelper {
         return shoppingCart;
     }
 
+    /**
+     * Delete the user shopping cart from the database
+     * @Param userEmail The user's email
+     */
     public boolean deleteUserCart(String userEmail) {
         DbHelper dbHelper = new DbHelper(context);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
@@ -76,6 +92,11 @@ public class DbShoppingCart extends DbHelper {
         return deleted;
     }
 
+    /**
+     * Delete the user shopping cart from the database
+     * @Param userEmail The user's email
+     * @Param id The product to be deleted
+     */
     public boolean deleteItem(String userEmail, int id) {
         DbHelper dbHelper = new DbHelper(context);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
@@ -86,6 +107,10 @@ public class DbShoppingCart extends DbHelper {
         return deleted;
     }
 
+    /**
+     * Get the total price of the user shopping cart
+     * @Param userEmail The user's email
+     */
     public int getTotalPriceOfUserShoppingCart(String userEmail) {
         DbHelper dbHelper = new DbHelper(context);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
@@ -102,6 +127,11 @@ public class DbShoppingCart extends DbHelper {
         return totalPrice;
     }
 
+    /**
+     * Get the quantity of a product in the a user's shopping cart
+     * @Param userEmail The user's email
+     * @Param productId The id of the product
+     */
     public int getItemQuantity(String email, int productId) {
         DbHelper dbHelper = new DbHelper(context);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
@@ -118,6 +148,13 @@ public class DbShoppingCart extends DbHelper {
         return quantity;
     }
 
+    /**
+     * Increase the quantity of a product in the a user's shopping cart
+     * @Param userEmail The user's email
+     * @Param productId The id of the product
+     * @Param productId The quantity to add
+     * @Param stock The total sock of the product, to validate availability
+     */
     public long increaseItemQuantity(String userEmail, int productId, int quantity, int stock) {
         long updateSuccess = 0;
 
