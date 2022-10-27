@@ -31,13 +31,15 @@ public class ImageGetter extends Fragment {
     private ImageView iView;
     private Uri pathToUserPic;
     private Context context;
-    private Bitmap picFromCamera;
-    private Boolean userTookPicture;
 
     public ImageGetter(Context context, ImageView iView, Uri path){
+        //Activity that invoked ImageGetter
         this.context = context;
+        //Dialog that allows user to choose where to get their user pic from.
         picOptions = new AlertDialog.Builder(context);
+        //Image View reference where ImageGetter will place the retrieved image on.
         this.iView = iView;
+        //Path to where the user's pic is stored.
         pathToUserPic = path;
         setPicOptions();
     }
@@ -46,9 +48,13 @@ public class ImageGetter extends Fragment {
         return pathToUserPic.toString();
     }
 
+    /**
+     *  Set click listeners, title and default message to dialog.
+     **/
+
     private void setPicOptions()
     {
-        //Set click listeners, title and default message to dialog.
+
         picOptions.setTitle("Actualizar imagen");
         picOptions.setMessage("¿Cómo desea actualizar su imagen de perfil?");
 
@@ -66,11 +72,18 @@ public class ImageGetter extends Fragment {
         });
     }
 
-
+    /**
+     * Display options to user
+     * */
     public void startPicUpdate() {
         picOptions.show();
     }
 
+    /**
+     * Start camera intent with a newly generated file.
+     * Intent will store the taken picture on the provided
+     * file.
+     * */
     private void launchCamera(){
         //Intent that launches camera
         Intent takePicture = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
@@ -97,31 +110,42 @@ public class ImageGetter extends Fragment {
 
     }
 
+    /**
+     * Start gallery intent that shows images only.
+     * */
     private void launchGallery() {
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        //Display only images
         intent.setType("image/*");
         startActivityForResult(intent, GALLERY_RESULT);
     }
 
-
+    /**
+     * Check result from either camera launch or gallery launch.
+     * */
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        //If the result comes from gallery intent, then...
         if(requestCode == GALLERY_RESULT) {
 
             if (resultCode == RESULT_OK) {
+                // Retrieve uri of the image user chose.
                 pathToUserPic = data.getData();
+                // Set image
                 setProfilePic();
-                userTookPicture = false;
+
 
             }else {
                 displayMessage("No se eligió imagen");
             }
         }
-
+        //If the result comes from camera intent, then...
         if(requestCode == CAMERA_RESULT) {
             if(resultCode == RESULT_OK )
             {
+                //If we need the pic's thumbnail, uncomment the below line.
               //  picFromCamera = (Bitmap) data.getExtras().get("data");
+                // Set profile pic. Path to it was saved in the cameraLaunch() method.
                 setProfilePic();
             }else {
                 displayMessage("No se tomó foto");
@@ -131,6 +155,11 @@ public class ImageGetter extends Fragment {
         }
     }
 
+    /**
+     * This method is to be used by whatever class creates an instance of
+     * ImageGetter. It checks if user had previously saved an image as their
+     * user profile pic and if so, retrieves it.
+     */
     public void retrieveUserPic() {
         //If user had previously saved an image as their profile pic, retrieve it
         if(!pathToUserPic.toString().equals("")){
@@ -138,6 +167,10 @@ public class ImageGetter extends Fragment {
         }
     }
 
+    /**
+     * This method converts pathToUri variable into a usable bitmap
+     * for the ImageView reference.
+     * */
     private Bitmap fromUriToBitmap() {
         Bitmap resultPicture = null;
 
@@ -163,6 +196,10 @@ public class ImageGetter extends Fragment {
         return  resultPicture;
     }
 
+    /**
+     * Retrieve bitmap from pathToUserPic and then set it
+     * as the profile picture.
+     * */
     private void setProfilePic() {
         System.out.print(pathToUserPic.toString());
         Bitmap selectedImage = fromUriToBitmap();
