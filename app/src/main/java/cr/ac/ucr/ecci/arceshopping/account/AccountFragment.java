@@ -56,13 +56,13 @@ public class AccountFragment extends Fragment {
     private TextInputLayout til_name;
     private TextView tv_id;
     private TextView tv_email;
-    private Spinner province_spinner;
+    private Spinner province_spinner; // Province dropdown list
     private TextView tv_age;
     private Button age_button;
     private Button update_password_button;
     private Button save_changes_button;
     private FragmentAccountBinding binding;
-    private Uri pathToUserPic;
+    private Uri pathToUserPic; //Contains user's profile picture path
     private ImageGetter imageGetter;
     private MaterialDatePicker materialDatePicker;
     @Override
@@ -89,6 +89,9 @@ public class AccountFragment extends Fragment {
     }
 
 
+    /**
+    * Connects the buttons with their methods. The method starts when the button is pressed
+    */
     private void setClickEvents(){
         change_pic_button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -129,7 +132,10 @@ public class AccountFragment extends Fragment {
                 });
     }
 
-
+    /**
+     * Save all the changes that the user made in his/her account profile. This includes the profile
+     * image
+     */
     private void saveChanges() {
         //Build sql string as program verifies which fields have been modified
         String changesToSqlString = " SET ";
@@ -195,6 +201,10 @@ public class AccountFragment extends Fragment {
         }
     }
 
+    /**
+     * Send a randomly generated password to the user's email as his/her new password. Then the user
+     * can change it
+     */
     private void changePassword(){
         String firstPassword = UUID.randomUUID().toString().substring(0, 16);
         String hashedPassword = BCrypt.withDefaults().hashToString(12, firstPassword.toCharArray());
@@ -209,6 +219,9 @@ public class AccountFragment extends Fragment {
         startActivity(intent);
     }
 
+    /**
+     * Method to calculate the user's current age with his/her birthday
+     */
     private void calculateAge(String stringDate) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM d, yyyy", Locale.ENGLISH);
         LocalDate date = LocalDate.parse(stringDate, formatter);
@@ -216,6 +229,9 @@ public class AccountFragment extends Fragment {
         this.tv_age.setText(String.valueOf(theAge));
     }
 
+    /**
+     * Sets the data to the corresponding views
+     */
     private void setData(){
         til_name.getEditText().setText(loggedInUser.getName());
         tv_id.setText(loggedInUser.getId());
@@ -246,6 +262,9 @@ public class AccountFragment extends Fragment {
         fragmentTransaction.replace(R.id.fragmentContainer, imageGetter).commit();
     }
 
+    /**
+     * Initiates the views
+     */
     private void retrieveXmlElements(View root) {
         user_pic = root.findViewById(R.id.user_pic);
         change_pic_button = root.findViewById(R.id.change_pic_button);
