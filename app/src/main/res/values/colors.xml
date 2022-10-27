@@ -8,4 +8,6 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="arce_blue">#083AB0</color>
+    <color name="arce_orange">#FFCC99</color>
+    <color name="gray">#867F7F</color>
 </resources>

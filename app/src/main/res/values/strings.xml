@@ -11,6 +11,7 @@
     <string name="iniciar_sesion_login_hint">Iniciar sesión</string>
     <string name="register_text_login">¿No tienes una cuenta?</string>
     <string name="register_link_login">Registrate</string>
+    <string name="forgot_password_link_login">¿Olvidaste tu contraseña?</string>
 
     //register
     <string name="title_register">Registro</string>
@@ -28,9 +29,39 @@
     <string name="button_password">Cambiar contraseña</string>
     <string name="image_description">Logo</string>
 
+    //account settings
+    <string name="title_account">Ajustes de cuenta</string>
+    <string name="user_pic">Foto</string>
+    <string name="update">Actualizar mis datos</string>
+    <string name="change_pic">Cambiar foto de perfil</string>
+    <string name="change_age">Cambiar edad</string>
+
     //products
     <string name="user_title_products">Cuenta</string>
     <string name="store_title_products">Tienda</string>
     <string name="cart_title_products">Carrito</string>
     <string name="no_implemented_products">Disponible próximamente</string>
+
+    //forgotPassword
+    <string name="title_forgot_password">Contraseña olvidada</string>
+    <string name="hint_email_forgot_password">Introduzca su correo electrónico</string>
+    <string name="button_forgot_password">Cambiar contraseña</string>
+
+    //dialog
+    <string name="button_dialog">Enviar código</string>
+    <string name="code_hint_dialog">Ingrese el código aquí</string>
+
+    //singleProduct
+    <string name="single_product_plus">+</string>
+    <string name="single_product_minus">-</string>
+    <string name="single_product_to_cart">Añadir al carrito</string>
+
+    //shoppingCart
+    <string name="shopping_cart">Carrito de Compras</string>
+    <string name="shopping_history">Historial de Compras</string>
+    <string name="total">TOTAL:</string>
+    <string name="pay_button">Pagar</string>
+    <string name="cancel_button">Limpiar</string>
+    <string name="empty_cart">¡El carrito de compras se encuentra vacío!</string>
+
 </resources>

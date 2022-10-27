@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cr.ac.ucr.ecci.arceshopping.model.Product;
+import cr.ac.ucr.ecci.arceshopping.api.ListProductViewInterface;
 
 
 public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.ViewHolder> implements Filterable {
@@ -25,6 +26,8 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.ViewHo
     public ArrayList<Product> mProducts;
     public ArrayList<Product> mFilteredProducts;
     public Context mContext;
+    public ListProductViewInterface mListProductViewInterface;
+
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -59,10 +62,12 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.ViewHo
     public int getItemCount() {
         return mProducts.size();
     }
-    public ProductsAdapter(ArrayList<Product> products, Context context){
+    public ProductsAdapter(ArrayList<Product> products, Context context,
+                           ListProductViewInterface listProductViewInterface){
         mProducts = products;
         mFilteredProducts = products;
         mContext = context;
+        mListProductViewInterface = listProductViewInterface;
     }
 
     public void filterList(ArrayList<Product> filterlist) {
@@ -117,10 +122,9 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.ViewHo
 
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-
         public TextView nameTextView;
-       public ImageView pictureImageView;
-       public TextView priceTextView;
+        public ImageView pictureImageView;
+        public TextView priceTextView;
 
 
         public ViewHolder(View itemView) {
@@ -130,6 +134,20 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.ViewHo
             nameTextView = (TextView) itemView.findViewById(R.id.product_name);
             pictureImageView = (ImageView) itemView.findViewById(R.id.product_image);
             priceTextView = (TextView) itemView.findViewById(R.id.product_price);
+
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    System.out.println("click detectado");
+                    if (mListProductViewInterface != null) {
+                        System.out.println("pase el if");
+                        int pos = getAdapterPosition();
+                        if (pos != RecyclerView.NO_POSITION) {
+                            mListProductViewInterface.onItemClick(mProducts.get(pos));
+                        }
+                    }
+                }
+            });
         }
 
     }

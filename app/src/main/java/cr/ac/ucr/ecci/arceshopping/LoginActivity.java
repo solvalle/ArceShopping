@@ -1,7 +1,5 @@
 package cr.ac.ucr.ecci.arceshopping;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -11,8 +9,6 @@ import android.widget.Toast;
 
 import com.google.android.material.textfield.TextInputLayout;
 
-import javax.mail.Store;
-
 import at.favre.lib.crypto.bcrypt.BCrypt;
 import cr.ac.ucr.ecci.arceshopping.db.DbUsers;
 import cr.ac.ucr.ecci.arceshopping.model.User;
@@ -20,7 +16,6 @@ import cr.ac.ucr.ecci.arceshopping.model.User;
 public class LoginActivity extends ConnectedActivity {
     private TextInputLayout tilEmail;
     private TextInputLayout tilPassword;
-    private User user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,16 +35,17 @@ public class LoginActivity extends ConnectedActivity {
         if (validEmail && validPassword) {
             DbUsers dbUsers = new DbUsers(this);
             User user = dbUsers.selectUser(email);
-            boolean validCredentials = validateCredentials(user, email, password);
+            boolean validCredentials = user != null && validateCredentials(user, email, password);
 
             if(validCredentials) {
                 Toast.makeText(this, "Se ingresó correctamente", Toast.LENGTH_LONG).show();
                 SharedPreferences sp = getSharedPreferences("login",MODE_PRIVATE);
                 sp.edit().putBoolean("logged" , true).apply();
                 sp.edit().putString("userEmail" , email).apply();
+                dbUsers.loginUser(email);
                 if (user.getPasswordIsChanged()) {
                     Toast.makeText(this, "Ir a tienda", Toast.LENGTH_LONG).show();
-                    Intent intent = new Intent( this , StoreActivity.class );
+                    Intent intent = new Intent( this , MainActivity.class );
                     startActivity(intent);
                 } else {
                     Intent intent = new Intent(this, PasswordChangeActivity.class);
@@ -64,6 +60,11 @@ public class LoginActivity extends ConnectedActivity {
     public void goToRegister(View view) {
         Intent registerIntent = new Intent(this, RegisterActivity.class);
         startActivity(registerIntent);
+    }
+
+    public void goToForgotPassword(View view) {
+        Intent forgotPasswordIntent = new Intent(this, ForgotPasswordActivity.class);
+        startActivity(forgotPasswordIntent);
     }
 
     private boolean isValidEmail(String email) {

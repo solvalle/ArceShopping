@@ -1,5 +1,6 @@
 package cr.ac.ucr.ecci.arceshopping.api;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -10,10 +11,12 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import cr.ac.ucr.ecci.arceshopping.GridSpacingItemDecoration;
+import cr.ac.ucr.ecci.arceshopping.SingleProductActivity;
+import cr.ac.ucr.ecci.arceshopping.model.Product;
 import cr.ac.ucr.ecci.arceshopping.model.Products;
 import cr.ac.ucr.ecci.arceshopping.ProductsAdapter;
 import cr.ac.ucr.ecci.arceshopping.R;
-import cr.ac.ucr.ecci.arceshopping.StoreActivity;
+import cr.ac.ucr.ecci.arceshopping.MainActivity;
 import cr.ac.ucr.ecci.arceshopping.databinding.FragmentApiBinding;
 
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -28,13 +31,9 @@ import com.android.volley.toolbox.Volley;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-//import com.example.communication.ListaQuotes;
-//import com.example.communication.Quote;
-//import com.example.communication.R;
-
 import com.google.gson.*;
 
-public class ApiFragment extends Fragment {
+public class ApiFragment extends Fragment implements ListProductViewInterface{
 
     private FragmentApiBinding binding;
     private final String URLEXAMPLE = "https://dummyjson.com/products";
@@ -43,7 +42,6 @@ public class ApiFragment extends Fragment {
     RecyclerView rvProducts;
     ProductsAdapter adapter;
 
-    private RecyclerView listProducts;
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -60,9 +58,8 @@ public class ApiFragment extends Fragment {
                         Gson gson = new Gson();
 
                         Products products = gson.fromJson(items, Products.class);
-                        listProducts = root.findViewById(R.id.rvProducts);
 
-                        adapter = new ProductsAdapter(products.getProducts(), root.getContext());
+                        adapter = new ProductsAdapter(products.getProducts(), root.getContext(), this);
 
                         rvProducts.setAdapter(adapter);
                         rvProducts.addItemDecoration(new GridSpacingItemDecoration(2,50, true));
@@ -70,8 +67,8 @@ public class ApiFragment extends Fragment {
                         rvProducts.setLayoutManager(new GridLayoutManager(root.getContext(), 2));
 
                         productos = products;
-                        ((StoreActivity)getActivity()).setAdapter(adapter);
-                        ((StoreActivity)getActivity()).setmProducts(products.getProducts());
+                        ((MainActivity)getActivity()).setProductsAdapter(adapter);
+                        ((MainActivity)getActivity()).setmProducts(products.getProducts());
 
                     }catch (JSONException e) {
                         e.printStackTrace();
@@ -86,11 +83,16 @@ public class ApiFragment extends Fragment {
     }
 
     @Override
+    public void onItemClick(Product product) {
+        Intent intent = new Intent(getActivity(), SingleProductActivity.class);
+        intent.putExtra("product", product);
+        startActivity(intent);
+    }
+
+    @Override
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
     }
-
-
 }
 

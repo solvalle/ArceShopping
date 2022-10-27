@@ -1,7 +1,5 @@
 package cr.ac.ucr.ecci.arceshopping;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -10,11 +8,8 @@ import android.widget.Toast;
 
 import com.google.android.material.textfield.TextInputLayout;
 
-import javax.mail.Store;
-
 import at.favre.lib.crypto.bcrypt.BCrypt;
 import cr.ac.ucr.ecci.arceshopping.db.DbUsers;
-import cr.ac.ucr.ecci.arceshopping.model.User;
 
 public class PasswordChangeActivity extends ConnectedActivity {
 
@@ -41,10 +36,10 @@ public class PasswordChangeActivity extends ConnectedActivity {
             String hashedPassword = BCrypt.withDefaults().hashToString(12,theNewPassword.toCharArray());
 
             DbUsers dbUsers = new DbUsers(this);
-            boolean passwordUpdated = dbUsers.updateUserPassword(email, hashedPassword);
+            boolean passwordUpdated = dbUsers.updateUserPassword(email, hashedPassword, 1);
             if(passwordUpdated) {
                 Toast.makeText(this, "Cambio de contraseña exitoso", Toast.LENGTH_LONG).show();
-                Intent intent = new Intent( this , StoreActivity.class);
+                Intent intent = new Intent( this , MainActivity.class);
                 startActivity(intent);
             } else {
                 Toast.makeText(this, "Ocurrió un error al cambiar la contraseña. Intentelo de nuevo", Toast.LENGTH_LONG).show();
