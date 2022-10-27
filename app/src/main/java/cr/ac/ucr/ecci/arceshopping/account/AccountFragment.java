@@ -29,13 +29,16 @@ import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.datepicker.MaterialPickerOnPositiveButtonClickListener;
 import com.google.android.material.textfield.TextInputLayout;
 
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Locale;
+import java.util.TimeZone;
 import java.util.UUID;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
@@ -123,11 +126,16 @@ public class AccountFragment extends Fragment {
         });
 
         materialDatePicker.addOnPositiveButtonClickListener(
-                new MaterialPickerOnPositiveButtonClickListener() {
+                new MaterialPickerOnPositiveButtonClickListener<Long>() {
                     @SuppressLint("SetTextI18n")
                     @Override
-                    public void onPositiveButtonClick(Object selection) {
-                        calculateAge(materialDatePicker.getHeaderText());
+                    public void onPositiveButtonClick(Long selection) {
+                        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+                        calendar.setTimeInMillis(selection);
+                        SimpleDateFormat format = new SimpleDateFormat("MMM d, yyyy");
+                        String formattedDate  = format.format(calendar.getTime());
+                        //System.out.println(formattedDate);
+                        calculateAge(formattedDate);
                     }
                 });
     }
@@ -226,7 +234,12 @@ public class AccountFragment extends Fragment {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM d, yyyy", Locale.ENGLISH);
         LocalDate date = LocalDate.parse(stringDate, formatter);
         int theAge = Period.between(date, LocalDate.now( ZoneId.of( "Pacific/Auckland" ))).getYears();
-        this.tv_age.setText(String.valueOf(theAge));
+        if (theAge > 0) {
+            this.tv_age.setText(String.valueOf(theAge));
+        } else
+        {
+            Toast.makeText(getContext(), "Fecha inválida, su edad debe ser mayor a 0", Toast.LENGTH_LONG).show();
+        }
     }
 
     /**
