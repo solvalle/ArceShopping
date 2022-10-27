@@ -173,7 +173,7 @@ public class CartFragment extends Fragment {
     }
 
     /**
-     * This method is attached to the "cancel button". This mehtod clears the cart, including the
+     * This method is attached to the "cancel button". This method clears the cart, including the
      * data stored in the data base
      */
     private void cleanCart(View root) {
@@ -192,6 +192,10 @@ public class CartFragment extends Fragment {
         }
     }
 
+    /**
+     * This method is attached to the "cancel button". This method clears the cart, including the
+     * data stored in the data base
+     */
     private void pay(View root) {
         DbShoppingCart dbShoppingCart = new DbShoppingCart(root.getContext());
         boolean deleted = dbShoppingCart.deleteUserCart(user.getEmail());
@@ -211,6 +215,9 @@ public class CartFragment extends Fragment {
         }
     }
 
+    /**
+     * This class is the recycleview adapter
+     */
     public class CartRvAdapter extends RecyclerView.Adapter<CartRvAdapter.ViewHolder> {
         private ArrayList<Product> productsList;
 
@@ -259,6 +266,9 @@ public class CartFragment extends Fragment {
             this.productsList = productsList;
         }
 
+        /**
+         * This class is the adapter's viewholder
+         */
         public class ViewHolder extends RecyclerView.ViewHolder  {
             private ImageView productPhoto;
             private TextView productName;
