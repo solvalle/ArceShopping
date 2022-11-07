@@ -1,6 +1,7 @@
 package cr.ac.ucr.ecci.arceshopping.cart;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
@@ -32,6 +33,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import cr.ac.ucr.ecci.arceshopping.PurchaseHistoryActivity;
 import cr.ac.ucr.ecci.arceshopping.R;
 import cr.ac.ucr.ecci.arceshopping.databinding.FragmentCartBinding;
 import cr.ac.ucr.ecci.arceshopping.db.DbShoppingCart;
@@ -70,6 +72,7 @@ public class CartFragment extends Fragment {
         this.priceTV = (TextView) root.findViewById(R.id.priceTV);
         Button cancelButton = (Button) root.findViewById(R.id.cancel_button);
         Button payButton = (Button) root.findViewById(R.id.pay_button);
+        Button shoppingHistoryButton = (Button) root.findViewById(R.id.shopping_history);
         productsRV = (RecyclerView) root.findViewById(R.id.productsRV);
         emptyCartTV = (TextView) root.findViewById(R.id.emptyCart);
 
@@ -100,6 +103,12 @@ public class CartFragment extends Fragment {
         cancelButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 cleanCart(v);
+            }
+        });
+        shoppingHistoryButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                launchHistory();
             }
         });
 
@@ -135,6 +144,12 @@ public class CartFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
+    }
+
+    public void launchHistory()
+    {
+        Intent intent = new Intent(getActivity(), PurchaseHistoryActivity.class);
+        startActivity(intent);
     }
 
     /**
