@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "890818683676",
+    "firebase_url": "https://equipo-3-be919-default-rtdb.firebaseio.com",
+    "project_id": "equipo-3-be919",
+    "storage_bucket": "equipo-3-be919.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:890818683676:android:ae67440be3e9f3aaff10d9",
+        "android_client_info": {
+          "package_name": "cr.ac.ucr.ecci.arceshopping"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "890818683676-o7kmfu1qvl9fv31289gk7c0sqiq6tipi.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDNied7f_2QtdZFRviVXe44RHznZKST3CA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "890818683676-o7kmfu1qvl9fv31289gk7c0sqiq6tipi.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
