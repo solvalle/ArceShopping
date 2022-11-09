@@ -15,6 +15,10 @@ import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
 import cr.ac.ucr.ecci.arceshopping.db.DbUsers;
@@ -51,16 +55,50 @@ public class LoginActivity extends ConnectedActivity {
                             FirebaseUser user = mAuth.getCurrentUser();
                             Toast.makeText(LoginActivity.this, "Exito",
                                     Toast.LENGTH_SHORT).show();
-                            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                            startActivity(intent);
+                            getReference(user.getUid());
+
                         } else {
-                                        // If sign in fails, display a message to the user.
+                            // If sign in fails, display a message to the user.
                             Toast.makeText(LoginActivity.this, "Authentication failed.",
                                     Toast.LENGTH_SHORT).show();
                         }
                     }
             });
         }
+    }
+
+    public void getReference(String userId)
+    {
+        DocumentReference reference = FirebaseFirestore.getInstance().collection("User").document(userId);
+        reference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        boolean isChanged = document.getBoolean("passwordIsChanged");
+                        selectNextActivity(isChanged);
+                    } else {
+                        System.out.println("Document doesn't exist");
+                    }
+                } else {
+                    System.out.println(task.getException().toString());
+                }
+            }
+        });
+    }
+
+    public void selectNextActivity(boolean isChanged)
+    {
+        Intent intent;
+        if (isChanged)
+        {
+            intent = new Intent(this, MainActivity.class);
+        } else
+        {
+            intent = new Intent(this, PasswordChangeActivity.class);
+        }
+        startActivity(intent);
     }
 
     public void goToRegister(View view) {

@@ -21,6 +21,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -95,12 +96,13 @@ public class RegisterActivity extends ConnectedActivity {
                 public void onComplete(@NonNull Task<AuthResult> task) {
                     if (task.isSuccessful())
                     {
+                        FirebaseUser newUser = mAuth.getCurrentUser();
                         User user = new User(theEmail, theId, theCompleteName, "",
                                 Integer.parseInt(theAge), theProvince, false);
-                        db.collection("User").add(user).addOnCompleteListener(
-                                new OnCompleteListener<DocumentReference>() {
+                        db.collection("User").document(newUser.getUid()).set(user).addOnCompleteListener(
+                                new OnCompleteListener<Void>() {
                                     @Override
-                                    public void onComplete(@NonNull Task<DocumentReference> task) {
+                                    public void onComplete(@NonNull Task<Void> task) {
                                         if (task.isSuccessful())
                                         {
                                             EmailManager emailManager = new EmailManager();
