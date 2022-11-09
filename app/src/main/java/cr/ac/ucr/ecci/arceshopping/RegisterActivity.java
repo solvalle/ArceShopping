@@ -16,7 +16,13 @@ import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -45,6 +51,8 @@ public class RegisterActivity extends ConnectedActivity {
     private Spinner province;
     private double latitude;
     private double longitude;
+    private FirebaseFirestore db;
+    private FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,8 +74,11 @@ public class RegisterActivity extends ConnectedActivity {
         if (!getLocation()) {
             ActivityCompat.requestPermissions(this, new String[] { Manifest.permission.ACCESS_FINE_LOCATION,
                             Manifest.permission.ACCESS_COARSE_LOCATION}, PackageManager.PERMISSION_GRANTED);
+            getLocation();
         }
         this.province.setSelection(provinceCalculator.calculateProvince(latitude, longitude));
+        db = FirebaseFirestore.getInstance();
+        mAuth = FirebaseAuth.getInstance();
     }
 
     public void register(View view) {
@@ -78,25 +89,37 @@ public class RegisterActivity extends ConnectedActivity {
         String theProvince = province.getSelectedItem().toString();
         if (checkStrings(theId, theCompleteName, theEmail, theAge)) {
             String firstPassword = UUID.randomUUID().toString().substring(0, 16);
-            String hashedPassword = BCrypt.withDefaults().hashToString(12, firstPassword.toCharArray());
-            DbUsers dbUsers = new DbUsers(this);
-            User user = dbUsers.selectUser(theEmail);
-            if (user == null) {
-                //empty space is path to user
-                long insert_id = dbUsers.insertUser(theEmail, theId, theCompleteName, "",Integer.parseInt(theAge), theProvince, hashedPassword);
-                if (insert_id > 0) {
-                    EmailManager emailManager = new EmailManager();
-                    System.out.println(firstPassword);
-                    emailManager.sendPasswordEmail(theCompleteName,theEmail, firstPassword);
-                    Toast.makeText(this, "Registro exitoso", Toast.LENGTH_LONG).show();
-                    Intent intent = new Intent(this, LoginActivity.class);
-                    startActivity(intent);
-                } else {
-                    Toast.makeText(this, "Error al registrar", Toast.LENGTH_LONG).show();
+            mAuth.createUserWithEmailAndPassword(theEmail, firstPassword).addOnCompleteListener(
+            new OnCompleteListener<AuthResult>() {
+                @Override
+                public void onComplete(@NonNull Task<AuthResult> task) {
+                    if (task.isSuccessful())
+                    {
+                        User user = new User(theEmail, theId, theCompleteName, "",
+                                Integer.parseInt(theAge), theProvince, false);
+                        db.collection("User").add(user).addOnCompleteListener(
+                                new OnCompleteListener<DocumentReference>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<DocumentReference> task) {
+                                        if (task.isSuccessful())
+                                        {
+                                            EmailManager emailManager = new EmailManager();
+                                            System.out.println(firstPassword);
+                                            emailManager.sendPasswordEmail(theCompleteName,theEmail, firstPassword);
+                                            Toast.makeText(RegisterActivity.this,
+                                                    "Registro exitoso", Toast.LENGTH_LONG).show();
+                                            finish();
+                                        } else {
+                                            System.out.println(task.getException().toString());
+                                        }
+                                    }
+                                }
+                        );
+                    } else {
+                        System.out.println(task.getException().toString());
+                    }
                 }
-            } else {
-                Toast.makeText(this, "Correo electronico ya registrado", Toast.LENGTH_LONG).show();
-            }
+            });
         }
     }
 
@@ -174,10 +197,12 @@ public class RegisterActivity extends ConnectedActivity {
             LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
             Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
             if (location != null) {
+                System.out.println("no es null");
                 this.latitude = location.getLatitude();
                 this.longitude = location.getLongitude();
             }
             else {
+                System.out.println("Es null");
                 this.latitude = 0;
                 this.longitude = 0;
             }
@@ -192,7 +217,6 @@ public class RegisterActivity extends ConnectedActivity {
     {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            getLocation();
             Toast.makeText(this, "Location Permission Granted", Toast.LENGTH_SHORT).show();
         } else {
             this.latitude = 0;

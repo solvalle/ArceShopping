@@ -2,7 +2,6 @@ package cr.ac.ucr.ecci.arceshopping.model;
 
 public class User {
     private String name;
-    private String password;
     private String id;
     private String email;
     private String path;
@@ -11,9 +10,8 @@ public class User {
     private boolean passwordIsChanged;
 
     public User(String email, String id, String name,  String path,
-                int age, String province, String password, boolean passwordIsChanged) {
+                int age, String province, boolean passwordIsChanged) {
         this.name = name;
-        this.password = password;
         this.id = id;
         this.path = path;
         this.email = email;
@@ -28,10 +26,6 @@ public class User {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getPassword() {
-        return password;
     }
 
     public String getId() {
@@ -80,7 +74,6 @@ public class User {
     public String toString() {
         return
                 "name='" + name + '\'' +
-                ", password='" + password + '\'' +
                 ", id='" + id + '\'' +
                 ", email='" + email + '\'' +
                 ", age=" + age +

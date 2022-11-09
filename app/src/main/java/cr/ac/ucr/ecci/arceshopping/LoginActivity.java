@@ -7,7 +7,14 @@ import android.util.Patterns;
 import android.view.View;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
 import cr.ac.ucr.ecci.arceshopping.db.DbUsers;
@@ -16,6 +23,7 @@ import cr.ac.ucr.ecci.arceshopping.model.User;
 public class LoginActivity extends ConnectedActivity {
     private TextInputLayout tilEmail;
     private TextInputLayout tilPassword;
+    private FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,6 +31,7 @@ public class LoginActivity extends ConnectedActivity {
         setContentView(R.layout.activity_login);
         tilEmail = (TextInputLayout)findViewById(R.id.login_email);
         tilPassword = (TextInputLayout)findViewById(R.id.login_password);
+        mAuth = FirebaseAuth.getInstance();
     }
 
     public void login(View view) {
@@ -33,27 +42,24 @@ public class LoginActivity extends ConnectedActivity {
         boolean validPassword = isValidPassword(password);
 
         if (validEmail && validPassword) {
-            DbUsers dbUsers = new DbUsers(this);
-            User user = dbUsers.selectUser(email);
-            boolean validCredentials = user != null && validateCredentials(user, email, password);
-
-            if(validCredentials) {
-                Toast.makeText(this, "Se ingresó correctamente", Toast.LENGTH_LONG).show();
-                SharedPreferences sp = getSharedPreferences("login",MODE_PRIVATE);
-                sp.edit().putBoolean("logged" , true).apply();
-                sp.edit().putString("userEmail" , email).apply();
-                dbUsers.loginUser(email);
-                if (user.getPasswordIsChanged()) {
-                    Toast.makeText(this, "Ir a tienda", Toast.LENGTH_LONG).show();
-                    Intent intent = new Intent( this , MainActivity.class );
-                    startActivity(intent);
-                } else {
-                    Intent intent = new Intent(this, PasswordChangeActivity.class);
-                    startActivity(intent);
-                }
-            } else {
-                Toast.makeText(this, "Credenciales inválidas", Toast.LENGTH_LONG).show();
-            }
+            mAuth.signInWithEmailAndPassword(email, password)
+                    .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            // Sign in success, update UI with the signed-in user's information
+                            FirebaseUser user = mAuth.getCurrentUser();
+                            Toast.makeText(LoginActivity.this, "Exito",
+                                    Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                            startActivity(intent);
+                        } else {
+                                        // If sign in fails, display a message to the user.
+                            Toast.makeText(LoginActivity.this, "Authentication failed.",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    }
+            });
         }
     }
 
@@ -87,11 +93,5 @@ public class LoginActivity extends ConnectedActivity {
         }
         tilPassword.setError(null);
         return true;
-    }
-
-    private boolean validateCredentials(User user, String email, String password){
-        BCrypt.Result result = BCrypt.verifyer().verify(password.toCharArray(),user.getPassword());
-
-        return email.compareTo(user.getEmail()) == 0 && result.verified;
     }
 }
