@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.Random;
 import java.util.UUID;
@@ -31,6 +32,7 @@ public class ForgotPasswordActivity extends AppCompatActivity {
     private Button dialogButton;
     private String code;
     private Dialog dialog;
+    private FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +49,7 @@ public class ForgotPasswordActivity extends AppCompatActivity {
                 checkCode();
             }
         });
+        mAuth = FirebaseAuth.getInstance();
     }
 
     /**

@@ -12,6 +12,7 @@
     <string name="register_text_login">¿No tienes una cuenta?</string>
     <string name="register_link_login">Registrate</string>
     <string name="forgot_password_link_login">¿Olvidaste tu contraseña?</string>
+    <string name="button_biometric">Huella</string>
 
     //register
     <string name="title_register">Registro</string>
