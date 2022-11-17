@@ -17,7 +17,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cr.ac.ucr.ecci.arceshopping.db.DbShoppingCart;
+import cr.ac.ucr.ecci.arceshopping.db.FirebaseHelper;
 import cr.ac.ucr.ecci.arceshopping.model.Product;
+import cr.ac.ucr.ecci.arceshopping.model.ShoppingCartRow;
 
 public class SingleProductActivity extends AppCompatActivity {
 
@@ -28,10 +30,12 @@ public class SingleProductActivity extends AppCompatActivity {
     private TextView textCounter;
     private Product product;
     private ImageSlider carousel;
+    private  FirebaseHelper firebaseHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        firebaseHelper = new FirebaseHelper();
         setContentView(R.layout.activity_single_product);
         productTitle = (TextView) findViewById(R.id.single_product_title);
         productDescription = (TextView) findViewById(R.id.single_product_description);
@@ -86,11 +90,22 @@ public class SingleProductActivity extends AppCompatActivity {
      * Adds the current product to the cart and then goes the CartActivity
      */
     public void addToCart(View view) {
-        DbShoppingCart db = new DbShoppingCart(this);
+
+
+
         SharedPreferences sp = this.getSharedPreferences("login", Context.MODE_PRIVATE);
+        Toast toast = new Toast(this);
+        ShoppingCartRow newRow = new ShoppingCartRow(sp.getString("userEmail",""),
+                this.product.getId(),
+                Integer.parseInt(textCounter.getText().toString()),
+                this.product.getPrice());
+
+        firebaseHelper.insertShoppingCartRow(newRow, toast, this.product.getStock());
+        /*
         long result = db.insertProduct(sp.getString("userEmail",""), this.product.getId(),
                 Integer.parseInt(textCounter.getText().toString()), this.product.getPrice(),
                 this.product.getStock());
+        /*
         if (result == 1) {
             Toast.makeText(this, "Producto añadido éxitosamente", Toast.LENGTH_SHORT).show();
             finish();
@@ -101,5 +116,8 @@ public class SingleProductActivity extends AppCompatActivity {
         else {
             Toast.makeText(this, "Hubo un error", Toast.LENGTH_SHORT).show();
         }
+    */
+
     }
+
 }
