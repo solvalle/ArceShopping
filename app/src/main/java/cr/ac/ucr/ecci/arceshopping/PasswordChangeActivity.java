@@ -90,6 +90,10 @@ public class PasswordChangeActivity extends ConnectedActivity {
             newPassword.setError("Escriba su contraseña");
             return false;
         }
+        if (password.length() < 6) {
+            confirmPassword.setError("La contraseña debe estar compuesto de al menos 6 caracteres");
+            return false;
+        }
         newPassword.setError(null);
         return true;
     }
@@ -97,6 +101,10 @@ public class PasswordChangeActivity extends ConnectedActivity {
     private boolean isValidConfirmPassword(String password) {
         if (password.length() == 0) {
             confirmPassword.setError("Escriba su contraseña");
+            return false;
+        }
+        if (password.length() < 6) {
+            confirmPassword.setError("La contraseña debe estar compuesto de al menos 6 caracteres");
             return false;
         }
         confirmPassword.setError(null);

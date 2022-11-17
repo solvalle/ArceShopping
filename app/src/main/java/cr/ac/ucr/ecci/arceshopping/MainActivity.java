@@ -41,12 +41,10 @@ public class MainActivity extends ConnectedActivity {
         mAuth = FirebaseAuth.getInstance();
         FirebaseUser currentUser = mAuth.getCurrentUser();
 
-        if (currentUser != null) { //cambiar cuando se agregue el cerrar sesión
+        if (currentUser == null) { //cambiar cuando se agregue el cerrar sesión
             Intent intent = new Intent(this, LoginActivity.class);
             startActivity(intent);
         } else {
-            Intent intent = new Intent(this, LoginActivity.class);
-            startActivity(intent);
             BottomNavigationView navView = findViewById(R.id.nav_view);
             AppBarConfiguration appBarConfiguration = new
                     AppBarConfiguration.Builder(
