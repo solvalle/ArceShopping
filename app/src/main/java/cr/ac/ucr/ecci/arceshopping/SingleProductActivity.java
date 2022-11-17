@@ -91,16 +91,14 @@ public class SingleProductActivity extends AppCompatActivity {
      */
     public void addToCart(View view) {
 
-
-
         SharedPreferences sp = this.getSharedPreferences("login", Context.MODE_PRIVATE);
-        Toast toast = new Toast(this);
+        Toast toast= Toast.makeText(this,"", Toast.LENGTH_SHORT);
         ShoppingCartRow newRow = new ShoppingCartRow(sp.getString("userEmail",""),
                 this.product.getId(),
                 Integer.parseInt(textCounter.getText().toString()),
                 this.product.getPrice());
 
-        firebaseHelper.insertShoppingCartRow(newRow, toast, this.product.getStock());
+        firebaseHelper.insertShoppingCartRow(newRow, toast, this.product.getStock(), this);
         /*
         long result = db.insertProduct(sp.getString("userEmail",""), this.product.getId(),
                 Integer.parseInt(textCounter.getText().toString()), this.product.getPrice(),
