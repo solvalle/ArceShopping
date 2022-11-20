@@ -35,11 +35,14 @@ public class PasswordChangeActivity extends ConnectedActivity {
         db = FirebaseFirestore.getInstance();
     }
 
+    /**
+     * Change the user's password
+     */
     public void changePassword(View view) {
         String theNewPassword = newPassword.getEditText().getText().toString();
         String theConfirmPassword = confirmPassword.getEditText().getText().toString();
         boolean validNewPassword = isValidNewPassword(theNewPassword);
-        boolean validConfirmPassword = isValidConfirmPassword(theConfirmPassword);
+        boolean validConfirmPassword = isValidNewPassword(theConfirmPassword);
         FirebaseUser user = mAuth.getCurrentUser();
         if (theNewPassword.equals(theConfirmPassword) && validNewPassword && validConfirmPassword) {
             user.updatePassword(theNewPassword).addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -65,6 +68,11 @@ public class PasswordChangeActivity extends ConnectedActivity {
         }
     }
 
+    /**
+     * Change the user's password in Cloud FireStone from fireBase
+     * @param userId The id to identify the current user
+     * @return true if the password was changed in FireBase, false otherwise
+     */
     private boolean changeInDb(String userId)
     {
         final boolean[] success = {true};
@@ -85,6 +93,12 @@ public class PasswordChangeActivity extends ConnectedActivity {
         return success[0];
     }
 
+    /**
+     * Checks if the new password inserted by the user is valid (the password must be at least 6
+     * characters long)
+     * @param password The password that has to be checked
+     * @return True if the password is valid, false otherwise
+     */
     private boolean isValidNewPassword(String password) {
         if (password.length() == 0) {
             newPassword.setError("Escriba su contraseña");
@@ -95,19 +109,6 @@ public class PasswordChangeActivity extends ConnectedActivity {
             return false;
         }
         newPassword.setError(null);
-        return true;
-    }
-
-    private boolean isValidConfirmPassword(String password) {
-        if (password.length() == 0) {
-            confirmPassword.setError("Escriba su contraseña");
-            return false;
-        }
-        if (password.length() < 6) {
-            confirmPassword.setError("La contraseña debe estar compuesto de al menos 6 caracteres");
-            return false;
-        }
-        confirmPassword.setError(null);
         return true;
     }
 }

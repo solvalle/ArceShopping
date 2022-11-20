@@ -82,6 +82,9 @@ public class RegisterActivity extends ConnectedActivity {
         mAuth = FirebaseAuth.getInstance();
     }
 
+    /**
+     * Register the new user all his/her information
+     */
     public void register(View view) {
         String theId = id.getEditText().getText().toString();
         String theCompleteName = completeName.getEditText().getText().toString();
@@ -125,6 +128,14 @@ public class RegisterActivity extends ConnectedActivity {
         }
     }
 
+    /**
+     * Checks if all the string data inserted by the user is valid
+     * @param theId User's id
+     * @param theCompleteName User's complete name
+     * @param theEmail User's email
+     * @param theAge User's age
+     * @return True if all the data is valid, false otherwise
+     */
     public boolean checkStrings(String theId, String theCompleteName, String theEmail, String theAge) {
         boolean validID = checkID(theId);
         boolean validName = checkName(theCompleteName);
@@ -137,6 +148,11 @@ public class RegisterActivity extends ConnectedActivity {
         return false;
     }
 
+    /**
+     * Checks if the user's id is valid
+     * @param TheID User's id
+     * @return True if the id is valid, false otherwise
+     */
     public boolean checkID(String TheID) {
         if (TheID.length() == 0) {
             id.setError("Debe ingresar su número de identidad");
@@ -146,23 +162,33 @@ public class RegisterActivity extends ConnectedActivity {
         return true;
     }
 
-    public boolean checkName(String TheName) {
-        if (TheName.length() == 0) {
+    /**
+     * Checks if the user's name is valid
+     * @param theName User's name
+     * @return True if the user's name is valid, false otherwise
+     */
+    public boolean checkName(String theName) {
+        if (theName.length() == 0) {
             completeName.setError("Debe ingresar su nombre completo");
             return false;
         }
         Pattern patron = Pattern.compile("^[a-zA-Z ]+$");
-        if (!patron.matcher(TheName).matches()) {
+        if (!patron.matcher(theName).matches()) {
             completeName.setError("nombre invalido");
             return false;
         }
-        if (TheName.length() > 30) {
+        if (theName.length() > 30) {
             completeName.setError("Su nombre no puede ser mayor a 30 caracteres");
         }
         completeName.setError(null);
         return true;
     }
 
+    /**
+     * Checks if the user's email is valid
+     * @param theEmail User's email
+     * @return True if the email is valid, false otherwise
+     */
     public Boolean checkEmail(String theEmail) {
         if (theEmail.length() == 0) {
             email.setError("Debe ingresar su número de correo electrónico");
@@ -176,6 +202,11 @@ public class RegisterActivity extends ConnectedActivity {
         return true;
     }
 
+    /**
+     * Checks if the user's age is valid
+     * @param theAge User's age
+     * @return True if the age is valid, false otherwise
+     */
     public boolean checkAge(String theAge) {
         if (theAge.length() == 0) {
             age.setError("Debe ingresar su edad");
@@ -190,6 +221,10 @@ public class RegisterActivity extends ConnectedActivity {
         return true;
     }
 
+    /**
+     * Gets the user location
+     * @return True if the app get the permissions to get the location, false otherwise
+     */
     public boolean getLocation()
     {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)

@@ -59,6 +59,7 @@ public class MainActivity extends ConnectedActivity {
         }
     }
 
+
     public void setmProducts(ArrayList<Product> mProducts) {
         this.mProducts = mProducts;
     }

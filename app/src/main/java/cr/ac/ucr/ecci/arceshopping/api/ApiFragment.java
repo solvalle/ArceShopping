@@ -56,6 +56,7 @@ public class ApiFragment extends Fragment implements ListProductViewInterface{
         binding = FragmentApiBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
         rvProducts = (RecyclerView) root.findViewById(R.id.rvProducts);
+        // Obtain objects from the web api
         StringRequest myRequest = new StringRequest(Request.Method.GET,
                 URLEXAMPLE,
                 response -> {
@@ -89,6 +90,7 @@ public class ApiFragment extends Fragment implements ListProductViewInterface{
         return root;
     }
 
+    // Sends the user to the product individual screen when he/she clicks the product
     @Override
     public void onItemClick(Product product) {
         Intent intent = new Intent(getActivity(), SingleProductActivity.class);

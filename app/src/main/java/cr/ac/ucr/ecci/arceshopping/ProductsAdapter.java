@@ -20,7 +20,6 @@ import java.util.List;
 import cr.ac.ucr.ecci.arceshopping.model.Product;
 import cr.ac.ucr.ecci.arceshopping.api.ListProductViewInterface;
 
-
 public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.ViewHolder> implements Filterable {
 
     public ArrayList<Product> mProducts;
@@ -62,6 +61,8 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.ViewHo
     public int getItemCount() {
         return mProducts.size();
     }
+
+    //Constructor
     public ProductsAdapter(ArrayList<Product> products, Context context,
                            ListProductViewInterface listProductViewInterface){
         mProducts = products;
@@ -70,6 +71,10 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.ViewHo
         mListProductViewInterface = listProductViewInterface;
     }
 
+    /**
+     * Receives a new list and change the content displayed on screen
+     * @param filterlist the new filtered list
+     */
     public void filterList(ArrayList<Product> filterlist) {
 
         //losing the reference to filtered products here
@@ -80,6 +85,7 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.ViewHo
     }
 
 
+    // Filters the product list
     @Override
     public Filter getFilter() {
         Filter filter = new Filter() {
@@ -138,9 +144,7 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.ViewHo
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    System.out.println("click detectado");
                     if (mListProductViewInterface != null) {
-                        System.out.println("pase el if");
                         int pos = getAdapterPosition();
                         if (pos != RecyclerView.NO_POSITION) {
                             mListProductViewInterface.onItemClick(mProducts.get(pos));
