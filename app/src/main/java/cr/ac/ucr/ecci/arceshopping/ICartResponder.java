@@ -7,4 +7,5 @@ public interface ICartResponder {
     public void onShoppingCartEmptied(boolean deleted);
     public void onPriceCalculated(int total);
     public void onUserDataLoaded(User user);
+    public void onSuccessfulPurchase(boolean success);
 }

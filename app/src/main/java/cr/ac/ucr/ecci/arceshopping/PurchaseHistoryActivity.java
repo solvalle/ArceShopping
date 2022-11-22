@@ -1,20 +1,27 @@
 package cr.ac.ucr.ecci.arceshopping;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
+import cr.ac.ucr.ecci.arceshopping.db.FirebaseHelper;
+import cr.ac.ucr.ecci.arceshopping.model.Purchase;
 
-import androidx.appcompat.app.AppCompatActivity;
-
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
-public class PurchaseHistoryActivity extends ConnectedActivity {
+public class PurchaseHistoryActivity extends ConnectedActivity implements IPurchaseHistoryReceiver {
 
+    FirebaseHelper firebaseHelper;
+    Purchase[] userPurchaseHistory;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference myRef = database.getReference("lol");
-        myRef.setValue("Hola, desde el curso CI-0161");
+        SharedPreferences sp = this.getSharedPreferences("login", Context.MODE_PRIVATE);
+        firebaseHelper = new FirebaseHelper();
+        firebaseHelper.retrieveUserPurchases(sp.getString("userEmail",""));
+        firebaseHelper.setPurchaseHistoryReceiver(this);
         setContentView(R.layout.activity_purchase_history);
+    }
+
+    @Override
+    public void onHistoryLoaded(Purchase[] purchases) {
+        //Display purchase history
     }
 }

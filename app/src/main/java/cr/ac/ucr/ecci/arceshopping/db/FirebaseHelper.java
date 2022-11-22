@@ -1,10 +1,12 @@
 package cr.ac.ucr.ecci.arceshopping.db;
 import android.app.Activity;
 import android.widget.Toast;
-
+import java.util.Calendar;
+import java.util.Date;
 import androidx.annotation.NonNull;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
@@ -16,6 +18,8 @@ import java.util.HashMap;
 import java.util.List;
 
 import cr.ac.ucr.ecci.arceshopping.ICartResponder;
+import cr.ac.ucr.ecci.arceshopping.IPurchaseHistoryReceiver;
+import cr.ac.ucr.ecci.arceshopping.model.Purchase;
 import cr.ac.ucr.ecci.arceshopping.model.ShoppingCartRow;
 import cr.ac.ucr.ecci.arceshopping.model.User;
 
@@ -24,11 +28,13 @@ public class FirebaseHelper {
     static final int LIMIT = 10;
     private FirebaseFirestore db;
     private ICartResponder cartResponder;
+    private IPurchaseHistoryReceiver purchaseHistoryReceiver;
 
     public FirebaseHelper(){
         db = FirebaseFirestore.getInstance();
     }
     public void setCartResponder(ICartResponder cr) {this.cartResponder=cr;}
+    public void setPurchaseHistoryReceiver(IPurchaseHistoryReceiver pr) {this.purchaseHistoryReceiver = pr;}
 
     public void insertShoppingCartRow(ShoppingCartRow newRow, Toast toast, int stock, Activity context){
         //Check if incoming product has already been added to sc.
@@ -168,7 +174,27 @@ public class FirebaseHelper {
                 });
     }
 
-
+    public void commitPurchase(int total, String ownerEmail,
+                               HashMap<Integer,Integer> shoppingCart) {
+        String currentTime = Calendar.getInstance().getTime().toString();
+        Purchase newPurchase = new Purchase(total, currentTime, ownerEmail,shoppingCart);
+        db.collection("Purchase")
+                .add(newPurchase)
+                .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+                    @Override
+                    public void onComplete(Task<DocumentReference> task) {
+                        if(task.isSuccessful()){
+                            clearShoppingCart(ownerEmail);
+                            cartResponder.onSuccessfulPurchase(true);
+                        }
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        cartResponder.onSuccessfulPurchase(false);
+                    }
+                });
+    }
 
     public void getTotalPriceOfUserShoppingCart(String ownerEmail){
         db.collection("Shopping_cart")
@@ -189,6 +215,28 @@ public class FirebaseHelper {
                         cartResponder.onPriceCalculated(total);
                     }
                 });
+    }
+
+    public void retrieveUserPurchases(String ownerEmail){
+        db.collection("Purchase")
+                .whereEqualTo("ownerEmail",ownerEmail)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if(!task.getResult().isEmpty()){
+                    List<DocumentSnapshot> docs = task.getResult().getDocuments();
+                    Purchase[] purchases = new Purchase[docs.size()];
+                    for(int i = 0; i < docs.size(); i++){
+                        purchases[i] = new Purchase(Integer.parseInt(docs.get(i).get("total").toString()),
+                                                    docs.get(i).get("purchaseTime").toString(), ownerEmail,
+                                                    (HashMap<Integer, Integer>) docs.get(i).get("shoppingCart"));
+                    }
+
+                    purchaseHistoryReceiver.onHistoryLoaded(purchases);
+                }
+            }
+        });
     }
 
 }

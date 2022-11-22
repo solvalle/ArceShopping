@@ -119,10 +119,12 @@ public class CartFragment extends Fragment implements ICartResponder {
                 int position = viewHolder.getAdapterPosition();
                 Product product = productList.get(position);
                 firebaseHelper.deleteItem(user.getEmail(), product.getId());
+                shoppingCart.remove(product.getId());
                 productList.remove(position);
                 adapter.setProductsList(productList);
                 firebaseHelper.getTotalPriceOfUserShoppingCart(user.getEmail());
                 adapter.notifyDataSetChanged();
+
                 if (productList.size() == 0)
                 {
                     productsRV.setAdapter(null);
@@ -198,24 +200,30 @@ public class CartFragment extends Fragment implements ICartResponder {
      * data stored in the data base
      */
     private void pay(View root) {
-       /*
-        DbShoppingCart dbShoppingCart = new DbShoppingCart(root.getContext());
-        boolean deleted = dbShoppingCart.deleteUserCart(user.getEmail());
+        firebaseHelper.commitPurchase( Integer.parseInt(priceTV.getText().toString().substring(1)), user.getEmail(),
+                                        shoppingCart);
+    }
 
-        if(deleted) {
-            Toast.makeText(root.getContext(), "Compra exitosa. Revisa tu correo",
+    private void clearUI(){
+        productList.clear();
+        shoppingCart.clear();
+        productsRV.setAdapter(null);
+        emptyCartTV.setVisibility(View.VISIBLE);
+        priceTV.setText("$0");
+    }
+
+    @Override
+    public void onSuccessfulPurchase(boolean success){
+        if(success) {
+            Toast.makeText(getActivity(), "Compra exitosa. Revisa tu correo",
                     Toast.LENGTH_SHORT).show();
             EmailManager emailManager = new EmailManager();
             emailManager.sendPurchaseEmail(user.getName(), user.getEmail(),productList, priceTV.getText().toString());
-            productList.clear();
-            productsRV.setAdapter(null);
-            emptyCartTV.setVisibility(View.VISIBLE);
-            priceTV.setText("$0");
+            clearUI();
         } else {
-            Toast.makeText(root.getContext(), "Ocurrió un problema con el carrito. Intentelo de nuevo",
+            Toast.makeText(getActivity(), "Ocurrió un problema con el carrito. Intentelo de nuevo",
                     Toast.LENGTH_SHORT).show();
-        }*/
-        //PENDING: Save purchase details in new table
+        }
     }
 
     @Override
@@ -232,10 +240,7 @@ public class CartFragment extends Fragment implements ICartResponder {
     @Override
     public void onShoppingCartEmptied(boolean deleted) {
         if(deleted) {
-            productList.clear();
-            productsRV.setAdapter(null);
-            emptyCartTV.setVisibility(View.VISIBLE);
-            priceTV.setText("$0");
+            clearUI();
         } else {
             Toast.makeText(getActivity(), "Ocurrió un problema limpiando el carrito. Intentelo de nuevo",
                     Toast.LENGTH_SHORT).show();
