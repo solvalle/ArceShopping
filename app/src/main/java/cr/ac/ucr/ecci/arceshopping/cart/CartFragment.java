@@ -33,20 +33,23 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import cr.ac.ucr.ecci.arceshopping.ICartResponder;
 import cr.ac.ucr.ecci.arceshopping.PurchaseHistoryActivity;
 import cr.ac.ucr.ecci.arceshopping.R;
 import cr.ac.ucr.ecci.arceshopping.databinding.FragmentCartBinding;
 import cr.ac.ucr.ecci.arceshopping.db.DbShoppingCart;
 import cr.ac.ucr.ecci.arceshopping.db.DbUsers;
+import cr.ac.ucr.ecci.arceshopping.db.FirebaseHelper;
 import cr.ac.ucr.ecci.arceshopping.model.EmailManager;
 import cr.ac.ucr.ecci.arceshopping.model.Product;
+import cr.ac.ucr.ecci.arceshopping.model.ShoppingCartRow;
 import cr.ac.ucr.ecci.arceshopping.model.User;
 
 /**
  * Fragment that represents and controls the cart. Here the user can administrate his/her cart and buy
  * the products that he/she wants
  */
-public class CartFragment extends Fragment {
+public class CartFragment extends Fragment implements ICartResponder {
     private ArrayList<Product> productList = new ArrayList<Product>();
     private FragmentCartBinding binding;
     private RecyclerView productsRV;
@@ -54,21 +57,26 @@ public class CartFragment extends Fragment {
     private TextView priceTV;
     private CartRvAdapter adapter;
     private User user;
-    private DbShoppingCart dbShoppingCart;
+    private ImageView userPhotoIV;
+    private TextView userFullNameTV;
+    private FirebaseHelper firebaseHelper;
+    //private DbShoppingCart dbShoppingCart;
     HashMap<Integer, Integer> shoppingCart;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentCartBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
-
+        this.shoppingCart = new HashMap<Integer,Integer>();
         SharedPreferences sp = getActivity().getSharedPreferences("login", Context.MODE_PRIVATE);
 
-        DbUsers dbUsers = new DbUsers(root.getContext());
-        this.user = dbUsers.selectUser(sp.getString("userEmail",""));
-
-        ImageView userPhotoIV = (ImageView) root.findViewById(R.id.userPhoto);
-        TextView userFullNameTV = (TextView) root.findViewById(R.id.userFullName);
+        //DbUsers dbUsers = new DbUsers(root.getContext());
+        //this.user = dbUsers.selectUser(sp.getString("userEmail",""));
+        this.firebaseHelper = new FirebaseHelper();
+        firebaseHelper.setCartResponder(this);
+        firebaseHelper.selectUser(sp.getString("userEmail",""));
+        this.userPhotoIV = (ImageView) root.findViewById(R.id.userPhoto);
+        this.userFullNameTV = (TextView) root.findViewById(R.id.userFullName);
         this.priceTV = (TextView) root.findViewById(R.id.priceTV);
         Button cancelButton = (Button) root.findViewById(R.id.cancel_button);
         Button payButton = (Button) root.findViewById(R.id.pay_button);
@@ -76,23 +84,9 @@ public class CartFragment extends Fragment {
         productsRV = (RecyclerView) root.findViewById(R.id.productsRV);
         emptyCartTV = (TextView) root.findViewById(R.id.emptyCart);
 
-        userFullNameTV.setText(user.getName());
 
-        if(user.getPath().compareTo("") > 0)
-            Picasso.get().load(user.getPath()).into(userPhotoIV);
 
-        this.dbShoppingCart = new DbShoppingCart(root.getContext());
-        priceTV.setText("$" + dbShoppingCart.getTotalPriceOfUserShoppingCart(user.getEmail()));
-
-        // Load products list
-        this.shoppingCart = dbShoppingCart.selectUserShoppingCart(user.getEmail());
-        if (shoppingCart.size() > 0) {
-            emptyCartTV.setVisibility(View.INVISIBLE);
-            productsRV.setLayoutManager(new LinearLayoutManager(root.getContext(), LinearLayoutManager.VERTICAL, false));
-            loadProducts(root, shoppingCart);
-        } else {
-            emptyCartTV.setVisibility(View.VISIBLE);
-        }
+        //this.dbShoppingCart = new DbShoppingCart(root.getContext());
 
         // Listeners to buttons
         payButton.setOnClickListener(new View.OnClickListener() {
@@ -124,10 +118,10 @@ public class CartFragment extends Fragment {
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
                 int position = viewHolder.getAdapterPosition();
                 Product product = productList.get(position);
-                dbShoppingCart.deleteItem(user.getEmail(), product.getId());
+                firebaseHelper.deleteItem(user.getEmail(), product.getId());
                 productList.remove(position);
                 adapter.setProductsList(productList);
-                priceTV.setText("$" + dbShoppingCart.getTotalPriceOfUserShoppingCart(user.getEmail()));
+                firebaseHelper.getTotalPriceOfUserShoppingCart(user.getEmail());
                 adapter.notifyDataSetChanged();
                 if (productList.size() == 0)
                 {
@@ -155,8 +149,8 @@ public class CartFragment extends Fragment {
     /**
      * Consults the api to load the products in the cart with the necessary information
      */
-    public void loadProducts(View root, HashMap<Integer, Integer> shoppingCart) {
-        RequestQueue requestQueue = Volley.newRequestQueue(root.getContext());
+    public void loadProducts(HashMap<Integer, Integer> shoppingCart) {
+        RequestQueue requestQueue = Volley.newRequestQueue(getActivity());
 
         for (int productId : shoppingCart.keySet()) {
             final String URL_PRODUCT = "https://dummyjson.com/products/" + productId;
@@ -181,7 +175,7 @@ public class CartFragment extends Fragment {
                             e.printStackTrace();
                         }
                     },
-                    volleyError -> Toast.makeText(root.getContext(), volleyError.getMessage(), Toast.LENGTH_SHORT).show()
+                    volleyError -> Toast.makeText(getActivity(), volleyError.getMessage(), Toast.LENGTH_SHORT).show()
             );
             requestQueue.add(myRequest);
         }
@@ -192,19 +186,11 @@ public class CartFragment extends Fragment {
      * data stored in the data base
      */
     private void cleanCart(View root) {
-        DbShoppingCart dbShoppingCart = new DbShoppingCart(root.getContext());
+        //DbShoppingCart dbShoppingCart = new DbShoppingCart(root.getContext());
         // Delete the data base
-        boolean deleted = dbShoppingCart.deleteUserCart(user.getEmail());
+        //dbShoppingCart.deleteUserCart(user.getEmail());
+        firebaseHelper.clearShoppingCart(user.getEmail());
         // Reflect the data on the screen
-        if(deleted) {
-            productList.clear();
-            productsRV.setAdapter(null);
-            emptyCartTV.setVisibility(View.VISIBLE);
-            priceTV.setText("$0");
-        } else {
-            Toast.makeText(root.getContext(), "Ocurrió un problema limpiando el carrito. Intentelo de nuevo",
-                    Toast.LENGTH_SHORT).show();
-        }
     }
 
     /**
@@ -212,6 +198,7 @@ public class CartFragment extends Fragment {
      * data stored in the data base
      */
     private void pay(View root) {
+       /*
         DbShoppingCart dbShoppingCart = new DbShoppingCart(root.getContext());
         boolean deleted = dbShoppingCart.deleteUserCart(user.getEmail());
 
@@ -227,7 +214,52 @@ public class CartFragment extends Fragment {
         } else {
             Toast.makeText(root.getContext(), "Ocurrió un problema con el carrito. Intentelo de nuevo",
                     Toast.LENGTH_SHORT).show();
+        }*/
+        //PENDING: Save purchase details in new table
+    }
+
+    @Override
+    public void onShoppingCartLoaded() {
+        if (shoppingCart.size() > 0) {
+            emptyCartTV.setVisibility(View.INVISIBLE);
+            productsRV.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
+            loadProducts(shoppingCart);
+        } else {
+            emptyCartTV.setVisibility(View.VISIBLE);
         }
+    }
+
+    @Override
+    public void onShoppingCartEmptied(boolean deleted) {
+        if(deleted) {
+            productList.clear();
+            productsRV.setAdapter(null);
+            emptyCartTV.setVisibility(View.VISIBLE);
+            priceTV.setText("$0");
+        } else {
+            Toast.makeText(getActivity(), "Ocurrió un problema limpiando el carrito. Intentelo de nuevo",
+                    Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void onPriceCalculated(int total){
+        priceTV.setText("$" + total);
+    }
+
+    @Override
+    public void onUserDataLoaded(User user) {
+        this.user = user;
+        System.out.println(user.getName());
+        this.userFullNameTV.setText(user.getName());
+
+        if(this.user.getPath().compareTo("") > 0)
+            Picasso.get().load(user.getPath()).into(userPhotoIV);
+
+        firebaseHelper.getTotalPriceOfUserShoppingCart(user.getEmail());
+        // Load products list
+        firebaseHelper.getShoppingCart(this.user.getEmail(), shoppingCart); //dbShoppingCart.selectUserShoppingCart(user.getEmail());
+
     }
 
     /**
@@ -358,9 +390,13 @@ public class CartFragment extends Fragment {
              */
             public void modifyPrices(int counter, int number) {
                 Product product = productsList.get(this.getAdapterPosition());
-                dbShoppingCart.increaseItemQuantity(user.getEmail(), product.getId(), number, product.getStock());
+                //insertShoppingCartRow will determine that prduct is already in shopping cart, so it will just update its quantity
+                firebaseHelper.insertShoppingCartRow(new ShoppingCartRow(user.getEmail(),
+                                                    product.getId(), number,
+                                                    product.getPrice()),Toast.makeText(getActivity(),"",Toast.LENGTH_SHORT),
+                                                    product.getStock(), getActivity());
                 quantity.setText(Integer.toString(counter));
-                priceTV.setText("$" + dbShoppingCart.getTotalPriceOfUserShoppingCart(user.getEmail()));
+                //firebaseHelper.getTotalPriceOfUserShoppingCart(user.getEmail());
             }
         }
     }
