@@ -111,18 +111,14 @@ public class LoginActivity extends ConnectedActivity {
             public void onAuthenticationSucceeded(
                     @NonNull BiometricPrompt.AuthenticationResult result) {
                 super.onAuthenticationSucceeded(result);
-                Toast.makeText(getApplicationContext(),
-                        "Authentication succeeded!", Toast.LENGTH_SHORT).show();
                 String email = sp.getString("userEmail", "DEFAULT");
                 String password = sp.getString("userPassword", "DEFAULT");
-                System.out.println(email + " email");
-                System.out.println(password+ "pas");
                 if (email != null && email.compareTo("")!=0 && password != null && password.compareTo("")!=0) {
                     signIn(email, password, true);
                 } else
                 {
                     Toast.makeText(getApplicationContext(), "Debe usar sus credenciales al menos " +
-                                    "una vez antes de usar la huella", Toast.LENGTH_SHORT).show();
+                                    "una vez antes de usar su huella", Toast.LENGTH_SHORT).show();
                 }
             }
 
@@ -168,18 +164,24 @@ public class LoginActivity extends ConnectedActivity {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
                             FirebaseUser user = mAuth.getCurrentUser();
-                            Toast.makeText(LoginActivity.this, "Exito",
+                            Toast.makeText(LoginActivity.this, "Ingresando sesión...",
                                     Toast.LENGTH_SHORT).show();
                             if (fingerprint) {
-                                getReference(user.getUid());
-                            } else {
                                 selectNextActivity(true);
+                            } else {
+                                getReference(user.getUid());
                             }
-
                         } else {
                             // If sign in fails, display a message to the user.
-                            Toast.makeText(LoginActivity.this, "Authentication failed.",
-                                    Toast.LENGTH_SHORT).show();
+                            if (fingerprint)
+                            {
+                                Toast.makeText(LoginActivity.this, "No puede ingresar por " +
+                                    "fingerprint si acaba de cambiar su contraseña, por favor ingrese con " +
+                                        "sus credenciales", Toast.LENGTH_SHORT).show();
+                            } else {
+                                Toast.makeText(LoginActivity.this, "Authentication failed.",
+                                        Toast.LENGTH_SHORT).show();
+                            }
                         }
                     }
                 });
@@ -195,6 +197,7 @@ public class LoginActivity extends ConnectedActivity {
                     DocumentSnapshot document = task.getResult();
                     if (document.exists()) {
                         boolean isChanged = document.getBoolean("passwordIsChanged");
+                        System.out.println("user's password" + isChanged);
                         selectNextActivity(isChanged);
                     } else {
                         System.out.println("Document doesn't exist");

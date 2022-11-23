@@ -24,6 +24,7 @@ public class PasswordChangeActivity extends ConnectedActivity {
     private TextInputLayout confirmPassword;
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
+    private SharedPreferences sp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +32,7 @@ public class PasswordChangeActivity extends ConnectedActivity {
         setContentView(R.layout.activity_password_change);
         newPassword = (TextInputLayout) findViewById(R.id.Password_new);
         confirmPassword = (TextInputLayout) findViewById(R.id.Password_confirm);
+        sp = getSharedPreferences("login",MODE_PRIVATE);
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
     }
@@ -53,6 +55,7 @@ public class PasswordChangeActivity extends ConnectedActivity {
                         Toast.makeText(PasswordChangeActivity.this, "Cambio de contraseña exitoso",
                                 Toast.LENGTH_LONG).show();
                         if (changeInDb(user.getUid())) {
+                            sp.edit().putString("userPassword", theNewPassword).apply();
                             Intent intent = new Intent(PasswordChangeActivity.this, MainActivity.class);
                             startActivity(intent);
                         }
