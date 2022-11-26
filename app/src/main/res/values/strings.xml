@@ -67,4 +67,7 @@
 
     //Purchase history
     <string name="purchase_history_title">Historial de compras</string>
+    <string name="index">#</string>
+    <string name="date">Fecha</string>
+    <string name="purchase_total">Total</string>
 </resources>

@@ -3,6 +3,10 @@ buildscript {
     dependencies {
         classpath 'com.google.gms:google-services:4.3.14'
     }
+
+    repositories {
+        mavenCentral()
+    }
 }
 plugins {
     id 'com.android.application' version '7.2.2' apply false
@@ -12,3 +16,6 @@ plugins {
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
+
+
+

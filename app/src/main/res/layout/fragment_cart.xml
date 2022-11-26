@@ -6,9 +6,22 @@
     android:layout_height="match_parent"
     tools:context=".cart.CartFragment">
 
+    <pl.droidsonroids.gif.GifImageView
+        android:id="@+id/loading_circle"
+        android:layout_width="100dp"
+
+        android:layout_height="100dp"
+
+        android:layout_marginStart="150dp"
+        android:layout_marginTop="300dp"
+        android:background="#fff"
+        android:src="@drawable/loading" />
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:id="@+id/cart"
+        android:visibility="gone">
 
         <LinearLayout
             android:id="@+id/user"

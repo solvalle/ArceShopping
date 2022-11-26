@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 
 import androidx.annotation.NonNull;
@@ -145,6 +146,7 @@ public class CartFragment extends Fragment implements ICartResponder {
     public void launchHistory()
     {
         Intent intent = new Intent(getActivity(), PurchaseHistoryActivity.class);
+        intent.putExtra("LOGGED_IN_USER", this.user);
         startActivity(intent);
     }
 
@@ -191,7 +193,9 @@ public class CartFragment extends Fragment implements ICartResponder {
         //DbShoppingCart dbShoppingCart = new DbShoppingCart(root.getContext());
         // Delete the data base
         //dbShoppingCart.deleteUserCart(user.getEmail());
-        firebaseHelper.clearShoppingCart(user.getEmail());
+        if(!shoppingCart.isEmpty()) {
+            firebaseHelper.clearShoppingCart(user.getEmail());
+        }
         // Reflect the data on the screen
     }
 
@@ -200,8 +204,11 @@ public class CartFragment extends Fragment implements ICartResponder {
      * data stored in the data base
      */
     private void pay(View root) {
-        firebaseHelper.commitPurchase( Integer.parseInt(priceTV.getText().toString().substring(1)), user.getEmail(),
-                                        shoppingCart);
+        if(!shoppingCart.isEmpty()) {
+            firebaseHelper.commitPurchase(Integer
+                                        .parseInt(priceTV.getText().toString().substring(1)),
+                                        user.getEmail(), shoppingCart);
+        }
     }
 
     private void clearUI(){
@@ -235,6 +242,10 @@ public class CartFragment extends Fragment implements ICartResponder {
         } else {
             emptyCartTV.setVisibility(View.VISIBLE);
         }
+        //With shopping cart and user info loaded, hide loading circle and
+        //display data.
+        getView().findViewById(R.id.loading_circle).setVisibility(View.GONE);
+        getView().findViewById(R.id.cart).setVisibility(View.VISIBLE);
     }
 
     @Override
