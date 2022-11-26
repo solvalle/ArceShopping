@@ -5,5 +5,57 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".PurchaseHistoryActivity">
+    <LinearLayout
+        android:layout_marginTop="40dp"
+        android:id="@+id/user_info"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/title">
+        <ImageView
+            android:id="@+id/user_pic"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:src="@drawable/generic_user_icon"
+            android:layout_gravity="start"
+            android:layout_marginStart="30dp"
+            />
+
+        <TextView
+            android:id="@+id/user_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="zombi"
+            android:layout_marginTop="15dp"
+            android:layout_marginStart="30dp"
+            android:textSize="30sp"
+            android:layout_gravity="center"
+            />
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/user_info"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:textSize="25sp"
+        android:paddingTop="40dp"
+        android:gravity="center"
+        android:text="@string/purchase_history_title"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/history_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/title"
+        app:layout_constraintStart_toStartOf="parent"
+
+        android:paddingBottom="200dp"
+        android:scrollbars="vertical"
+        />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

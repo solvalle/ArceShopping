@@ -33,11 +33,14 @@
         <entry key="..\:/android/3raIterarcion/app/src/main/res/menu/menu.xml" value="0.2890625" />
         <entry key="..\:/android/3raIterarcion/app/src/main/res/menu/search_menu.xml" value="0.2890625" />
         <entry key="app/src/main/res/layout/activity_login.xml" value="0.19375" />
+        <entry key="app/src/main/res/layout/activity_purchase_history.xml" value="0.25" />
         <entry key="app/src/main/res/layout/activity_register.xml" value="0.19375" />
+        <entry key="app/src/main/res/layout/cart_item.xml" value="0.19375" />
         <entry key="app/src/main/res/layout/fragment_account.xml" value="0.2" />
         <entry key="app/src/main/res/layout/fragment_api.xml" value="0.19375" />
         <entry key="app/src/main/res/layout/fragment_cart.xml" value="0.19375" />
         <entry key="app/src/main/res/layout/product.xml" value="0.19375" />
+        <entry key="app/src/main/res/layout/purchase_history_row.xml" value="0.17864583333333334" />
         <entry key="app/src/main/res/menu/botton_nav_menu.xml" value="0.19375" />
         <entry key="app/src/main/res/menu/menu.xml" value="0.19375" />
         <entry key="app/src/main/res/menu/search_menu.xml" value="0.19375" />

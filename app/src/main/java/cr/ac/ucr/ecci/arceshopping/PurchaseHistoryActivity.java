@@ -6,10 +6,14 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 public class PurchaseHistoryActivity extends ConnectedActivity implements IPurchaseHistoryReceiver {
 
     FirebaseHelper firebaseHelper;
     Purchase[] userPurchaseHistory;
+    PurchaseHistoryAdapter adapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -23,5 +27,14 @@ public class PurchaseHistoryActivity extends ConnectedActivity implements IPurch
     @Override
     public void onHistoryLoaded(Purchase[] purchases) {
         //Display purchase history
+        this.userPurchaseHistory = purchases;
+        setHistory();
+    }
+
+    private void setHistory(){
+        RecyclerView rView = findViewById(R.id.history_view);
+        rView.setLayoutManager(new LinearLayoutManager(this));
+        adapter = new PurchaseHistoryAdapter(this, this.userPurchaseHistory);
+        rView.setAdapter(adapter);
     }
 }

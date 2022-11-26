@@ -1,6 +1,8 @@
 package cr.ac.ucr.ecci.arceshopping.db;
 import android.app.Activity;
 import android.widget.Toast;
+
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import androidx.annotation.NonNull;
@@ -16,6 +18,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 
 import cr.ac.ucr.ecci.arceshopping.ICartResponder;
 import cr.ac.ucr.ecci.arceshopping.IPurchaseHistoryReceiver;
@@ -40,19 +43,23 @@ public class FirebaseHelper {
         //Check if incoming product has already been added to sc.
         //If so, check how many stock there is available and if customer
         //hasn't exceeded the allowed maximum.
-        db.collection("Shopping_cart")
-                .whereEqualTo("ownerEmail", newRow.getOwnerEmail())
-                .whereEqualTo("productId", newRow.getProductId())
-                .get()
+        db.collection("Shopping_cart")//Name of the collection to find.
+                .whereEqualTo("ownerEmail", newRow.getOwnerEmail())//Find documents whose ownerEmail field's content is the same as the newRow's.
+                .whereEqualTo("productId", newRow.getProductId())//Find document whose productId is the same as the new row's productID.
+                .get()//Execute query
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    //Callback that will be invoked when we receive a response from firebase.
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if(task.getResult().getDocuments().isEmpty()){
+                            //This confirms that the product is being added to the shopping cart for the first time.
                             db.collection("Shopping_cart")
-                                    .add(newRow)
+                                    .add(newRow)//Firebase allows to pass an object as argument to insert into a collection.
+                                                //Just make sure that every class getter has been implemented.
                                     .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
                                 @Override
                                 public void onComplete(Task<DocumentReference> task) {
+                                    //When firebase responds to the insert operation...
                                     if(task.isSuccessful()){
                                         toast.setText("Producto añadido");
                                         toast.show();
@@ -61,6 +68,7 @@ public class FirebaseHelper {
                                 }
                             });
                         } else {
+                            //This confirms that the product has been previously included, so we start the quantity modification process.
                             int quantity = Integer.parseInt(task.getResult().getDocuments().get(0).get("quantity").toString());
                             increaseItemQuantity(newRow, toast, quantity, stock, task.getResult().getDocuments().get(0).getId(), context);
                         }
@@ -68,6 +76,7 @@ public class FirebaseHelper {
                 });
     }
 
+    //This method finds the data related with the currently logged in user.
     public void selectUser(String ownerEmail){
         db.collection("User")
                 .whereEqualTo("email", ownerEmail)
@@ -86,28 +95,29 @@ public class FirebaseHelper {
                 });
     }
 
-    public void increaseItemQuantity(ShoppingCartRow newRow, Toast toast,
+    public void increaseItemQuantity(ShoppingCartRow existingRow, Toast toast,
                                       int quantity, int stock, String docId, Activity context){
-        if (newRow.getQuantity() != 0) {
+        if (existingRow.getQuantity() != 0) {
             //Quantity previously set plus quantity user wants to add.
-            int total = newRow.getQuantity() + quantity;
-            //Determine if final quantity is bigger than available stock of the prouduct or
-            //more than 10, the most a customer can order of any product
+            int total = existingRow.getQuantity() + quantity;
+            //Determine if final quantity is bigger than available stock of the product or
+            //more than 10, which is the most a customer can order of any product
             if (total > stock || total > LIMIT) {
                 toast.setText("La cantidad deseada excede el límite del stock o carrito");
                 toast.show();
             }else{
+                //The product's quantity the user wants to buy is allowed, so update the firebase doc.
                 DocumentReference docRef = db.collection("Shopping_cart").document(docId);
                 docRef.update("quantity", total).addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void unused) {
-                        //If it is null, that means that this method was not invoked from shopping cart tab.
+                        //If cartResponder is null, that means that this method was not invoked from shopping cart tab.
                         if(cartResponder == null){
                             toast.setText("Cantidad añadida");
                             toast.show();
                             context.finish();
                         }else{
-                            getTotalPriceOfUserShoppingCart(newRow.getOwnerEmail());
+                            getTotalPriceOfUserShoppingCart(existingRow.getOwnerEmail());
                             toast.setText("Actualizando cantidad...");
                             toast.show();
                         }
@@ -120,7 +130,7 @@ public class FirebaseHelper {
         }
 
     }
-
+    //It retrieves user's shopping cart
     public void getShoppingCart(String ownerEmail, HashMap<Integer,Integer> shoppingCart){
         db.collection("Shopping_cart")
                 .whereEqualTo("ownerEmail", ownerEmail)
@@ -140,6 +150,8 @@ public class FirebaseHelper {
                     }
                 });
     }
+
+    //This method discards a specific item from the user's shopping cart.
     public void deleteItem(String ownerEmail, int productId){
         db.collection("Shopping_cart")
                 .whereEqualTo("productId",productId)
@@ -154,6 +166,7 @@ public class FirebaseHelper {
                 });
     }
 
+    // This method empties user's shopping cart and saves the change in firebase.
     public void clearShoppingCart(String ownerEmail){
         db.collection("Shopping_cart")
                 .whereEqualTo("ownerEmail", ownerEmail)
@@ -173,11 +186,13 @@ public class FirebaseHelper {
                     }
                 });
     }
-
+    //This method commits the purchase and saves it in the corresponding firebase collection.
     public void commitPurchase(int total, String ownerEmail,
                                HashMap<Integer,Integer> shoppingCart) {
-        String currentTime = Calendar.getInstance().getTime().toString();
-        Purchase newPurchase = new Purchase(total, currentTime, ownerEmail,shoppingCart);
+        Date currentTime = Calendar.getInstance().getTime();
+        SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy", Locale.getDefault());
+        String formattedDate = df.format(currentTime);
+        Purchase newPurchase = new Purchase(total, formattedDate, ownerEmail,shoppingCart);
         db.collection("Purchase")
                 .add(newPurchase)
                 .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
@@ -196,6 +211,8 @@ public class FirebaseHelper {
                 });
     }
 
+    //This method calculates the total price that the products in the shopping cart
+    //are worth.
     public void getTotalPriceOfUserShoppingCart(String ownerEmail){
         db.collection("Shopping_cart")
                 .whereEqualTo("ownerEmail", ownerEmail)
@@ -216,7 +233,7 @@ public class FirebaseHelper {
                     }
                 });
     }
-
+    //Method meant to be invoked by PurchaseHistoryActivity.
     public void retrieveUserPurchases(String ownerEmail){
         db.collection("Purchase")
                 .whereEqualTo("ownerEmail",ownerEmail)
@@ -224,13 +241,14 @@ public class FirebaseHelper {
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                //If query result is not empty, then populate Purchase array and then use interface.
                 if(!task.getResult().isEmpty()){
                     List<DocumentSnapshot> docs = task.getResult().getDocuments();
                     Purchase[] purchases = new Purchase[docs.size()];
                     for(int i = 0; i < docs.size(); i++){
                         purchases[i] = new Purchase(Integer.parseInt(docs.get(i).get("total").toString()),
                                                     docs.get(i).get("purchaseTime").toString(), ownerEmail,
-                                                    (HashMap<Integer, Integer>) docs.get(i).get("shoppingCart"));
+                                                    (HashMap<String, Integer>) docs.get(i).get("shoppingCart"), false);
                     }
 
                     purchaseHistoryReceiver.onHistoryLoaded(purchases);
