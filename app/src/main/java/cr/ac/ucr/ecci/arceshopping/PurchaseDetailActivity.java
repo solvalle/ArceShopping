@@ -5,7 +5,9 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -69,5 +71,23 @@ public class PurchaseDetailActivity extends ConnectedActivity {
             purchaseDate.setText(selectedPurchase.getPurchaseTime());
             purchaseTotal.setText("Total $"+selectedPurchase.getTotal());
         }
+
+        findViewById(R.id.share_button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                share();
+            }
+        });
+    }
+
+    private void share(){
+        //Solution taken from StackOverflow, available at:
+        //https://stackoverflow.com/questions/20236947/adding-a-share-button-to-share-the-app-on-social-networks
+        Intent intent = new Intent();
+        intent.setAction(Intent.ACTION_SEND);
+
+        intent.setType("text/plain");
+        intent.putExtra(Intent.EXTRA_TEXT, "¡He realizado una compra por Arce Shopping!");
+        startActivity(Intent.createChooser(intent, "Share"));
     }
 }

@@ -97,6 +97,7 @@
         android:gravity="center"
         android:layout_marginTop="150dp">
     <Button
+        android:id="@+id/share_button"
         android:backgroundTint="@color/arce_orange"
         android:layout_width="180dp"
         android:layout_height="wrap_content"
