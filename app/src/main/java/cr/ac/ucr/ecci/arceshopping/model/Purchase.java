@@ -12,10 +12,9 @@ public class Purchase implements Parcelable {
     int total;
     String ownerEmail;
     String purchaseTime;
-    HashMap<Integer, Integer> shoppingCart;
-    HashMap<String, Integer> shoppingCartB;
+    HashMap<String, Integer> shoppingCart;
     public Purchase(int total, String purchaseTime, String ownerEmail,
-                    HashMap<Integer,Integer> shoppingCart){
+                    HashMap<String,Integer> shoppingCart){
         this.total = total;
         this.purchaseTime = purchaseTime;
         this.ownerEmail = ownerEmail;
@@ -24,23 +23,14 @@ public class Purchase implements Parcelable {
 
     //Constructor meant to be used when retrieving purchase history from firebase
     public Purchase(int total, String purchaseTime, String ownerEmail,
-                    HashMap<String,Integer> loadedCart, boolean notToUse){
+                    HashMap<String,Long> loadedCart, boolean notToUse){
         this.total = total;
         this.purchaseTime = purchaseTime;
         this.ownerEmail = ownerEmail;
-        this.shoppingCartB = loadedCart ;
-        /*
-        * For some reason, this block throws an error saying that a long
-        * is being inserted as key.
-        * for (String productId : loadedCart.keySet()) {
-            System.out.println(productId);
-            System.out.println(Integer.parseInt(productId));
-            System.out.println(Integer.valueOf(productId));
-            Integer key = Integer.valueOf(productId);
-            System.out.println(key.getClass().toString());
-            this.shoppingCart.put(key.,loadedCart.get(productId));
+        this.shoppingCart = new HashMap<String, Integer>();
+        for(String id:loadedCart.keySet()){
+            this.shoppingCart.put(id, loadedCart.get(id).intValue());
         }
-        * */
     }
 
     public int getTotal() {
@@ -51,12 +41,7 @@ public class Purchase implements Parcelable {
         //Firebase only allows HashMaps of <String, Integer> type.
         //This method converts the original shopping cart into an accepted
         //type of hash map.
-        HashMap<String, Integer> newShoppingCart = new HashMap<String,Integer>();
-
-        for (int productId : shoppingCart.keySet()) {
-            newShoppingCart.put(String.valueOf(productId),shoppingCart.get(productId));
-        }
-        return newShoppingCart;
+        return shoppingCart;
     }
 
     public String getOwnerEmail() {
@@ -67,15 +52,12 @@ public class Purchase implements Parcelable {
         return purchaseTime;
     }
 
-    public HashMap<String, Integer> getShoppingCartB() {
-        return shoppingCartB;
-    }
 
     protected Purchase(Parcel in){
         this.total = in.readInt();
         this.ownerEmail = in.readString();
         this.purchaseTime = in.readString();
-        this.shoppingCartB = in.readHashMap(String.class.getClassLoader());
+        this.shoppingCart = in.readHashMap(String.class.getClassLoader());
     }
 
     @Override
@@ -88,7 +70,7 @@ public class Purchase implements Parcelable {
         parcel.writeInt(total);
         parcel.writeString(ownerEmail);
         parcel.writeString(purchaseTime);
-        parcel.writeMap(shoppingCartB);
+        parcel.writeMap(shoppingCart);
     }
 
     public static Creator<Purchase> CREATOR = new Creator<Purchase>() {
@@ -111,7 +93,6 @@ public class Purchase implements Parcelable {
                 ", ownerEmail='" + ownerEmail + '\'' +
                 ", purchaseTime='" + purchaseTime + '\'' +
                 ", shoppingCart=" + shoppingCart +
-                ", shoppingCartB=" + shoppingCartB +
                 '}';
     }
 }

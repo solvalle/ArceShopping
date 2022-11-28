@@ -26,6 +26,9 @@
         android:theme="@style/Theme.ArceShopping"
         tools:targetApi="31">
         <activity
+            android:name=".PurchaseDetailActivity"
+            android:exported="false" />
+        <activity
             android:name=".PurchaseHistoryActivity"
             android:exported="false" />
 

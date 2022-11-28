@@ -70,4 +70,6 @@
     <string name="index">#</string>
     <string name="date">Fecha</string>
     <string name="purchase_total">Total</string>
+    <string name="purchase_number">Compra #</string>
+    <string name="share_button">Compartir en mis redes</string>
 </resources>

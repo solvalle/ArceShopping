@@ -1,12 +1,13 @@
 package cr.ac.ucr.ecci.arceshopping;
+import cr.ac.ucr.ecci.arceshopping.adapters.PurchaseHistoryAdapter;
 import cr.ac.ucr.ecci.arceshopping.db.FirebaseHelper;
 import cr.ac.ucr.ecci.arceshopping.model.Purchase;
 import cr.ac.ucr.ecci.arceshopping.model.User;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -20,6 +21,7 @@ public class PurchaseHistoryActivity extends ConnectedActivity implements IPurch
         PurchaseHistoryAdapter.ItemClickListener {
 
     FirebaseHelper firebaseHelper;
+    User user;
     Purchase[] userPurchaseHistory;
     PurchaseHistoryAdapter adapter;
     @Override
@@ -33,12 +35,12 @@ public class PurchaseHistoryActivity extends ConnectedActivity implements IPurch
         setContentView(R.layout.activity_purchase_history);
 
         if(bundle != null){
-            User user = bundle.getParcelable("LOGGED_IN_USER");
+            this.user = bundle.getParcelable("LOGGED_IN_USER");
             ImageView userPic = findViewById(R.id.user_pic);
             TextView userName = findViewById(R.id.user_name);
-            userName.setText(user.getName());
+            userName.setText(this.user.getName());
             if(!user.getPath().equals("")){
-                Picasso.get().load(user.getPath()).into(userPic);
+                Picasso.get().load(this.user.getPath()).into(userPic);
             }
         }
 
@@ -63,13 +65,17 @@ public class PurchaseHistoryActivity extends ConnectedActivity implements IPurch
         rView.setAdapter(adapter);
     }
 
-    private void launchPurchaseDetail(){
-
+    private void launchPurchaseDetail(Purchase selectedPurchase, int position){
+        Intent intent = new Intent(this,PurchaseDetailActivity.class);
+        intent.putExtra("SELECTED_PURCHASE", selectedPurchase);
+        intent.putExtra("LOGGED_IN_USER", this.user );
+        intent.putExtra("PURCHASE_NUMBER", position);
+        startActivity(intent);
     }
 
     @Override
     public void onItemClick(int position) {
         System.out.println(userPurchaseHistory[position].toString());
-        launchPurchaseDetail();
+        launchPurchaseDetail(userPurchaseHistory[position], position);
     }
 }

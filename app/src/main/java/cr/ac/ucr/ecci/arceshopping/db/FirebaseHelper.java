@@ -131,7 +131,7 @@ public class FirebaseHelper {
 
     }
     //It retrieves user's shopping cart
-    public void getShoppingCart(String ownerEmail, HashMap<Integer,Integer> shoppingCart){
+    public void getShoppingCart(String ownerEmail, HashMap<String,Integer> shoppingCart){
         db.collection("Shopping_cart")
                 .whereEqualTo("ownerEmail", ownerEmail)
                 .get()
@@ -141,7 +141,7 @@ public class FirebaseHelper {
                         if(!task.getResult().getDocuments().isEmpty()) {
                             List<DocumentSnapshot> documents = task.getResult().getDocuments();
                             for(int i = 0; i < task.getResult().size(); i++) {
-                                shoppingCart.put(Integer.parseInt(documents.get(i).get("productId").toString()),
+                                shoppingCart.put(documents.get(i).get("productId").toString(),
                                                  Integer.parseInt(documents.get(i).get("quantity").toString()));
                             }
 
@@ -188,7 +188,7 @@ public class FirebaseHelper {
     }
     //This method commits the purchase and saves it in the corresponding firebase collection.
     public void commitPurchase(int total, String ownerEmail,
-                               HashMap<Integer,Integer> shoppingCart) {
+                               HashMap<String,Integer> shoppingCart) {
         Date currentTime = Calendar.getInstance().getTime();
         SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy", Locale.getDefault());
         String formattedDate = df.format(currentTime);
@@ -248,7 +248,7 @@ public class FirebaseHelper {
                     for(int i = 0; i < docs.size(); i++){
                         purchases[i] = new Purchase(Integer.parseInt(docs.get(i).get("total").toString()),
                                                     docs.get(i).get("purchaseTime").toString(), ownerEmail,
-                                                    (HashMap<String, Integer>) docs.get(i).get("shoppingCart"), false);
+                                                    (HashMap<String, Long>) docs.get(i).get("shoppingCart"), false);
                     }
 
                     purchaseHistoryReceiver.onHistoryLoaded(purchases);

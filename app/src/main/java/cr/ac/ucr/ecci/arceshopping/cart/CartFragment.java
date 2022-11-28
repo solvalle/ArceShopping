@@ -37,6 +37,7 @@ import java.util.HashMap;
 import cr.ac.ucr.ecci.arceshopping.ICartResponder;
 import cr.ac.ucr.ecci.arceshopping.PurchaseHistoryActivity;
 import cr.ac.ucr.ecci.arceshopping.R;
+import cr.ac.ucr.ecci.arceshopping.adapters.CartRvAdapter;
 import cr.ac.ucr.ecci.arceshopping.databinding.FragmentCartBinding;
 import cr.ac.ucr.ecci.arceshopping.db.DbShoppingCart;
 import cr.ac.ucr.ecci.arceshopping.db.DbUsers;
@@ -62,13 +63,13 @@ public class CartFragment extends Fragment implements ICartResponder {
     private TextView userFullNameTV;
     private FirebaseHelper firebaseHelper;
     //private DbShoppingCart dbShoppingCart;
-    HashMap<Integer, Integer> shoppingCart;
+    HashMap<String, Integer> shoppingCart;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentCartBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
-        this.shoppingCart = new HashMap<Integer,Integer>();
+        this.shoppingCart = new HashMap<String,Integer>();
         SharedPreferences sp = getActivity().getSharedPreferences("login", Context.MODE_PRIVATE);
 
         //DbUsers dbUsers = new DbUsers(root.getContext());
@@ -84,7 +85,7 @@ public class CartFragment extends Fragment implements ICartResponder {
         Button shoppingHistoryButton = (Button) root.findViewById(R.id.shopping_history);
         productsRV = (RecyclerView) root.findViewById(R.id.productsRV);
         emptyCartTV = (TextView) root.findViewById(R.id.emptyCart);
-
+        this.adapter = new CartRvAdapter(this.productList);
 
 
         //this.dbShoppingCart = new DbShoppingCart(root.getContext());
@@ -153,10 +154,12 @@ public class CartFragment extends Fragment implements ICartResponder {
     /**
      * Consults the api to load the products in the cart with the necessary information
      */
-    public void loadProducts(HashMap<Integer, Integer> shoppingCart) {
-        RequestQueue requestQueue = Volley.newRequestQueue(getActivity());
+    static public void loadProducts(HashMap<String, Integer> shoppingCart, Context context,
+                                    ArrayList<Product> productList, CartRvAdapter adapter,
+                                    RecyclerView productsRV) {
+        RequestQueue requestQueue = Volley.newRequestQueue(context);
 
-        for (int productId : shoppingCart.keySet()) {
+        for (String productId : shoppingCart.keySet()) {
             final String URL_PRODUCT = "https://dummyjson.com/products/" + productId;
 
             StringRequest myRequest = new StringRequest(Request.Method.GET, URL_PRODUCT,
@@ -172,14 +175,14 @@ public class CartFragment extends Fragment implements ICartResponder {
                                 productList.add(product);
                             }
 
-                            adapter = new CartRvAdapter(productList);
+                            adapter.setProductsList(productList);
                             productsRV.setAdapter(adapter);
 
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
                     },
-                    volleyError -> Toast.makeText(getActivity(), volleyError.getMessage(), Toast.LENGTH_SHORT).show()
+                    volleyError -> Toast.makeText(context, volleyError.getMessage(), Toast.LENGTH_SHORT).show()
             );
             requestQueue.add(myRequest);
         }
@@ -238,7 +241,8 @@ public class CartFragment extends Fragment implements ICartResponder {
         if (shoppingCart.size() > 0) {
             emptyCartTV.setVisibility(View.INVISIBLE);
             productsRV.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
-            loadProducts(shoppingCart);
+            loadProducts(shoppingCart, getActivity().getBaseContext(),
+                    productList, adapter, productsRV);
         } else {
             emptyCartTV.setVisibility(View.VISIBLE);
         }
@@ -266,7 +270,11 @@ public class CartFragment extends Fragment implements ICartResponder {
     @Override
     public void onUserDataLoaded(User user) {
         this.user = user;
-        System.out.println(user.getName());
+
+        //Pass references to adapter.
+        this.adapter.setContext(getActivity());
+        this.adapter.setFirebaseHelper(this.firebaseHelper);
+        this.adapter.setUserEmail(user.getEmail());
         this.userFullNameTV.setText(user.getName());
 
         if(this.user.getPath().compareTo("") > 0)
@@ -278,143 +286,5 @@ public class CartFragment extends Fragment implements ICartResponder {
 
     }
 
-    /**
-     * This class is the recycleview adapter
-     */
-    public class CartRvAdapter extends RecyclerView.Adapter<CartRvAdapter.ViewHolder> {
-        private ArrayList<Product> productsList;
-
-        public CartRvAdapter(ArrayList<Product> productsList) {
-            this.productsList = productsList;
-        }
-
-        @NonNull
-        @Override
-        public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
-            View listItem = layoutInflater.inflate(R.layout.cart_item, parent, false);
-
-            return new ViewHolder(listItem);
-        }
-
-        @Override
-        public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-            Product product = productsList.get(position);
-
-            holder.getProductName().setText(product.getTitle());
-            holder.getPrice().setText("$"+product.getPrice());
-            holder.getQuantity().setText(Integer.toString(product.getItemsInCart()));
-            holder.getAddButton().setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    holder.addCounter();
-                }
-            });
-            holder.getDeductButton().setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    holder.deductCounter();
-                }
-            });
-            holder.setStock(product.getStock());
-            Picasso.get().load(product.images.get(0)).into(holder.getProductPhoto());
-        }
-
-        @Override
-        public int getItemCount() {
-            return productsList.size();
-        }
-
-        public void setProductsList(ArrayList<Product> productsList) {
-            this.productsList = productsList;
-        }
-
-        /**
-         * This class is the adapter's viewholder
-         */
-        public class ViewHolder extends RecyclerView.ViewHolder  {
-            private ImageView productPhoto;
-            private TextView productName;
-            private TextView quantity;
-            private TextView price;
-            private Button addButton;
-            private Button deductButton;
-            private int stock;
-
-            public ImageView getProductPhoto() {
-                return productPhoto;
-            }
-
-            public TextView getProductName() {
-                return productName;
-            }
-
-            public TextView getQuantity() {
-                return quantity;
-            }
-
-            public TextView getPrice() {
-                return price;
-            }
-
-            public Button getAddButton() {
-                return addButton;
-            }
-
-            public Button getDeductButton() {
-                return deductButton;
-            }
-
-            public void setStock(int stock) {
-                this.stock = stock;
-            }
-
-            public ViewHolder(View itemView) {
-                super(itemView);
-
-                productPhoto = (ImageView) itemView.findViewById(R.id.productPhoto);
-                productName = (TextView) itemView.findViewById(R.id.productName);
-                quantity = (TextView) itemView.findViewById(R.id.quantity);
-                price = (TextView) itemView.findViewById(R.id.price);
-                addButton = (Button) itemView.findViewById(R.id.plus_button);
-                deductButton = (Button) itemView.findViewById(R.id.minus_button);
-                stock = 10;
-            }
-
-            /**
-             * Increases the product counter
-             */
-            public void addCounter() {
-                int counter = Integer.parseInt(quantity.getText().toString()) + 1;
-                if (counter <= 10 && counter <= this.stock) {
-                    modifyPrices(counter, 1);
-                }
-            }
-
-            /**
-             * Decreases the product counter
-             */
-            public void deductCounter() {
-                int counter = Integer.parseInt(quantity.getText().toString()) - 1;
-                if (counter >= 1) {
-                    modifyPrices(counter, -1);
-                }
-            }
-
-            /**
-             * Saves the cart changes on the data base
-             */
-            public void modifyPrices(int counter, int number) {
-                Product product = productsList.get(this.getAdapterPosition());
-                //insertShoppingCartRow will determine that prduct is already in shopping cart, so it will just update its quantity
-                firebaseHelper.insertShoppingCartRow(new ShoppingCartRow(user.getEmail(),
-                                                    product.getId(), number,
-                                                    product.getPrice()),Toast.makeText(getActivity(),"",Toast.LENGTH_SHORT),
-                                                    product.getStock(), getActivity());
-                quantity.setText(Integer.toString(counter));
-                //firebaseHelper.getTotalPriceOfUserShoppingCart(user.getEmail());
-            }
-        }
-    }
 
 }

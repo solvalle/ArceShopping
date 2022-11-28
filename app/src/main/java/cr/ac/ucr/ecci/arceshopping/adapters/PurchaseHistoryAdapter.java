@@ -1,6 +1,5 @@
-package cr.ac.ucr.ecci.arceshopping;
+package cr.ac.ucr.ecci.arceshopping.adapters;
 
-import android.content.ClipData;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,8 +9,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.denzcoskun.imageslider.interfaces.ItemClickListener;
-
+import cr.ac.ucr.ecci.arceshopping.R;
 import cr.ac.ucr.ecci.arceshopping.model.Purchase;
 
 public class PurchaseHistoryAdapter extends RecyclerView.Adapter<PurchaseHistoryAdapter.PurchaseHolder> {

@@ -14,12 +14,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import cr.ac.ucr.ecci.arceshopping.ConnectedActivity;
 import cr.ac.ucr.ecci.arceshopping.GridSpacingItemDecoration;
 import cr.ac.ucr.ecci.arceshopping.SingleProductActivity;
 import cr.ac.ucr.ecci.arceshopping.model.Product;
 import cr.ac.ucr.ecci.arceshopping.model.Products;
-import cr.ac.ucr.ecci.arceshopping.ProductsAdapter;
+import cr.ac.ucr.ecci.arceshopping.adapters.ProductsAdapter;
 import cr.ac.ucr.ecci.arceshopping.R;
 import cr.ac.ucr.ecci.arceshopping.MainActivity;
 import cr.ac.ucr.ecci.arceshopping.databinding.FragmentApiBinding;
@@ -37,8 +36,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.google.gson.*;
-
-import java.util.ArrayList;
 
 public class ApiFragment extends Fragment implements ListProductViewInterface{
 

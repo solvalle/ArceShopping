@@ -1,7 +1,6 @@
 package cr.ac.ucr.ecci.arceshopping;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.navigation.NavController;
@@ -9,10 +8,6 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import androidx.appcompat.widget.SearchView;
 import android.widget.Toast;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -20,8 +15,8 @@ import com.google.firebase.auth.FirebaseUser;
 
 import java.util.ArrayList;
 
+import cr.ac.ucr.ecci.arceshopping.adapters.ProductsAdapter;
 import cr.ac.ucr.ecci.arceshopping.databinding.ActivityProductsBinding;
-import cr.ac.ucr.ecci.arceshopping.db.DbUsers;
 import cr.ac.ucr.ecci.arceshopping.model.Product;
 
 
