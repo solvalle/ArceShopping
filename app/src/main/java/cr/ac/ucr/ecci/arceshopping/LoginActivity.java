@@ -94,6 +94,11 @@ public class LoginActivity extends ConnectedActivity {
         return compatible;
     }
 
+    @Override
+    public void onBackPressed(){
+        finishAffinity();
+    }
+
     private void buildFingerPrint()
     {
         executor = ContextCompat.getMainExecutor(this);

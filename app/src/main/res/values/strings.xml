@@ -36,6 +36,7 @@
     <string name="update">Actualizar mis datos</string>
     <string name="change_pic">Cambiar foto de perfil</string>
     <string name="change_age">Cambiar edad</string>
+    <string name="logout">Cerrar sesión</string>
 
     //products
     <string name="user_title_products">Cuenta</string>

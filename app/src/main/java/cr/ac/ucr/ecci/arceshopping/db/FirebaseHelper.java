@@ -11,6 +11,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -33,9 +34,7 @@ public class FirebaseHelper {
     private ICartResponder cartResponder;
     private IPurchaseHistoryReceiver purchaseHistoryReceiver;
 
-    public FirebaseHelper(){
-        db = FirebaseFirestore.getInstance();
-    }
+    public FirebaseHelper(){db = FirebaseFirestore.getInstance();}
     public void setCartResponder(ICartResponder cr) {this.cartResponder=cr;}
     public void setPurchaseHistoryReceiver(IPurchaseHistoryReceiver pr) {this.purchaseHistoryReceiver = pr;}
 
@@ -257,6 +256,9 @@ public class FirebaseHelper {
         });
     }
 
+    static public void logOut(){
+        FirebaseAuth.getInstance().signOut();
+    }
 }
 
 
