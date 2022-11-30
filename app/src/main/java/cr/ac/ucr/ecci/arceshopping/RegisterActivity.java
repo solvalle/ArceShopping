@@ -18,7 +18,14 @@ import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -71,7 +78,11 @@ public class RegisterActivity extends ConnectedActivity {
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
                 com.google.android.material.R.layout.support_simple_spinner_dropdown_item, provinces);
         this.province.setAdapter(adapter);
+
         checkPermissions();
+        db = FirebaseFirestore.getInstance();
+        mAuth = FirebaseAuth.getInstance();
+
     }
 
     public void register(View view) {
@@ -178,6 +189,7 @@ public class RegisterActivity extends ConnectedActivity {
         } else {
             getLocation();
         }
+
     }
 
     @Override

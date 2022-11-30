@@ -19,6 +19,12 @@ public class ProvinceCalculator {
         ;
     }
 
+    /**
+     * Calculates in which province the user is located approximately
+     * @param lat user's latitude
+     * @param log user's longitude
+     * @return The province where the user is
+     */
     public int calculateProvince(double lat, double log) {
         float results[] = new float[1];
         if (lat == 0 && log == 0)

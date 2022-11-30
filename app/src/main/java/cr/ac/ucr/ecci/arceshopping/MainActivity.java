@@ -35,8 +35,7 @@ public class MainActivity extends ConnectedActivity {
 
         mAuth = FirebaseAuth.getInstance();
         FirebaseUser currentUser = mAuth.getCurrentUser();
-
-        if (currentUser == null) { //cambiar cuando se agregue el cerrar sesión
+        if (currentUser == null) {
             Intent intent = new Intent(this, LoginActivity.class);
             startActivity(intent);
         } else {
@@ -53,6 +52,7 @@ public class MainActivity extends ConnectedActivity {
             NavigationUI.setupWithNavController(binding.navView, navController);
         }
     }
+
 
     public void setmProducts(ArrayList<Product> mProducts) {
         this.mProducts = mProducts;
