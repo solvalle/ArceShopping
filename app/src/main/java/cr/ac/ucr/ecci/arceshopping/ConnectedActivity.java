@@ -15,8 +15,10 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import cr.ac.ucr.ecci.arceshopping.db.DbUsers;
+import cr.ac.ucr.ecci.arceshopping.db.FirebaseHelper;
 
 public class ConnectedActivity extends AppCompatActivity {
+
     private NetworkRequest networkRequest = new NetworkRequest.Builder()
             .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
             .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
@@ -33,9 +35,7 @@ public class ConnectedActivity extends AppCompatActivity {
                 @Override
                 public void onLost(@NonNull Network network) {
                     super.onLost(network);
-                    displayMessage("Se ha perdido la conexion.");
-                    returnToLoginActivity();
-
+                    endSession();
                 }
 
                 @Override
@@ -54,6 +54,12 @@ public class ConnectedActivity extends AppCompatActivity {
                 }
 
             };
+
+    public void endSession(){
+        displayMessage("Se ha perdido la conexion.");
+        FirebaseHelper.logOut();
+        returnToLoginActivity();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState)

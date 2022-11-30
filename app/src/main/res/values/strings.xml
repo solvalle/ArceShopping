@@ -12,6 +12,7 @@
     <string name="register_text_login">¿No tienes una cuenta?</string>
     <string name="register_link_login">Registrate</string>
     <string name="forgot_password_link_login">¿Olvidaste tu contraseña?</string>
+    <string name="button_biometric">Huella</string>
 
     //register
     <string name="title_register">Registro</string>
@@ -35,6 +36,7 @@
     <string name="update">Actualizar mis datos</string>
     <string name="change_pic">Cambiar foto de perfil</string>
     <string name="change_age">Cambiar edad</string>
+    <string name="logout">Cerrar sesión</string>
 
     //products
     <string name="user_title_products">Cuenta</string>
@@ -64,4 +66,11 @@
     <string name="cancel_button">Limpiar</string>
     <string name="empty_cart">¡El carrito de compras se encuentra vacío!</string>
 
+    //Purchase history
+    <string name="purchase_history_title">Historial de compras</string>
+    <string name="index">#</string>
+    <string name="date">Fecha</string>
+    <string name="purchase_total">Total</string>
+    <string name="purchase_number">Compra #</string>
+    <string name="share_button">Compartir en mis redes</string>
 </resources>

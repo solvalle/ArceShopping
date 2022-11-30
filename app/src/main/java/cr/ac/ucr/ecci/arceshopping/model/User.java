@@ -1,8 +1,10 @@
 package cr.ac.ucr.ecci.arceshopping.model;
 
-public class User {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class User implements Parcelable {
     private String name;
-    private String password;
     private String id;
     private String email;
     private String path;
@@ -11,9 +13,8 @@ public class User {
     private boolean passwordIsChanged;
 
     public User(String email, String id, String name,  String path,
-                int age, String province, String password, boolean passwordIsChanged) {
+                int age, String province, boolean passwordIsChanged) {
         this.name = name;
-        this.password = password;
         this.id = id;
         this.path = path;
         this.email = email;
@@ -28,10 +29,6 @@ public class User {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getPassword() {
-        return password;
     }
 
     public String getId() {
@@ -80,11 +77,49 @@ public class User {
     public String toString() {
         return
                 "name='" + name + '\'' +
-                ", password='" + password + '\'' +
                 ", id='" + id + '\'' +
                 ", email='" + email + '\'' +
                 ", age=" + age +
                 ", province='" + province + '\'' +
                 ", passwordIsChanged=" + passwordIsChanged;
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    protected User(Parcel in) {
+        this.name = in.readString();
+        this.id = in.readString();
+        this.path = in.readString();
+        this.email = in.readString();
+        this.province = in.readString();
+        this.age = in.readInt();
+        this.passwordIsChanged = Boolean.valueOf(in.readString());
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeString(name);
+        parcel.writeString(id);
+        parcel.writeString(path);
+        parcel.writeString(email);
+        parcel.writeString(province);
+        parcel.writeInt(age);
+        parcel.writeString(String.valueOf(passwordIsChanged));
+    }
+
+    public static Creator<User> CREATOR = new Creator<User>() {
+
+        @Override
+        public User createFromParcel(Parcel in) {
+            return new User(in);
+        }
+
+        @Override
+        public User[] newArray(int size) {
+            return new User[size];
+        }
+    };
 }

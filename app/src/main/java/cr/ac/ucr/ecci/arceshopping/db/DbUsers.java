@@ -66,7 +66,7 @@ public class DbUsers extends DbHelper {
 
         if(userCursor.moveToFirst()) {
             user = new User(userCursor.getString(0), userCursor.getString(1), userCursor.getString(2),
-                    userCursor.getString(3),userCursor.getInt(4), userCursor.getString(5), userCursor.getString(6),
+                    userCursor.getString(3),userCursor.getInt(4), userCursor.getString(5),
                         userCursor.getInt(7) != 0);
         }
 

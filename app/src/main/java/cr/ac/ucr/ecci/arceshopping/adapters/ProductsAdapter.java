@@ -1,4 +1,4 @@
-package cr.ac.ucr.ecci.arceshopping;
+package cr.ac.ucr.ecci.arceshopping.adapters;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -17,6 +17,7 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 import java.util.List;
 
+import cr.ac.ucr.ecci.arceshopping.R;
 import cr.ac.ucr.ecci.arceshopping.model.Product;
 import cr.ac.ucr.ecci.arceshopping.api.ListProductViewInterface;
 

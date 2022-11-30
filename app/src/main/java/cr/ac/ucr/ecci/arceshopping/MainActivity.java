@@ -1,7 +1,6 @@
 package cr.ac.ucr.ecci.arceshopping;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.navigation.NavController;
@@ -9,16 +8,15 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import androidx.appcompat.widget.SearchView;
 import android.widget.Toast;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
 import java.util.ArrayList;
 
+import cr.ac.ucr.ecci.arceshopping.adapters.ProductsAdapter;
 import cr.ac.ucr.ecci.arceshopping.databinding.ActivityProductsBinding;
-import cr.ac.ucr.ecci.arceshopping.db.DbUsers;
 import cr.ac.ucr.ecci.arceshopping.model.Product;
 
 
@@ -27,25 +25,21 @@ public class MainActivity extends ConnectedActivity {
 
     ArrayList<Product> mProducts;
     ProductsAdapter productsAdapter;
+    FirebaseAuth mAuth;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityProductsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        SharedPreferences sp = getSharedPreferences("login", MODE_PRIVATE);
-        DbUsers dbUsers = new DbUsers(this);
-        String userEmail = dbUsers.getLoggedInUser();
+        mAuth = FirebaseAuth.getInstance();
+        FirebaseUser currentUser = mAuth.getCurrentUser();
 
-        if (userEmail.equals("")) {
-            sp.edit().putBoolean("logged" , false).apply();
-            sp.edit().putString("userEmail" , "").apply();
+        if (currentUser == null) { //cambiar cuando se agregue el cerrar sesión
             Intent intent = new Intent(this, LoginActivity.class);
             startActivity(intent);
         } else {
-            sp.edit().putBoolean("logged", true).apply();
-            sp.edit().putString("userEmail", userEmail).apply();
-
             BottomNavigationView navView = findViewById(R.id.nav_view);
             AppBarConfiguration appBarConfiguration = new
                     AppBarConfiguration.Builder(

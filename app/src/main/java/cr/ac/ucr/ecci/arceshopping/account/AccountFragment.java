@@ -42,11 +42,13 @@ import java.util.TimeZone;
 import java.util.UUID;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
+import cr.ac.ucr.ecci.arceshopping.ConnectedActivity;
 import cr.ac.ucr.ecci.arceshopping.ImageGetter;
 import cr.ac.ucr.ecci.arceshopping.LoginActivity;
 import cr.ac.ucr.ecci.arceshopping.R;
 import cr.ac.ucr.ecci.arceshopping.databinding.FragmentAccountBinding;
 import cr.ac.ucr.ecci.arceshopping.db.DbUsers;
+import cr.ac.ucr.ecci.arceshopping.db.FirebaseHelper;
 import cr.ac.ucr.ecci.arceshopping.model.EmailManager;
 import cr.ac.ucr.ecci.arceshopping.model.User;
 
@@ -62,6 +64,7 @@ public class AccountFragment extends Fragment {
     private Spinner province_spinner; // Province dropdown list
     private TextView tv_age;
     private Button age_button;
+    private Button logout_button;
     private Button update_password_button;
     private Button save_changes_button;
     private FragmentAccountBinding binding;
@@ -100,6 +103,14 @@ public class AccountFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 imageGetter.startPicUpdate();
+            }
+        });
+
+        logout_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ConnectedActivity parent = (ConnectedActivity) getActivity();
+                parent.endSession();
             }
         });
 
@@ -288,6 +299,7 @@ public class AccountFragment extends Fragment {
         age_button = root.findViewById(R.id.date_button);
         update_password_button = root.findViewById(R.id.change_password_button);
         save_changes_button = root.findViewById(R.id.save_changes_button);
+        logout_button = root.findViewById(R.id.logout);
     }
 
     @Override

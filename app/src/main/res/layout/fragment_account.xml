@@ -201,6 +201,7 @@
 
 
     <LinearLayout
+        android:id="@+id/options"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="40dp"
@@ -224,7 +225,17 @@
             android:layout_marginEnd="10dp"
             />
     </LinearLayout>
+    <Button
+        android:id="@+id/logout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text ="@string/logout"
+        app:layout_constraintTop_toBottomOf="@id/options"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginStart="120dp"
+        android:layout_marginTop="30dp"
 
+        />
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragmentContainer"
         android:layout_width="match_parent"
