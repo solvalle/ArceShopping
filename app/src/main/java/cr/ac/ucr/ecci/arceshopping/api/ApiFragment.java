@@ -123,34 +123,7 @@ public class ApiFragment extends Fragment implements ListProductViewInterface{
         startActivity(intent);
     }
 
-    //https://www.geeksforgeeks.org/searchview-in-android-with-recyclerview/
-    @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        // inside inflater we are inflating our menu file.
-        inflater.inflate(R.menu.search_menu, menu);
 
-        // below line is to get our menu item.
-        MenuItem searchItem = menu.findItem(R.id.actionSearch);
-
-        // getting search view of our item.
-        SearchView searchView = (SearchView) searchItem.getActionView();
-
-        // below line is to call set on query text listener method.
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                // inside on query text change method we are
-                // calling a method to filter our recycler view.
-                ((MainActivity)getActivity()).filter(newText);
-                return false;
-            }
-        });
-    }
 
     @Override
     public void onDestroyView() {
