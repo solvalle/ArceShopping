@@ -59,6 +59,8 @@ public class RegisterActivity extends ConnectedActivity {
     private TextInputLayout age;
     private Spinner province;
     ProvinceCalculator provinceCalculator;
+    FirebaseFirestore db;
+    FirebaseAuth mAuth;
     private double latitude;
     private double longitude;
     private static final int REQUEST_CODE = 1;
