@@ -46,6 +46,7 @@ public class PurchaseDetailActivity extends ConnectedActivity {
         ArrayList<Product> productsList = new ArrayList<Product>();
         RecyclerView rView = findViewById(R.id.shopping_cart);
         scAdapter = new CartRvAdapter(productsList);
+        scAdapter.setHideButtons(true);
         LinearLayoutManager lManager = new LinearLayoutManager(this);
         DividerItemDecoration divider = new DividerItemDecoration(rView.getContext(), lManager.getOrientation());
         rView.addItemDecoration(divider);

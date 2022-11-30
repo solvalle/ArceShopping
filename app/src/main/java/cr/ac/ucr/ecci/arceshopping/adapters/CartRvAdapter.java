@@ -32,9 +32,11 @@ public class CartRvAdapter extends RecyclerView.Adapter<CartRvAdapter.ViewHolder
     private FirebaseHelper firebaseHelper;
     private String userEmail;
     private Activity context;
+    private boolean hide;
 
     public CartRvAdapter(ArrayList<Product> productsList) {
         this.productsList = productsList;
+        this.hide = false;
     }
 
     public void setFirebaseHelper(FirebaseHelper firebaseHelper) {
@@ -45,9 +47,10 @@ public class CartRvAdapter extends RecyclerView.Adapter<CartRvAdapter.ViewHolder
         this.context = context;
     }
 
-    public void setUserEmail(String userEmail) {
-        this.userEmail = userEmail;
-    }
+    public void setUserEmail(String userEmail) { this.userEmail = userEmail;}
+
+    public void setHideButtons(boolean hide) { this.hide = hide;}
+
 
     @NonNull
     @Override
@@ -65,18 +68,23 @@ public class CartRvAdapter extends RecyclerView.Adapter<CartRvAdapter.ViewHolder
         holder.getProductName().setText(product.getTitle());
         holder.getPrice().setText("$"+product.getPrice());
         holder.getQuantity().setText(Integer.toString(product.getItemsInCart()));
-        holder.getAddButton().setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                holder.addCounter();
-            }
-        });
-        holder.getDeductButton().setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                holder.deductCounter();
-            }
-        });
+        if (hide) {
+            holder.addButton.setVisibility(View.GONE);
+            holder.deductButton.setVisibility(View.GONE);
+        } else {
+            holder.getAddButton().setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    holder.addCounter();
+                }
+            });
+            holder.getDeductButton().setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    holder.deductCounter();
+                }
+            });
+        }
         holder.setStock(product.getStock());
         Picasso.get().load(product.images.get(0)).into(holder.getProductPhoto());
     }
