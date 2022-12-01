@@ -2,27 +2,36 @@ package cr.ac.ucr.ecci.arceshopping;
 
 import static android.app.Activity.RESULT_OK;
 import android.app.AlertDialog;
-import android.content.ContentResolver;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 
+
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.UUID;
+
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.OnProgressListener;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+import com.squareup.picasso.Picasso;
 
 public class ImageGetter extends Fragment {
     public static final int GALLERY_RESULT = 0;
@@ -31,6 +40,9 @@ public class ImageGetter extends Fragment {
     private ImageView iView;
     private Uri pathToUserPic;
     private Context context;
+    private FirebaseFirestore db;
+    private FirebaseStorage storage;
+    private StorageReference storageReference;
 
     public ImageGetter(Context context, ImageView iView, Uri path){
         //Activity that invoked ImageGetter
@@ -41,6 +53,11 @@ public class ImageGetter extends Fragment {
         this.iView = iView;
         //Path to where the user's pic is stored.
         pathToUserPic = path;
+
+        db = FirebaseFirestore.getInstance();
+        storage = FirebaseStorage.getInstance();
+        storageReference = storage.getReference();
+
         setPicOptions();
     }
 
@@ -51,10 +68,7 @@ public class ImageGetter extends Fragment {
     /**
      *  Set click listeners, title and default message to dialog.
      **/
-
-    private void setPicOptions()
-    {
-
+    private void setPicOptions() {
         picOptions.setTitle("Actualizar imagen");
         picOptions.setMessage("¿Cómo desea actualizar su imagen de perfil?");
 
@@ -97,16 +111,17 @@ public class ImageGetter extends Fragment {
 
         if (photoFile != null) {
             //Create path for incoming image file
-            Uri photoURI = FileProvider.getUriForFile(getActivity(),
-                    "com.arceshopping.android.fileprovider",
-                    photoFile);
+            Uri photoURI = FileProvider.getUriForFile(getActivity(), "com.arceshopping.android.fileprovider", photoFile);
+
             //Save path
             pathToUserPic = photoURI;
             //Add new file to intent, so intent returns the full sized image
             //and saves it into provided path.
             takePicture.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
             startActivityForResult(takePicture, CAMERA_RESULT);
-        }else {displayMessage("Ocurrió un error");}
+        } else {
+            displayMessage("Ocurrió un error");
+        }
 
     }
 
@@ -114,7 +129,7 @@ public class ImageGetter extends Fragment {
      * Start gallery intent that shows images only.
      * */
     private void launchGallery() {
-        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT); // Intent.ACTION_OPEN_DOCUMENT
         //Display only images
         intent.setType("image/*");
         startActivityForResult(intent, GALLERY_RESULT);
@@ -125,35 +140,70 @@ public class ImageGetter extends Fragment {
      * */
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
         //If the result comes from gallery intent, then...
-        if(requestCode == GALLERY_RESULT) {
-
+        if(requestCode == GALLERY_RESULT && data != null && data.getData() != null) {
             if (resultCode == RESULT_OK) {
-                // Retrieve uri of the image user chose.
                 pathToUserPic = data.getData();
-                // Set image
-                setProfilePic();
-
-
+                iView.setImageURI(pathToUserPic);
+                uploadImage();
             }else {
                 displayMessage("No se eligió imagen");
             }
         }
+
         //If the result comes from camera intent, then...
-        if(requestCode == CAMERA_RESULT) {
-            if(resultCode == RESULT_OK )
-            {
-                //If we need the pic's thumbnail, uncomment the below line.
-              //  picFromCamera = (Bitmap) data.getExtras().get("data");
-                // Set profile pic. Path to it was saved in the cameraLaunch() method.
-                setProfilePic();
+        if(requestCode == CAMERA_RESULT && data != null && data.getData() != null) {
+            if(resultCode == RESULT_OK ) {
+                iView.setImageURI(pathToUserPic);
+                uploadImage();
             }else {
                 displayMessage("No se tomó foto");
             }
-
-
         }
     }
+
+    /**
+     * This method is used to upload an image to Firebase Storage
+     */
+    public void uploadImage() {
+        final ProgressDialog progressDialog = new ProgressDialog(context);
+        progressDialog.setTitle("Guardando imagen...");
+        progressDialog.show();
+
+        final String randomKey = UUID.randomUUID().toString();
+        StorageReference imageRef = storageReference.child("images/" + randomKey);
+        imageRef.putFile(pathToUserPic)
+                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        taskSnapshot.getStorage().getDownloadUrl()
+                                .addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                    @Override
+                                    public void onSuccess(Uri uri) {
+                                        pathToUserPic = Uri.parse(uri.toString());
+                                        progressDialog.dismiss();
+                                        displayMessage("Imagen cargada con éxito. Recuerde actualizar los cambios para que se guarde su imagen");
+                                    }
+                                });
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        progressDialog.dismiss();
+                        displayMessage("Failed to upload");
+                    }
+                })
+                .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onProgress(@NonNull UploadTask.TaskSnapshot snapshot) {
+                        double progressPercent = (100.00 * snapshot.getBytesTransferred() / snapshot.getTotalByteCount());
+                        progressDialog.setMessage("Progress: " + (int) progressPercent + "%");
+                    }
+               });
+    }
+
 
     /**
      * This method is to be used by whatever class creates an instance of
@@ -162,54 +212,13 @@ public class ImageGetter extends Fragment {
      */
     public void retrieveUserPic() {
         //If user had previously saved an image as their profile pic, retrieve it
-        if(!pathToUserPic.toString().equals("")){
-            setProfilePic();
+        if(!pathToUserPic .toString().equals("")) {
+            System.out.println("IMAGE URL: " + pathToUserPic.toString());
+            Picasso.get().load(pathToUserPic.toString()).into(iView);
         }
     }
 
-    /**
-     * This method converts pathToUri variable into a usable bitmap
-     * for the ImageView reference.
-     * */
-    private Bitmap fromUriToBitmap() {
-        Bitmap resultPicture = null;
-
-        try {
-            //Get content resolver so we can open image as stream.
-            ContentResolver cr = this.context.getContentResolver();
-            System.out.println("\n Array"+pathToUserPic.toString().split("com.arceshopping.android",3).length);
-            if(pathToUserPic.toString().split("com.arceshopping.android",3).length <= 1) {
-                System.out.println("voy a pedir");
-                //If pathToUser pic is split by the above operation, that means that the user's picture was taken from camera.
-                //In that case, the below line of code must not be executed, or else app crashes.
-                cr.takePersistableUriPermission(pathToUserPic, Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            }
-
-            //Open stream from picture's URI
-            final InputStream imageStream = cr.openInputStream(pathToUserPic);
-            //Generate bitmap from img specified in Uri
-            resultPicture = BitmapFactory.decodeStream(imageStream);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-            displayMessage("Ocurrió un error");
-        }
-        return  resultPicture;
-    }
-
-    /**
-     * Retrieve bitmap from pathToUserPic and then set it
-     * as the profile picture.
-     * */
-    private void setProfilePic() {
-        System.out.print(pathToUserPic.toString());
-        Bitmap selectedImage = fromUriToBitmap();
-        if(selectedImage != null) {
-            iView.setImageBitmap(selectedImage);
-        }
-    }
-
-    public void displayMessage(String message)
-    {
+    public void displayMessage(String message) {
         int duration = Toast.LENGTH_SHORT;
         Toast toast = Toast.makeText(context, message, duration);
         toast.show();
@@ -227,7 +236,6 @@ public class ImageGetter extends Fragment {
                 ".jpg",         /* suffix */
                 storageDir      /* directory */
         );
-
 
         return image;
     }

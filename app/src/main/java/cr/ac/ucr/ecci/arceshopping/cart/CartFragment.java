@@ -22,8 +22,12 @@ import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
 
@@ -32,6 +36,8 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
+
 
 import cr.ac.ucr.ecci.arceshopping.PurchaseHistoryActivity;
 import cr.ac.ucr.ecci.arceshopping.R;
@@ -137,6 +143,8 @@ public class CartFragment extends Fragment {
             }
         }).attachToRecyclerView(productsRV);
 
+
+
         return root;
     }
 
@@ -207,6 +215,50 @@ public class CartFragment extends Fragment {
         }
     }
 
+    private void notification(){
+        FirebaseMessaging.getInstance().getToken()
+                .addOnCompleteListener(new OnCompleteListener<String>() {
+                    @Override
+                    public void onComplete(@NonNull Task<String> task) {
+                        if (!task.isSuccessful()) {
+                            //Log.w(TAG, "Fetching FCM registration token failed", task.getException());
+                            System.out.println("Fetching FCM registration token failed: " +  task.getException());
+                            return;
+                        }
+
+                        // Get new FCM registration token
+                        String token = task.getResult();
+                        RequestQueue requestQueue= Volley.newRequestQueue(getContext());
+                        JSONObject json = new JSONObject();
+                        try {
+                            json.put("to",token);
+                            JSONObject notification = new JSONObject();
+                            notification.put("title", "Nueva compra éxitosa");
+                            notification.put("body","Has completado exitosamente una compra en Arce Shopping. Revisa tu correo para más detalles.");
+
+                            json.put("notification",notification);
+                            System.out.println("REQUEST: " + json.toString());
+                            String URL="https://fcm.googleapis.com/fcm/send";
+                            JsonObjectRequest request=new JsonObjectRequest(Request.Method.POST,URL,json,null,null){
+                                @Override
+                                public Map<String, String> getHeaders() {
+                                    Map<String,String>header=new HashMap<>();
+                                    header.put("Content-type","application/json");
+                                    header.put("Authorization","key=AAAAz2juYxw:APA91bFP8XUkd5NDlnv40jC9FaGqyzZ3aJlubAm2rt7SFXYlVe92v8sx7fdrEV03PFIJ8T7hx6NRFCAD78ghUY9vjXr1j0URL1y7KMzTMMjJnhMI_-zoTNEC9X5Crn5EstBc_hvRvox4");
+
+                                    return header;
+                                }
+                            };
+                            requestQueue.add(request);
+                        }catch (JSONException e){
+                            e.printStackTrace();
+                        }
+
+
+                    }
+                });
+    }
+
     /**
      * This method is attached to the "cancel button". This method clears the cart, including the
      * data stored in the data base
@@ -216,14 +268,14 @@ public class CartFragment extends Fragment {
         boolean deleted = dbShoppingCart.deleteUserCart(user.getEmail());
 
         if(deleted) {
-            Toast.makeText(root.getContext(), "Compra exitosa. Revisa tu correo",
-                    Toast.LENGTH_SHORT).show();
             EmailManager emailManager = new EmailManager();
             emailManager.sendPurchaseEmail(user.getName(), user.getEmail(),productList, priceTV.getText().toString());
             productList.clear();
             productsRV.setAdapter(null);
             emptyCartTV.setVisibility(View.VISIBLE);
             priceTV.setText("$0");
+            notification();
+
         } else {
             Toast.makeText(root.getContext(), "Ocurrió un problema con el carrito. Intentelo de nuevo",
                     Toast.LENGTH_SHORT).show();

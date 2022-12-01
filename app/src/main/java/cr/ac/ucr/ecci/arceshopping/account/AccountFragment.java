@@ -6,11 +6,9 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -25,19 +23,24 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.datepicker.MaterialPickerOnPositiveButtonClickListener;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Locale;
 import java.util.TimeZone;
 import java.util.UUID;
 
@@ -46,14 +49,12 @@ import cr.ac.ucr.ecci.arceshopping.ImageGetter;
 import cr.ac.ucr.ecci.arceshopping.LoginActivity;
 import cr.ac.ucr.ecci.arceshopping.R;
 import cr.ac.ucr.ecci.arceshopping.databinding.FragmentAccountBinding;
-import cr.ac.ucr.ecci.arceshopping.db.DbUsers;
 import cr.ac.ucr.ecci.arceshopping.model.EmailManager;
 import cr.ac.ucr.ecci.arceshopping.model.User;
 
 
 public class AccountFragment extends Fragment {
     private User loggedInUser;
-    private DbUsers dbUsers;
     private ImageView user_pic;
     private Button change_pic_button;
     private TextInputLayout til_name;
@@ -68,27 +69,53 @@ public class AccountFragment extends Fragment {
     private Uri pathToUserPic; //Contains user's profile picture path
     private ImageGetter imageGetter;
     private MaterialDatePicker materialDatePicker;
+    private FirebaseFirestore db;
+    private FirebaseAuth mAuth;
+
+
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             ViewGroup container, Bundle savedInstanceState)
-    {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentAccountBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
         //Retrieve an instance so we can save changes to db
-        dbUsers = new DbUsers(getActivity());
+        db = FirebaseFirestore.getInstance();
+        mAuth = FirebaseAuth.getInstance();
+
         //Retrieve user email so we can retrieve their data from db
         SharedPreferences sp = getActivity().getSharedPreferences("login", MODE_PRIVATE);
-        loggedInUser = dbUsers.selectUser(sp.getString("userEmail", "DEFAULT"));
+        setUserFromDataBase(sp.getString("userEmail", "DEFAULT"));
+
         MaterialDatePicker.Builder materialDateBuilder = MaterialDatePicker.Builder.datePicker();
         materialDateBuilder.setTitleText("Seleccione una fecha");
         materialDatePicker = materialDateBuilder.build();
 
         //Retrieve xml elements so we can populate them with user data
         retrieveXmlElements(root);
-        setData();
-        setClickEvents();
 
         return root;
+    }
+    /**
+     * Load user info from Firebase
+     * @param email the user email
+     * */
+    private void setUserFromDataBase(String email){
+        db.collection("User")
+                .whereEqualTo("email", email)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if(!task.getResult().isEmpty()){
+                            DocumentSnapshot userData = task.getResult().getDocuments().get(0);
+                            loggedInUser = new User(email, userData.get("id").toString(), userData.get("name").toString(),
+                                    userData.get("path").toString(), Integer.parseInt(userData.get("age").toString()),
+                                    userData.get("province").toString(), userData.getBoolean("passwordIsChanged"));
+
+                            setData();
+                            setClickEvents();
+                        }
+                    }
+                });
     }
 
 
@@ -141,67 +168,62 @@ public class AccountFragment extends Fragment {
      */
     private void saveChanges() {
         //Build sql string as program verifies which fields have been modified
-        String changesToSqlString = " SET ";
+        boolean changes = false;
         String til_name_content = til_name.getEditText().getText().toString();
         if(!loggedInUser.getName().equals(til_name_content)) {
-            changesToSqlString += "name = \"" +  til_name_content +"\",";
             this.loggedInUser.setName(til_name_content);
-        }
-/*
-        String til_email_content = til_email.getEditText().getText().toString();
-        if(!loggedInUser.getEmail().equals(til_email_content)) {
-            changesToSqlString += "email = \"" + til_email_content + "\",";
+            changes = true;
         }
 
-        String til_id_content = til_id.getEditText().getText().toString();
-        if(!loggedInUser.getId().equals(til_id_content)) {
-            changesToSqlString += "id =\"" + til_id_content + "\",";
-        }
-*/
         if(!loggedInUser.getPath().equals(imageGetter.getUriPath())) {
-            changesToSqlString += "path = \"" + imageGetter.getUriPath() + "\",";
             this.loggedInUser.setPath(imageGetter.getUriPath());
-            System.out.println(this.loggedInUser.getPath());
+            changes = true;
         }
 
         int tv_age_content = Integer.valueOf(tv_age.getText().toString());
         if(loggedInUser.getAge() != tv_age_content) {
-            changesToSqlString += "age = \"" + String.valueOf(tv_age_content) + "\",";
             this.loggedInUser.setAge(tv_age_content);
+            changes = true;
         }
 
         String province_spinner_content = province_spinner.getSelectedItem().toString();
         if(!loggedInUser.getProvince().equals(province_spinner_content)) {
-            changesToSqlString += "province = \"" + province_spinner_content + "\"";
             this.loggedInUser.setProvince(province_spinner_content);
+            changes = true;
         }
         //Only save into db if any field was actually modified
-        if(changesToSqlString.length() > 6) {
-            //Remove last comma if there is any, to avoid syntax errors
-            char lastComma = changesToSqlString.charAt(changesToSqlString.length() -1);
-
-            if(lastComma == ',')
-            {
-                changesToSqlString = changesToSqlString.substring(0, changesToSqlString.length()-1);
-                System.out.println(changesToSqlString);
-            }
-            //Finally, save changes into user's row
-            changesToSqlString += " WHERE email = \"" + loggedInUser.getEmail() + "\"";
-            if(dbUsers.updateUserDetails(changesToSqlString)){
-                /*
-                //Update data in memory and update shared preferences
-                SharedPreferences sp = getActivity().getSharedPreferences("login", MODE_PRIVATE);
-                sp.edit().putString("userEmail",til_email_content).apply();
-                loggedInUser = dbUsers.selectUser(sp.getString("userEmail", "DEFAULT"));
-                */
-                imageGetter.displayMessage("Cambios guardados exitosamente");
-
-            }else{
-                imageGetter.displayMessage("Ocurrió un error");
-            }
+        if(changes) {
+            updateUserDetails();
         } else {
             imageGetter.displayMessage("No hay cambios que guardar.");
         }
+    }
+
+    /**
+     * Update user info in Firebase
+     * */
+    private void updateUserDetails() {
+        db.collection("User")
+                .whereEqualTo("email", loggedInUser.getEmail())
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if(!task.getResult().isEmpty()){
+                            String docId = task.getResult().getDocuments().get(0).getId();
+
+                            db.collection("User")
+                                    .document(docId)
+                                    .set(loggedInUser)
+                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void unused){
+                                            Toast.makeText(getContext(), "Cambios guardados exitosamente", Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                        }
+                    }
+                });
     }
 
     /**
@@ -212,7 +234,10 @@ public class AccountFragment extends Fragment {
         String firstPassword = UUID.randomUUID().toString().substring(0, 16);
         String hashedPassword = BCrypt.withDefaults().hashToString(12, firstPassword.toCharArray());
         String email = loggedInUser.getEmail();
-        this.dbUsers.updateUserPassword(email, hashedPassword, 0);
+
+        FirebaseUser user = mAuth.getCurrentUser();
+        user.updatePassword(hashedPassword);
+
         EmailManager manager = new EmailManager();
         manager.sendPasswordEmail(loggedInUser.getName(), email, firstPassword);
         System.out.println(firstPassword);
@@ -245,33 +270,35 @@ public class AccountFragment extends Fragment {
      * Sets the data to the corresponding views
      */
     private void setData(){
-        til_name.getEditText().setText(loggedInUser.getName());
-        tv_id.setText(loggedInUser.getId());
-        tv_email.setText(loggedInUser.getEmail());
+        if(loggedInUser != null) {
+            til_name.getEditText().setText(loggedInUser.getName());
+            tv_id.setText(loggedInUser.getId());
+            tv_email.setText(loggedInUser.getEmail());
 
-        //TODO: Learn to save the provinces array in the strings.xml file so it can be used here and
-        //on the register screen
-        ArrayList<String> provinces = new ArrayList<String>(Arrays.asList("Alajuela", "Cartago", "Heredia",
-                "Guanacaste", "Puntarenas","San José",  "Limón"));
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),
-                com.google.android.material.R.layout.support_simple_spinner_dropdown_item, provinces);
-        province_spinner.setAdapter(adapter);
-        //adapter.getPosition() is how we get the index number for the user's province
-        province_spinner.setSelection(adapter.getPosition(loggedInUser.getProvince()));
-        tv_age.setText(String.valueOf(loggedInUser.getAge()));
+            //TODO: Learn to save the provinces array in the strings.xml file so it can be used here and
+            //on the register screen
+            ArrayList<String> provinces = new ArrayList<String>(Arrays.asList("Alajuela", "Cartago", "Heredia",
+                    "Guanacaste", "Puntarenas", "San José", "Limón"));
+            ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),
+                    com.google.android.material.R.layout.support_simple_spinner_dropdown_item, provinces);
+            province_spinner.setAdapter(adapter);
+            //adapter.getPosition() is how we get the index number for the user's province
+            province_spinner.setSelection(adapter.getPosition(loggedInUser.getProvince()));
+            tv_age.setText(String.valueOf(loggedInUser.getAge()));
 
-        //Get profile pic path from user and turn it into an URI object
-        pathToUserPic = Uri.parse(loggedInUser.getPath());
+            //Get profile pic path from user and turn it into an URI object
+            pathToUserPic = Uri.parse(loggedInUser.getPath());
 
-        //Give a context, an image view and a URI object to imageGetter
-        imageGetter = new ImageGetter(getContext(), user_pic, pathToUserPic);
-        imageGetter.retrieveUserPic();
+            //Give a context, an image view and a URI object to imageGetter
+            imageGetter = new ImageGetter(getContext(), user_pic, pathToUserPic);
+            imageGetter.retrieveUserPic();
 
-        //ImageGetter needs to be attached to account fragment's activity so it can start intents
-        // and avoid runtime errors
-        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.fragmentContainer, imageGetter).commit();
+            //ImageGetter needs to be attached to account fragment's activity so it can start intents
+            // and avoid runtime errors
+            FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction.replace(R.id.fragmentContainer, imageGetter).commit();
+        }
     }
 
     /**
@@ -295,6 +322,4 @@ public class AccountFragment extends Fragment {
         super.onDestroyView();
         binding = null;
     }
-
-
 }

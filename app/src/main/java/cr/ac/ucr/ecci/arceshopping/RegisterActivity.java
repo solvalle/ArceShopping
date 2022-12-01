@@ -22,25 +22,13 @@ import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.regex.Pattern;
-import java.util.Properties;
 import java.util.UUID;
 
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.PasswordAuthentication;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
-
-import at.favre.lib.crypto.bcrypt.BCrypt;
-import cr.ac.ucr.ecci.arceshopping.db.DbUsers;
 import cr.ac.ucr.ecci.arceshopping.model.EmailManager;
 import cr.ac.ucr.ecci.arceshopping.model.User;
 
