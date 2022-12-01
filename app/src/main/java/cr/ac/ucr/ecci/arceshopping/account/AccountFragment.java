@@ -47,6 +47,8 @@ import java.util.UUID;
 import at.favre.lib.crypto.bcrypt.BCrypt;
 import cr.ac.ucr.ecci.arceshopping.ImageGetter;
 import cr.ac.ucr.ecci.arceshopping.LoginActivity;
+import cr.ac.ucr.ecci.arceshopping.MainActivity;
+import cr.ac.ucr.ecci.arceshopping.PasswordChangeActivity;
 import cr.ac.ucr.ecci.arceshopping.R;
 import cr.ac.ucr.ecci.arceshopping.databinding.FragmentAccountBinding;
 import cr.ac.ucr.ecci.arceshopping.model.EmailManager;
@@ -232,19 +234,56 @@ public class AccountFragment extends Fragment {
      */
     private void changePassword(){
         String firstPassword = UUID.randomUUID().toString().substring(0, 16);
-        String hashedPassword = BCrypt.withDefaults().hashToString(12, firstPassword.toCharArray());
         String email = loggedInUser.getEmail();
 
         FirebaseUser user = mAuth.getCurrentUser();
-        user.updatePassword(hashedPassword);
+        user.updatePassword(firstPassword);
 
-        EmailManager manager = new EmailManager();
-        manager.sendPasswordEmail(loggedInUser.getName(), email, firstPassword);
-        System.out.println(firstPassword);
-        Toast.makeText(getContext(), "Se le envió una contraseña temporal al correo",
-                Toast.LENGTH_LONG).show();
-        Intent intent = new Intent(getContext(), LoginActivity.class);
-        startActivity(intent);
+        user.updatePassword(firstPassword).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (task.isSuccessful())
+                {
+                    EmailManager manager = new EmailManager();
+                    manager.sendPasswordEmail(loggedInUser.getName(), email, firstPassword);
+                    Toast.makeText(getContext(), "Se le envió un correo temporal",
+                            Toast.LENGTH_LONG).show();
+                    if (changeInDb(user.getUid())) {
+                        mAuth.signOut();
+                        Intent intent = new Intent(getContext(), MainActivity.class);
+                        startActivity(intent);
+                    }
+                } else
+                {
+                    Toast.makeText(getContext(), "Hubo un error, puede que tenga que cerrar sesión y volver a iniciar", Toast.LENGTH_LONG).show();
+                    System.out.println(task.getException());
+                }
+            }
+        });
+    }
+
+    /**
+     * Change the user's password in Cloud FireStone from fireBase
+     * @param userId The id to identify the current user
+     * @return true if the password was changed in FireBase, false otherwise
+     */
+    private boolean changeInDb(String userId)
+    {
+        final boolean[] success = {true};
+        db.collection("User").document(userId).update("passwordIsChanged", false).
+                addOnCompleteListener( new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (!task.isSuccessful())
+                        {
+                            System.out.println(task.getException().toString());
+                            Toast.makeText(getContext(), "Hubo un error, " +
+                                    "intente otra vez", Toast.LENGTH_LONG).show();
+                            success[0] = false;
+                        }
+                    }
+                });
+        return success[0];
     }
 
     /**
