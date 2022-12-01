@@ -24,13 +24,25 @@ import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.regex.Pattern;
+import java.util.Properties;
 import java.util.UUID;
 
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+
+import at.favre.lib.crypto.bcrypt.BCrypt;
+import cr.ac.ucr.ecci.arceshopping.db.DbUsers;
 import cr.ac.ucr.ecci.arceshopping.model.EmailManager;
 import cr.ac.ucr.ecci.arceshopping.model.User;
 
@@ -74,7 +86,6 @@ public class RegisterActivity extends ConnectedActivity {
         mAuth = FirebaseAuth.getInstance();
 
     }
-
     public void register(View view) {
         String theId = id.getEditText().getText().toString();
         String theCompleteName = completeName.getEditText().getText().toString();
@@ -83,25 +94,38 @@ public class RegisterActivity extends ConnectedActivity {
         String theProvince = province.getSelectedItem().toString();
         if (checkStrings(theId, theCompleteName, theEmail, theAge)) {
             String firstPassword = UUID.randomUUID().toString().substring(0, 16);
-            String hashedPassword = BCrypt.withDefaults().hashToString(12, firstPassword.toCharArray());
-            DbUsers dbUsers = new DbUsers(this);
-            User user = dbUsers.selectUser(theEmail);
-            if (user == null) {
-                //empty space is path to user
-                long insert_id = dbUsers.insertUser(theEmail, theId, theCompleteName, "",Integer.parseInt(theAge), theProvince, hashedPassword);
-                if (insert_id > 0) {
-                    EmailManager emailManager = new EmailManager();
-                    System.out.println(firstPassword);
-                    emailManager.sendPasswordEmail(theCompleteName,theEmail, firstPassword);
-                    Toast.makeText(this, "Registro exitoso", Toast.LENGTH_LONG).show();
-                    Intent intent = new Intent(this, LoginActivity.class);
-                    startActivity(intent);
-                } else {
-                    Toast.makeText(this, "Error al registrar", Toast.LENGTH_LONG).show();
-                }
-            } else {
-                Toast.makeText(this, "Correo electronico ya registrado", Toast.LENGTH_LONG).show();
-            }
+            mAuth.createUserWithEmailAndPassword(theEmail, firstPassword).addOnCompleteListener(
+                    new OnCompleteListener<AuthResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task) {
+                            if (task.isSuccessful())
+                            {
+                                FirebaseUser newUser = mAuth.getCurrentUser();
+                                User user = new User(theEmail, theId, theCompleteName, "",
+                                        Integer.parseInt(theAge), theProvince, false);
+                                db.collection("User").document(newUser.getUid()).set(user).addOnCompleteListener(
+                                        new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<Void> task) {
+                                                if (task.isSuccessful())
+                                                {
+                                                    EmailManager emailManager = new EmailManager();
+                                                    System.out.println(firstPassword);
+                                                    emailManager.sendPasswordEmail(theCompleteName,theEmail, firstPassword);
+                                                    Toast.makeText(RegisterActivity.this,
+                                                            "Registro exitoso", Toast.LENGTH_LONG).show();
+                                                    finish();
+                                                } else {
+                                                    System.out.println(task.getException().toString());
+                                                }
+                                            }
+                                        }
+                                );
+                            } else {
+                                System.out.println(task.getException().toString());
+                            }
+                        }
+                    });
         }
     }
 
@@ -209,21 +233,21 @@ public class RegisterActivity extends ConnectedActivity {
             }
             LocationServices.getFusedLocationProviderClient(this).requestLocationUpdates(locationRequest,
                     new LocationCallback()
-            {
-                @Override
-                public void onLocationResult(LocationResult locationResult) {
-                    super.onLocationResult(locationResult);
-                    LocationServices.getFusedLocationProviderClient(RegisterActivity.this).removeLocationUpdates(this);
-                    if (locationResult != null && locationResult.getLocations().size() > 0) {
-                        int latestLocationIndex = locationResult.getLocations().size() - 1;
-                        latitude = locationResult.getLocations().get(latestLocationIndex).getLatitude();
-                        longitude = locationResult.getLocations().get(latestLocationIndex).getLongitude();
-                        System.out.println(latitude + " " + longitude);
-                        province.setSelection(provinceCalculator.calculateProvince(latitude, longitude));
-                    }
-                }
+                    {
+                        @Override
+                        public void onLocationResult(LocationResult locationResult) {
+                            super.onLocationResult(locationResult);
+                            LocationServices.getFusedLocationProviderClient(RegisterActivity.this).removeLocationUpdates(this);
+                            if (locationResult != null && locationResult.getLocations().size() > 0) {
+                                int latestLocationIndex = locationResult.getLocations().size() - 1;
+                                latitude = locationResult.getLocations().get(latestLocationIndex).getLatitude();
+                                longitude = locationResult.getLocations().get(latestLocationIndex).getLongitude();
+                                System.out.println(latitude + " " + longitude);
+                                province.setSelection(provinceCalculator.calculateProvince(latitude, longitude));
+                            }
+                        }
 
-            }, Looper.myLooper());
+                    }, Looper.myLooper());
 
         }catch (Exception e){
             System.out.println(e);

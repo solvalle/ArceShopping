@@ -78,8 +78,6 @@ public class CartFragment extends Fragment implements ICartResponder {
         this.shoppingCart = new HashMap<String,Integer>();
         SharedPreferences sp = getActivity().getSharedPreferences("login", Context.MODE_PRIVATE);
 
-        //DbUsers dbUsers = new DbUsers(root.getContext());
-        //this.user = dbUsers.selectUser(sp.getString("userEmail",""));
         this.firebaseHelper = new FirebaseHelper();
         firebaseHelper.setCartResponder(this);
         firebaseHelper.selectUser(sp.getString("userEmail",""));
@@ -93,8 +91,6 @@ public class CartFragment extends Fragment implements ICartResponder {
         emptyCartTV = (TextView) root.findViewById(R.id.emptyCart);
         this.adapter = new CartRvAdapter(this.productList);
 
-        if(user.getPath().compareTo("") > 0)
-            Picasso.get().load(user.getPath()).into(userPhotoIV);
 
         //this.dbShoppingCart = new DbShoppingCart(root.getContext());
 
@@ -200,9 +196,7 @@ public class CartFragment extends Fragment implements ICartResponder {
      * data stored in the data base
      */
     private void cleanCart(View root) {
-        //DbShoppingCart dbShoppingCart = new DbShoppingCart(root.getContext());
-        // Delete the data base
-        //dbShoppingCart.deleteUserCart(user.getEmail());
+
         if(!shoppingCart.isEmpty()) {
             firebaseHelper.clearShoppingCart(user.getEmail());
         }
