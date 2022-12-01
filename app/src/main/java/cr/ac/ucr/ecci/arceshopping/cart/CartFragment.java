@@ -23,8 +23,12 @@ import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
 
@@ -33,6 +37,8 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
+
 
 import cr.ac.ucr.ecci.arceshopping.ICartResponder;
 import cr.ac.ucr.ecci.arceshopping.PurchaseHistoryActivity;
@@ -87,6 +93,8 @@ public class CartFragment extends Fragment implements ICartResponder {
         emptyCartTV = (TextView) root.findViewById(R.id.emptyCart);
         this.adapter = new CartRvAdapter(this.productList);
 
+        if(user.getPath().compareTo("") > 0)
+            Picasso.get().load(user.getPath()).into(userPhotoIV);
 
         //this.dbShoppingCart = new DbShoppingCart(root.getContext());
 
@@ -126,7 +134,6 @@ public class CartFragment extends Fragment implements ICartResponder {
                 adapter.setProductsList(productList);
                 firebaseHelper.getTotalPriceOfUserShoppingCart(user.getEmail());
                 adapter.notifyDataSetChanged();
-
                 if (productList.size() == 0)
                 {
                     productsRV.setAdapter(null);
@@ -199,7 +206,51 @@ public class CartFragment extends Fragment implements ICartResponder {
         if(!shoppingCart.isEmpty()) {
             firebaseHelper.clearShoppingCart(user.getEmail());
         }
-        // Reflect the data on the screen
+
+    }
+
+    private void notification(){
+        FirebaseMessaging.getInstance().getToken()
+                .addOnCompleteListener(new OnCompleteListener<String>() {
+                    @Override
+                    public void onComplete(@NonNull Task<String> task) {
+                        if (!task.isSuccessful()) {
+                            //Log.w(TAG, "Fetching FCM registration token failed", task.getException());
+                            System.out.println("Fetching FCM registration token failed: " +  task.getException());
+                            return;
+                        }
+
+                        // Get new FCM registration token
+                        String token = task.getResult();
+                        RequestQueue requestQueue= Volley.newRequestQueue(getContext());
+                        JSONObject json = new JSONObject();
+                        try {
+                            json.put("to",token);
+                            JSONObject notification = new JSONObject();
+                            notification.put("title", "Nueva compra éxitosa");
+                            notification.put("body","Has completado exitosamente una compra en Arce Shopping. Revisa tu correo para más detalles.");
+
+                            json.put("notification",notification);
+                            System.out.println("REQUEST: " + json.toString());
+                            String URL="https://fcm.googleapis.com/fcm/send";
+                            JsonObjectRequest request=new JsonObjectRequest(Request.Method.POST,URL,json,null,null){
+                                @Override
+                                public Map<String, String> getHeaders() {
+                                    Map<String,String>header=new HashMap<>();
+                                    header.put("Content-type","application/json");
+                                    header.put("Authorization","key=AAAAz2juYxw:APA91bFP8XUkd5NDlnv40jC9FaGqyzZ3aJlubAm2rt7SFXYlVe92v8sx7fdrEV03PFIJ8T7hx6NRFCAD78ghUY9vjXr1j0URL1y7KMzTMMjJnhMI_-zoTNEC9X5Crn5EstBc_hvRvox4");
+
+                                    return header;
+                                }
+                            };
+                            requestQueue.add(request);
+                        }catch (JSONException e){
+                            e.printStackTrace();
+                        }
+
+
+                    }
+                });
     }
 
     /**
@@ -230,6 +281,7 @@ public class CartFragment extends Fragment implements ICartResponder {
             EmailManager emailManager = new EmailManager();
             emailManager.sendPurchaseEmail(user.getName(), user.getEmail(),productList, priceTV.getText().toString());
             clearUI();
+            notification();
         } else {
             Toast.makeText(getActivity(), "Ocurrió un problema con el carrito. Intentelo de nuevo",
                     Toast.LENGTH_SHORT).show();
@@ -285,6 +337,5 @@ public class CartFragment extends Fragment implements ICartResponder {
         firebaseHelper.getShoppingCart(this.user.getEmail(), shoppingCart); //dbShoppingCart.selectUserShoppingCart(user.getEmail());
 
     }
-
 
 }
