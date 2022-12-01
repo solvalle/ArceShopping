@@ -35,7 +35,7 @@ public class ConnectedActivity extends AppCompatActivity {
                 @Override
                 public void onLost(@NonNull Network network) {
                     super.onLost(network);
-                    endSession();
+                    endSession(true);
                 }
 
                 @Override
@@ -55,8 +55,10 @@ public class ConnectedActivity extends AppCompatActivity {
 
             };
 
-    public void endSession(){
-        displayMessage("Se ha perdido la conexion.");
+    public void endSession(boolean disconnected){
+        if(disconnected) {
+            displayMessage("Se ha perdido la conexion.");
+        }
         FirebaseHelper.logOut();
         returnToLoginActivity();
     }

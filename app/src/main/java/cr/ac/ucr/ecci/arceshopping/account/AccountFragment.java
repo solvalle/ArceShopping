@@ -45,6 +45,7 @@ import java.util.TimeZone;
 import java.util.UUID;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
+import cr.ac.ucr.ecci.arceshopping.ConnectedActivity;
 import cr.ac.ucr.ecci.arceshopping.ImageGetter;
 import cr.ac.ucr.ecci.arceshopping.LoginActivity;
 import cr.ac.ucr.ecci.arceshopping.MainActivity;
@@ -153,6 +154,13 @@ public class AccountFragment extends Fragment {
             }
         });
 
+        getView().findViewById(R.id.logout).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                endSession();
+            }
+        });
+
         materialDatePicker.addOnPositiveButtonClickListener(
                 new MaterialPickerOnPositiveButtonClickListener<Long>() {
                     @SuppressLint("SetTextI18n")
@@ -161,6 +169,11 @@ public class AccountFragment extends Fragment {
                         calculateAge(selection);
                     }
                 });
+    }
+
+    private void endSession(){
+        ConnectedActivity activity = (ConnectedActivity) getActivity();
+        activity.endSession(false);
     }
 
     /**
