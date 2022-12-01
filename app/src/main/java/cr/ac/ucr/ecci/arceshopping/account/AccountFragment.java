@@ -80,8 +80,7 @@ public class AccountFragment extends Fragment {
         binding = FragmentAccountBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
         //Retrieve an instance so we can save changes to db
-        db = FirebaseFirestore.getInstance();
-        mAuth = FirebaseAuth.getInstance();
+        getInstances();
 
         //Retrieve user email so we can retrieve their data from db
         SharedPreferences sp = getActivity().getSharedPreferences("login", MODE_PRIVATE);
@@ -237,8 +236,10 @@ public class AccountFragment extends Fragment {
         String email = loggedInUser.getEmail();
 
         FirebaseUser user = mAuth.getCurrentUser();
-        user.updatePassword(firstPassword);
-
+        if (user == null) {
+            Intent intent = new Intent(getContext(), LoginActivity.class);
+            startActivity(intent);
+        }
         user.updatePassword(firstPassword).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
@@ -257,9 +258,15 @@ public class AccountFragment extends Fragment {
                 {
                     Toast.makeText(getContext(), "Hubo un error, puede que tenga que cerrar sesión y volver a iniciar", Toast.LENGTH_LONG).show();
                     System.out.println(task.getException());
+                    getInstances();
                 }
             }
         });
+    }
+
+    public void getInstances() {
+        db = FirebaseFirestore.getInstance();
+        mAuth = FirebaseAuth.getInstance();
     }
 
     /**
@@ -280,6 +287,7 @@ public class AccountFragment extends Fragment {
                             Toast.makeText(getContext(), "Hubo un error, " +
                                     "intente otra vez", Toast.LENGTH_LONG).show();
                             success[0] = false;
+                            System.out.println(task.getException());
                         }
                     }
                 });
