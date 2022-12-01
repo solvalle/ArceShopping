@@ -153,7 +153,7 @@ public class ImageGetter extends Fragment {
         }
 
         //If the result comes from camera intent, then...
-        if(requestCode == CAMERA_RESULT && data != null && data.getData() != null) {
+        if(requestCode == CAMERA_RESULT) {
             if(resultCode == RESULT_OK ) {
                 iView.setImageURI(pathToUserPic);
                 uploadImage();
@@ -183,7 +183,7 @@ public class ImageGetter extends Fragment {
                                     public void onSuccess(Uri uri) {
                                         pathToUserPic = Uri.parse(uri.toString());
                                         progressDialog.dismiss();
-                                        displayMessage("Imagen cargada con éxito. Recuerde actualizar los cambios para que se guarde su imagen");
+                                        displayMessage("Imagen cargada con éxito. Recuerde actualizar los cambios.");
                                     }
                                 });
                     }
